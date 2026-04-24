@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://byjtw0yjya7ia"]
+
+[ext_resource type="Texture2D" uid="uid://br6c7nhmyl5dx" path="res://Textures/NoteBase.jpg" id="1_6w4eq"]
+[ext_resource type="Script" uid="uid://brm0k422e5mbt" path="res://Scripts/Note.gd" id="2_cp8im"]
+
+[node name="Note" type="Node2D" unique_id=1307802017]
+script = ExtResource("2_cp8im")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729566812]
+position = Vector2(12, 0)
+texture = ExtResource("1_6w4eq")

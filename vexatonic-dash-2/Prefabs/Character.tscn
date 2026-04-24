@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://db3llundjhedf"]
+
+[ext_resource type="Script" uid="uid://dcm8fyygstrbs" path="res://Scripts/Character.gd" id="1_dkyrv"]
+[ext_resource type="Texture2D" uid="uid://dlso3gh16d8w6" path="res://Textures/daxbotsheet.png" id="2_2evft"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n3ll4"]
+atlas = ExtResource("2_2evft")
+region = Rect2(0, 0, 64, 68)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s42lw"]
+atlas = ExtResource("2_2evft")
+region = Rect2(64, 0, 64, 68)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bh4iq"]
+atlas = ExtResource("2_2evft")
+region = Rect2(128, 0, 64, 68)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r0cns"]
+atlas = ExtResource("2_2evft")
+region = Rect2(192, 0, 64, 68)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cwwu3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n3ll4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s42lw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bh4iq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r0cns")
+}],
+"loop": true,
+"name": &"new_animation",
+"speed": 10.0
+}]
+
+[node name="Character" type="Node2D" unique_id=995761361]
+script = ExtResource("1_dkyrv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1796983103]
+position = Vector2(0, -26)
+sprite_frames = SubResource("SpriteFrames_cwwu3")
+animation = &"new_animation"
+frame = 3
+frame_progress = 0.267931

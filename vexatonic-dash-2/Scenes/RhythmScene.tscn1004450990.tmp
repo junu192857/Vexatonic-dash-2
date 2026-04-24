@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+
+[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+
+[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+
+[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+script = ExtResource("1_7jauh")
+
+[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+script = ExtResource("2_wib5u")
+NOTE_SCENE = ExtResource("3_4pq8y")
+CONNECTOR_SCENE = ExtResource("4_wjq5j")
+
+[node name="Character" type="AnimatedSprite2D" parent="." unique_id=165243957]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1505561183]
