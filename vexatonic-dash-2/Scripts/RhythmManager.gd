@@ -19,10 +19,7 @@ func _ready() -> void:
 	InputHandler.note_pressed.connect(_on_pressed)
 	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
 	render_chart()
-	
-	for lane:Lane in lanes:
-		lane.print_data()
-		lane.sort_notes()
+
 	print(noteDatas.size())
 	
 	#RhythmScene으로 넘어온 뒤 3초 후 게임 시작
@@ -88,6 +85,10 @@ func render_chart():
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
+	for lane:Lane in lanes:
+		lane.print_data()
+		lane.sort_notes()
+		place_final_connector(lane)
 
 func place_note(data:NoteData, pos_x: float, original:bool) -> Node2D:
 	var note = NOTE_SCENE.instantiate() as Node2D
@@ -120,7 +121,13 @@ func place_initial_connector():
 	connector.set_connector_data(-1, -3000, 0, null, false)
 	add_child(connector)
 	
-
+func place_final_connector(lane: Lane):
+	print("LANE SIZE: %d" % lane.notes.size())
+	if (!lane.notes.is_empty()):
+		var last_note_time = lane.notes[-1].data.end_time #find last note or marker
+		if lane.keyframes[-1].x - last_note_time > Setting.time_per_note_width:
+			var final_connector = place_connector(-1, last_note_time + Setting.time_per_note_width, lane.keyframes[-1].x, lane.lane_index, true)
+			add_child(final_connector)
 	
 func assign_note(note: Note):
 	var lane = Lane.find_lane(lanes, note.data.lane)
