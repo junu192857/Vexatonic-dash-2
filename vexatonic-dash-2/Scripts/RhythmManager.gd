@@ -139,7 +139,11 @@ func render_chart():
 func place_note(data:NoteData, pos_x: float, original:bool) -> Node2D:
 	var note = NOTE_SCENE.instantiate() as Node2D
 	note.set_data(data)
-	note.position = Vector2(pos_x, -Lane.find_lane(lanes, data.lane).get_height(data.time) if original else 0)
+	var lane = Lane.find_lane(lanes, data.lane)
+	if original:
+		note.position = Vector2(pos_x, -lane.get_height(data.time))
+	else:
+		note.position = Vector2(pos_x, -(lane.get_height(data.end_time) - lane.get_height(data.time)))
 	#print("Place Note at %f"% pos_x)
 	return note
 
@@ -154,7 +158,7 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int)
 	
 func place_initial_connector():
 	var connector = CONNECTOR_SCENE.instantiate() as Node2D
-	connector.position = Vector2(-1000,0)
+	connector.position = Vector2(-1500,0)
 	connector.set_connector_data(-1, -3000, 0)
 	add_child(connector)
 	

@@ -18,18 +18,22 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane = null):
 		var start_height = p_lane.get_height(start_time)
 		for kf in p_lane.keyframes:
 			if kf.x > start_time:
-				calculated_delta_y = kf.y - start_height
-				connector_ended = false
+				if kf.x >= end_time:
+					calculated_delta_y = p_lane.get_height(end_time) - start_height
+				else:
+					calculated_delta_y = kf.y - start_height
+					connector_ended = false
+					#TODO: connector 이어서 만들기
 				break
 				
 	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)
 
 func _ready():
 	polygon.polygon = PackedVector2Array([
-		Vector2(0,-25-data.delta_y), #좌상
+		Vector2(0,-25), #좌상
 		Vector2(data.length,-25-data.delta_y), #우상
 		Vector2(data.length,25-data.delta_y), #우하
-		Vector2(0,25-data.delta_y) #좌하
+		Vector2(0,25) #좌하
 	])
 	polygon.uv = PackedVector2Array([
 		Vector2(0,0),
