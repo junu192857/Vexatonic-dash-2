@@ -1,9 +1,6 @@
 # time  color  type  end_time  lane
 0 0 0 0 0
-500 1 0 0 0
-1000 2 1 1200 0
-1400 0 0 0 0
-1600 1 1 4500 0
+1000 2 0 0 0
 
 # lane information: 오직 꺾이는 부분에 대한 정보만 가지고 있음.
 # LANE index
@@ -14,7 +11,8 @@
 
 LANE 0
 0 0
-3000 200
+500 100
+3000 100
 END
 
 LANE 1

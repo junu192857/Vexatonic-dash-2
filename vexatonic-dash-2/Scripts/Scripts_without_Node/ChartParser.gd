@@ -1,9 +1,5 @@
 class_name ChartParser
 
-enum NoteColor { RED = 0, BLUE = 1, YELLOW = 2 }
-enum NoteType { SHORT = 0, LONG = 1 }
-
-
 static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
 	#var notes: Array[NoteData]
 	
@@ -44,7 +40,7 @@ static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
 			var time = float(parts[0])
 			var color = int(parts[1])
 			var type = int(parts[2])
-			var end_time = float(parts[3])
+			var end_time = float(parts[3]) if type == 1 else time #단노트일 시 시작 시간과 종료 시간이 같음
 			var lane = int(parts[4])
 
 			noteDatas.append(NoteData.new(time, color, type, end_time, lane))
