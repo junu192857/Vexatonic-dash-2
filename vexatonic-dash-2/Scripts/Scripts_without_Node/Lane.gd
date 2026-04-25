@@ -23,7 +23,7 @@ func print_data():
 func get_height(time_ms: float) -> float:
 	print("My time: %f" % time_ms)
 	if time_ms < keyframes[0].x:
-		return 0.0
+		return keyframes[0].y
 
 	if time_ms > keyframes[-1].x:
 		push_error("ERROR: 레인 %d 종료 후에 노트가 있습니다. (time: %sms)" % [lane_index, time_ms])
