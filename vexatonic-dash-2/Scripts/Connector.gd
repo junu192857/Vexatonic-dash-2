@@ -9,10 +9,9 @@ const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 
-func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane = null):
+func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane = null) -> float:
 	lane = p_lane
 	var calculated_delta_y: float = 0.0
-	var connector_ended: bool = true
 	
 	if p_lane != null:
 		var start_height = p_lane.get_height(start_time)
@@ -22,11 +21,11 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane = null):
 					calculated_delta_y = p_lane.get_height(end_time) - start_height
 				else:
 					calculated_delta_y = kf.y - start_height
-					connector_ended = false
-					#TODO: connector 이어서 만들기
+					end_time = kf.x
 				break
 				
 	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)
+	return end_time
 
 func _ready():
 	polygon.polygon = PackedVector2Array([

@@ -117,6 +117,7 @@ func render_chart():
 			var connector = place_connector(-1, previous_time + Setting.time_per_note_width, noteData.time, previous_lane)
 			if (connector):
 				previous_note.add_child(connector)
+				connector.position = Vector2(Setting.NOTE_WIDTH, 0)
 		
 		var cur_note = place_note(noteData, pos_x, true)
 		add_child(cur_note)
@@ -129,7 +130,9 @@ func render_chart():
 		if (noteData.type == 1): #LongNote
 			var length = Setting.get_posx_from_time(noteData.end_time-noteData.time)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width, noteData.end_time, previous_lane)
-			cur_note.add_child(connector)
+			if (connector):
+				cur_note.add_child(connector)
+				connector.position = Vector2(Setting.NOTE_WIDTH, 0)
 			var marker = place_note(noteData, length, false)
 			cur_note.add_child(marker)
 			previous_time = noteData.end_time
@@ -151,8 +154,12 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int)
 	if (end_time - start_time <= 0):
 		return null
 	var connector = CONNECTOR_SCENE.instantiate() as Node2D
-	connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(lanes, lane))
-	connector.position = Vector2(Setting.NOTE_WIDTH, 0)
+	var connector_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(lanes, lane))
+	if (end_time - connector_end_time > 0.01):
+		var following_connector = place_connector(p_color, connector_end_time, end_time, lane)
+		connector.add_child(following_connector)
+		following_connector.position = Vector2(connector.data.length, -connector.data.delta_y)
+
 	#print("Place Connector with length %f" % (length-Setting.NOTE_WIDTH))
 	return connector
 	
