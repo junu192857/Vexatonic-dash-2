@@ -1,6 +1,6 @@
 # time  color  type  end_time  lane
 0 0 0 0 0
-1000 2 0 0 0
+1000 2 1 1400 0
 
 # lane information: 오직 꺾이는 부분에 대한 정보만 가지고 있음.
 # LANE index
@@ -8,14 +8,18 @@
 # 관절_time 관절_height
 # ....
 # lane_end_time lane_end_height
+# END
 
 LANE 0
 0 0
 500 100
-3000 100
+1200 100
+1500 0
+3000 0
 END
 
 LANE 1
-3000 300
-8000 300
+700 100
+1000 -200
+4000 -200
 END
