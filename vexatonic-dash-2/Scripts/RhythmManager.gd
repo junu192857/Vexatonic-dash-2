@@ -127,7 +127,8 @@ func place_final_connector(lane: Lane):
 		var last_note_time = lane.notes[-1].data.end_time #find last note or marker
 		if lane.keyframes[-1].x - last_note_time > Setting.time_per_note_width:
 			var final_connector = place_connector(-1, last_note_time + Setting.time_per_note_width, lane.keyframes[-1].x, lane.lane_index, true)
-			add_child(final_connector)
+			lane.notes[1].add_child(final_connector)
+			final_connector.position = Vector2(Setting.NOTE_WIDTH, 0)
 	
 func assign_note(note: Note):
 	var lane = Lane.find_lane(lanes, note.data.lane)
