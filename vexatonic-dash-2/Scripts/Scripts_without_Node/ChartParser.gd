@@ -1,9 +1,5 @@
 class_name ChartParser
 
-enum NoteColor { RED = 0, BLUE = 1, YELLOW = 2 }
-enum NoteType { SHORT = 0, LONG = 1 }
-
-
 static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
 	#var notes: Array[NoteData]
 	

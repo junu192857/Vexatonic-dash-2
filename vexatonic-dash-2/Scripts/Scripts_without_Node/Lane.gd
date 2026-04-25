@@ -19,6 +19,7 @@ func print_data():
 	print("Note Count:%d" % notes.size())
 		
 func get_height(time_ms: float) -> float:
+	print("My time: %f" % time_ms)
 	if time_ms < keyframes[0].x:
 		push_error("ERROR: 레인 %d 시작 전에 노트가 있습니다. (time: %sms)" % [index, time_ms])
 		return 0.0
@@ -42,6 +43,7 @@ func add_Note(note: Note):
 
 func sort_notes():
 	notes.sort_custom(func(a:Note, b:Note): return a.data.time < b.data.time)
+	
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane:Lane in lanes:
