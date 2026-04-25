@@ -4,9 +4,11 @@ var lane_index: int
 var keyframes: Array[Vector2]
 var notes: Array[Node2D]
 var note_index: int
+var is_init: bool
 
-func _init(p_index: int):
+func _init(p_index: int, p_is_init: bool):
 	lane_index = p_index
+	is_init = p_is_init
 	note_index = 0
 
 func add_keyframe(time: float, height: float):
@@ -21,7 +23,6 @@ func print_data():
 func get_height(time_ms: float) -> float:
 	print("My time: %f" % time_ms)
 	if time_ms < keyframes[0].x:
-		push_error("ERROR: 레인 %d 시작 전에 노트가 있습니다. (time: %sms)" % [lane_index, time_ms])
 		return 0.0
 
 	if time_ms > keyframes[-1].x:

@@ -52,7 +52,6 @@ func _process(delta):
 @export var CONNECTOR_SCENE: PackedScene
 	
 func render_chart():
-	place_initial_connector()
 	
 	var pos_x
 	var previous_time = -1
@@ -88,6 +87,7 @@ func render_chart():
 	for lane:Lane in lanes:
 		lane.print_data()
 		lane.sort_notes()
+		place_initial_connector(lane)
 		place_final_connector(lane)
 
 func place_note(data:NoteData, pos_x: float, original:bool) -> Node2D:
@@ -115,11 +115,20 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 	#print("Place Connector with length %f" % (length-Setting.NOTE_WIDTH))
 	return connector
 	
-func place_initial_connector():
-	var connector = CONNECTOR_SCENE.instantiate() as Node2D
-	connector.position = Vector2(-1500,0)
-	connector.set_connector_data(-1, -3000, 0, null, false)
-	add_child(connector)
+func place_initial_connector(lane: Lane):
+	if (!lane.notes.is_empty()):
+		if (lane.is_init):
+			var initial_height = lane.keyframes[0].y
+			var connector = CONNECTOR_SCENE.instantiate() as Node2D
+			connector.position = Vector2(-1500,0)
+			connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
+			add_child(connector)
+		else:
+			if (lane.keyframes[0].x < lane.notes[0].get_time()):
+				var connector = CONNECTOR_SCENE.instantiate() as Node2D
+				connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
+				connector.set_connector_data(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane, false)
+				add_child(connector)
 	
 func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())

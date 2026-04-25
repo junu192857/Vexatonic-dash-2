@@ -15,6 +15,23 @@ enum Judgement { VEXATONIC = 0, SPARKLIC = 1, WILD = 2, MISS = 3, PASS = 4 }
 var data: NoteData
 
 var is_hit := false
+
+#=============== NoteData 값 가져오기 =======================
+func get_time() -> float:
+	return data.time
+
+func get_color() -> int:
+	return data.color
+
+func get_type() -> int:
+	return data.type
+
+func get_end_time() -> float:
+	return data.end_time
+
+func get_lane() -> int:
+	return data.lane
+
 # 스포너에서 노트 생성 후 가장 먼저 호출되어 색상을 정함.
 func set_data(p_data: NoteData):
 	data = p_data

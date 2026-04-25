@@ -1,5 +1,7 @@
 class_name NoteData
 
+# NoteData의 멤버에 직접 접근하는 것 지양
+
 # 노트를 처리해야 하는 시간
 var time: float
 # RED = 0, BLUE = 1, YELLOW = 2

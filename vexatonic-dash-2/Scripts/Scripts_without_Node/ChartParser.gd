@@ -21,8 +21,9 @@ static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
 		
 		if parts[0] == "LANE":
 			var index = int(parts[1])
+			var is_init = int(parts[2])
 			if (Lane.find_lane(lanes, index)) == null:
-				current_lane = Lane.new(index)
+				current_lane = Lane.new(index, true if is_init == 1 else false)
 				lanes.append(current_lane)
 			else:
 				push_error("ERROR: lane index %d already exist" % index)
