@@ -3,7 +3,10 @@ class_name Setting
 static var speed = 1
 
 static var PX_PER_MS = 0.5
+#단노트의 좌우 길이
 static var NOTE_WIDTH = 24
+#레인 중앙 기준 캐릭터의 발 위치
+static var CHARACTER_POS_Y = 26
 
 static func get_speed() -> float:
 	return speed

@@ -45,7 +45,7 @@ func add_Note(note: Note):
 
 func sort_notes():
 	notes.sort_custom(func(a:Note, b:Note): return a.data.time < b.data.time)
-	
+
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane:Lane in lanes:

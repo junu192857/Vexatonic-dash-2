@@ -6,7 +6,7 @@ var lanes: Array[Lane]
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
 
-var character: Node2D
+var characters: Array[Sayane]
 var time: float
 var music_started = false
 var time_start_tick: float
@@ -16,6 +16,7 @@ const COUNTDOWN_TIME = 3000
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
 	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
 	render_chart()
@@ -23,15 +24,20 @@ func _ready() -> void:
 	print(noteDatas.size())
 	
 	#RhythmScene으로 넘어온 뒤 3초 후 게임 시작
-	place_character()
+	for lane in lanes:
+		if (lane.is_init):
+			place_character(lane)
 	
 	time_start_tick = Time.get_ticks_msec()
 
-func place_character():
+func place_character(lane: Lane):
 	var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
-	character = CHARACTER_SCENE.instantiate() as Node2D
-	character.position = Vector2(initial_pos_x, -26)
-	add_child(character)
+	var sayane = CHARACTER_SCENE.instantiate() as Sayane
+	#sayane.position = Vector2(initial_pos_x, -Setting.CHARACTER_POS_Y)
+	sayane.set_lane(lane)
+	characters.append(sayane)
+	add_child(sayane)
+	
 	
 func _process(delta):
 	if (not music_started):
@@ -42,8 +48,9 @@ func _process(delta):
 			music_started = true
 	else:
 		time = musicPlayer.get_playback_position() * 1000
-		
-	character.position.x = Setting.get_posx_from_time(time)
+	
+	for sayane in characters:
+		sayane.set_character_position(time)
 
 
 #============================== Chart Rendering ===================================
@@ -52,7 +59,7 @@ func _process(delta):
 @export var CONNECTOR_SCENE: PackedScene
 	
 func render_chart():
-	
+	print("Rendering chart..")
 	var pos_x
 	var previous_time = -1
 	var previous_note
@@ -162,7 +169,7 @@ var total_judgements:Array[int] = [0, 0, 0, 0]
 
 func _on_pressed(p_color:int):
 	var pressed_ms = time
-	print("Hello! your color is: %d and pressed_ms: %f and time: %f and character_posx: %f" % [p_color, pressed_ms, time, character.position.x])
+	#print("Hello! your color is: %d and pressed_ms: %f and time: %f and character_posx: %f" % [p_color, pressed_ms, time, character.position.x])
 	
 	for lane:Lane in lanes:
 		if (lane.notes.size() <= lane.note_index):
