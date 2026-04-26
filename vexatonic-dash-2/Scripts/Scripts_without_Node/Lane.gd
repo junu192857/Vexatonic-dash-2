@@ -14,6 +14,17 @@ func _init(p_index: int, p_is_init: bool):
 func add_keyframe(time: float, height: float):
 	keyframes.append(Vector2(time,height))
 
+func insert_keyframe(time: float, height: float):
+	var new_kf = Vector2(time, height)
+	for i in range(keyframes.size()):
+		if keyframes[i].x > time:
+			keyframes.insert(i, new_kf)
+			return
+	keyframes.append(new_kf)
+
+func delete_middle_keyframe(time1: float, time2: float):
+	keyframes = keyframes.filter(func(kf: Vector2): return kf.x <= time1 or kf.x >= time2)
+	
 func print_data():
 	print("INDEX: %d" % lane_index)
 	for kf:Vector2 in keyframes:
@@ -21,7 +32,7 @@ func print_data():
 	print("Note Count:%d" % notes.size())
 		
 func get_height(time_ms: float) -> float:
-	print("My time: %f" % time_ms)
+	#print("My time: %f" % time_ms)
 	if time_ms < keyframes[0].x:
 		push_error("ERROR: 레인 %d 시작 전에 노트가 있습니다. (time: %sms)" % [lane_index, time_ms])
 		return 0.0
