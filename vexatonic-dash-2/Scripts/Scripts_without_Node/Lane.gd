@@ -12,9 +12,11 @@ func _init(p_index: int, p_is_init: bool):
 	note_index = 0
 
 func add_keyframe(time: float, height: float):
+	delete_middle_keyframe(time - 0.001, time + 0.001)
 	keyframes.append(Vector2(time,height))
 
 func insert_keyframe(time: float, height: float):
+	delete_middle_keyframe(time - 0.001, time + 0.001)
 	var new_kf = Vector2(time, height)
 	for i in range(keyframes.size()):
 		if keyframes[i].x > time:

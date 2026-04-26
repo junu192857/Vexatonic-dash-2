@@ -10,12 +10,14 @@ const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Colo
 
 
 func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: bool) -> float:
+	print("Calling set_connector_data with %d, %f, %f" % [p_color, start_time, end_time])
 	lane = p_lane
 	var calculated_delta_y: float = 0.0
 	var start_height
 	if p_lane != null:
 		start_height = p_lane.get_height(start_time - Setting.time_per_note_width) if first else \
 					   p_lane.get_height(start_time)
+		print("STARt height: %f" % start_height)
 		for kf in p_lane.keyframes:
 			if kf.x > start_time:
 				if kf.x >= end_time:

@@ -125,7 +125,8 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 func place_initial_connector(lane: Lane):
 	if (!lane.notes.is_empty()):
 		if (lane.is_init):
-			var initial_height = lane.keyframes[0].y
+			print("THIS IS INITIAL LANE")
+			#var initial_height = lane.keyframes[0].y
 			var connector = CONNECTOR_SCENE.instantiate() as Node2D
 			connector.position = Vector2(-1500,0)
 			connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
