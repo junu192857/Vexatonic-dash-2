@@ -4,9 +4,11 @@ var lane_index: int
 var keyframes: Array[Vector2]
 var notes: Array[Node2D]
 var note_index: int
+var is_init: bool
 
-func _init(p_index: int):
+func _init(p_index: int, p_is_init: bool):
 	lane_index = p_index
+	is_init = p_is_init
 	note_index = 0
 
 func add_keyframe(time: float, height: float):

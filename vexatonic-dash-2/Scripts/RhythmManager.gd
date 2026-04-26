@@ -52,7 +52,6 @@ func _process(delta):
 @export var CONNECTOR_SCENE: PackedScene
 	
 func render_chart():
-	place_initial_connector()
 	
 	var pos_x
 	var previous_time = -1
@@ -88,6 +87,7 @@ func render_chart():
 	for lane:Lane in lanes:
 		lane.print_data()
 		lane.sort_notes()
+		place_initial_connector(lane)
 		place_final_connector(lane)
 
 func place_note(data:NoteData, pos_x: float, original:bool) -> Node2D:
@@ -115,20 +115,30 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 	#print("Place Connector with length %f" % (length-Setting.NOTE_WIDTH))
 	return connector
 	
-func place_initial_connector():
-	var connector = CONNECTOR_SCENE.instantiate() as Node2D
-	connector.position = Vector2(-1500,0)
-	connector.set_connector_data(-1, -3000, 0, null, false)
-	add_child(connector)
+func place_initial_connector(lane: Lane):
+	if (!lane.notes.is_empty()):
+		if (lane.is_init):
+			var initial_height = lane.keyframes[0].y
+			var connector = CONNECTOR_SCENE.instantiate() as Node2D
+			connector.position = Vector2(-1500,0)
+			connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
+			add_child(connector)
+		else:
+			if (lane.keyframes[0].x < lane.notes[0].get_time()):
+				var connector = CONNECTOR_SCENE.instantiate() as Node2D
+				connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
+				connector.set_connector_data(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane, false)
+				add_child(connector)
 	
 func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
 		var last_note_time = lane.notes[-1].data.end_time #find last note or marker
 		if lane.keyframes[-1].x - last_note_time > Setting.time_per_note_width:
-			var final_connector = place_connector(-1, last_note_time + Setting.time_per_note_width, lane.keyframes[-1].x, lane.lane_index, true)
-			lane.notes[1].add_child(final_connector)
-			final_connector.position = Vector2(Setting.NOTE_WIDTH, 0)
+			var connector_time = last_note_time + Setting.time_per_note_width
+			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].x, lane.lane_index, true)
+			add_child(final_connector)
+			final_connector.position = Vector2(Setting.get_posx_from_time(connector_time), -lane.get_height(last_note_time))
 	
 func assign_note(note: Note):
 	var lane = Lane.find_lane(lanes, note.data.lane)
