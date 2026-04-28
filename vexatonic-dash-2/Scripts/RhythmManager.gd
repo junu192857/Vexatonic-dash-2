@@ -149,7 +149,7 @@ func place_initial_connector(lane: Lane):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
 			var connector = CONNECTOR_SCENE.instantiate() as Node2D
-			connector.position = Vector2(-1500,0)
+			connector.position = Vector2(Setting.get_posx_from_time(-3000),0)
 			connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
 			add_child(connector)
 		else:
