@@ -34,10 +34,6 @@ static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
 			continue
 		
 		if parts.size() == 2 and current_lane:
-			if (float(parts[0]) < 0):
-				push_error("ERROR: keyframe time should be positive")
-			if (current_lane.is_init and current_lane.keyframes.is_empty() and float(parts[0]) > 0.001):
-				push_error("ERROR: initial lane's first keyframe time shold be 0")
 			current_lane.add_keyframe(float(parts[0]), float(parts[1]))
 			continue
 			

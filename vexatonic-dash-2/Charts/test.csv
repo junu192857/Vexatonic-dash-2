@@ -1,11 +1,13 @@
 # time  color  type  end_time  lane
 0 0 0 0 0
-1000 2 1 1400 0
 1500 1 0 0 0
 800 1 0 0 0
+1000 2 1 1400 0
+900 1 0 0 1
+
+
 
 # lane information: 오직 꺾이는 부분에 대한 정보만 가지고 있음.
-# is_init: 처음부터 등장하는 lane인지의 여부. 만약 is_init = 1이라면 init_time은 반드시 0일 것.
 # LANE index is_init
 # init_time init_height
 # 관절_time 관절_height
@@ -24,5 +26,4 @@ END
 LANE 1 0
 700 100
 1000 -70
-4000 -70
 END

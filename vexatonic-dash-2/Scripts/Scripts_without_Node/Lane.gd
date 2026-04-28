@@ -32,7 +32,9 @@ func print_data():
 	for kf:Vector2 in keyframes:
 		print("time: %f and height: %f" % [kf[0],kf[1]])
 	print("Note Count:%d" % notes.size())
-		
+	for note:Note in notes:
+		print("Note: time %f, color %d, type %d" % [note.get_time(), note.get_color(), note.get_type()])
+	
 func get_height(time_ms: float) -> float:
 	#print("My time: %f" % time_ms)
 	if time_ms < keyframes[0].x:
@@ -61,10 +63,18 @@ func add_Note(note: Note):
 
 func sort_notes():
 	notes.sort_custom(func(a:Note, b:Note): return a.data.time < b.data.time)
+	
+func get_start_time():
+	return keyframes[0].x
 
+func get_end_time():
+	return keyframes[-1].x
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane:Lane in lanes:
 		if (lane.lane_index == index):
 			return lane
 	return null
+
+static func sort_lanes(lanes: Array[Lane]):
+	lanes.sort_custom(func(a:Lane, b:Lane): return a.keyframes[0].x < b.keyframes[0].x) 

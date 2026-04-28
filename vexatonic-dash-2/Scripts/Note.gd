@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 class_name Note
 
 const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]

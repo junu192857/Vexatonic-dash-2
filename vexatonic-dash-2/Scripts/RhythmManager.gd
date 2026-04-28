@@ -6,11 +6,13 @@ var lanes: Array[Lane]
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
 
-var characters: Array[Sayane]
+var characters: Array[Character]
 var time: float
 var music_started = false
 var time_start_tick: float
 var music_start_tick: float
+#어느 레인까지 캐릭터가 생성되었는지 체크하는 용도
+var lane_index: int
 
 const COUNTDOWN_TIME = 3000
 
@@ -19,24 +21,30 @@ func _ready() -> void:
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
 	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
+	Lane.sort_lanes(lanes)
+	lane_index = 0
+	
 	render_chart()
-
-	print(noteDatas.size())
+	
+	#print(noteDatas.size())
+	for lane:Lane in lanes:
+		lane.print_data()
 	
 	#RhythmScene으로 넘어온 뒤 3초 후 게임 시작
 	for lane in lanes:
 		if (lane.is_init):
 			place_character(lane)
+			lane_index += 1
 	
 	time_start_tick = Time.get_ticks_msec()
 
 func place_character(lane: Lane):
-	var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
-	var sayane = CHARACTER_SCENE.instantiate() as Sayane
+	#var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
+	var character = CHARACTER_SCENE.instantiate() as Character
 	#sayane.position = Vector2(initial_pos_x, -Setting.CHARACTER_POS_Y)
-	sayane.set_lane(lane)
-	characters.append(sayane)
-	add_child(sayane)
+	character.set_lane(lane)
+	characters.append(character)
+	add_child(character)
 	
 	
 func _process(delta):
@@ -49,8 +57,14 @@ func _process(delta):
 	else:
 		time = musicPlayer.get_playback_position() * 1000
 	
-	for sayane in characters:
-		sayane.set_character_position(time)
+	if (lane_index < lanes.size() and lanes[lane_index].get_start_time() < time):
+		place_character(lanes[lane_index])
+		lane_index += 1
+		
+	
+	for character in characters:
+		if character.set_character_position(time):
+			characters.erase(character)
 
 
 #============================== Chart Rendering ===================================
@@ -59,7 +73,7 @@ func _process(delta):
 @export var CONNECTOR_SCENE: PackedScene
 	
 func render_chart():
-	print("Rendering chart..")
+	#print("Rendering chart..")
 	var pos_x
 	var previous_time = -1
 	var previous_note
@@ -71,15 +85,15 @@ func render_chart():
 			if (connector):
 				previous_note.add_child(connector)
 				connector.position = Vector2(Setting.NOTE_WIDTH, 0)
-		
+	
 		var cur_note = place_note(noteData, pos_x, true)
 		add_child(cur_note)
 		assign_note(cur_note)
-		
+	
 		previous_time = noteData.time
 		previous_lane = noteData.lane
 		previous_note = cur_note;
-		
+	
 		if (noteData.type == 1): #LongNote
 			var length = Setting.get_posx_from_time(noteData.end_time-noteData.time)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width, noteData.end_time, previous_lane, true)
