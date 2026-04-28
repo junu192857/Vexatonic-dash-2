@@ -18,19 +18,26 @@ const COUNTDOWN_TIME = 3000
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
 	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
 	Lane.sort_lanes(lanes)
 	lane_index = 0
+	noteDatas.sort_custom(func(a: NoteData, b: NoteData):
+		if a.lane != b.lane:
+			return a.lane < b.lane
+		return a.time < b.time
+	)
 	
+	# 채보 찍기
 	render_chart()
 	
 	#print(noteDatas.size())
 	for lane:Lane in lanes:
 		lane.print_data()
 	
-	#RhythmScene으로 넘어온 뒤 3초 후 게임 시작
+	# 최초의 lane들에 캐릭터 생성
 	for lane in lanes:
 		if (lane.is_init):
 			place_character(lane)
