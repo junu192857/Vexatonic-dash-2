@@ -10,12 +10,14 @@ const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Colo
 
 
 func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: bool) -> float:
+	print("Calling set_connector_data with %d, %f, %f" % [p_color, start_time, end_time])
 	lane = p_lane
 	var calculated_delta_y: float = 0.0
-	
+	var start_height
 	if p_lane != null:
-		var start_height = p_lane.get_height(start_time - Setting.time_per_note_width) if first else \
-						   p_lane.get_height(start_time)
+		start_height = p_lane.get_height(start_time - Setting.time_per_note_width) if first else \
+					   p_lane.get_height(start_time)
+		print("STARt height: %f" % start_height)
 		for kf in p_lane.keyframes:
 			if kf.x > start_time:
 				if kf.x >= end_time:
@@ -24,6 +26,11 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 					calculated_delta_y = kf.y - start_height
 					end_time = kf.x
 				break
+	
+	if (first):
+		p_lane.insert_keyframe(start_time - Setting.time_per_note_width, start_height)
+		p_lane.insert_keyframe(start_time, start_height)
+		p_lane.delete_middle_keyframe(start_time - Setting.time_per_note_width, start_time)
 				
 	print("Calculated_delta_y = %f" % calculated_delta_y)
 	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)

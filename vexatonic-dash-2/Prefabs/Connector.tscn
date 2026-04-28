@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cw54hy54u4o3h"]
 
-[ext_resource type="Texture2D" uid="uid://bf2ncgi2n7je3" path="res://Textures/Connector.jpg" id="1_ci68o"]
+[ext_resource type="Texture2D" uid="uid://b6da4bo2wovn0" path="res://Textures/Connector.jpg" id="1_ci68o"]
 [ext_resource type="Script" uid="uid://be2tj6sethhja" path="res://Scripts/Connector.gd" id="1_peggv"]
 
 [node name="Connector" type="Node2D" unique_id=691671917]

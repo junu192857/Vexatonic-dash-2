@@ -1,11 +1,16 @@
-extends Node
+extends Node2D
 class_name Character
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+var lane:Lane
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func set_character_position(time:float) -> bool:
+	if (time > lane.get_end_time()):
+		queue_free()
+		return true
+	else:
+		position = Vector2(Setting.get_posx_from_time(time), -(lane.get_height(time)+Setting.CHARACTER_POS_Y))
+		return false
+	
+	
+func set_lane(p_lane: Lane):
+	lane = p_lane

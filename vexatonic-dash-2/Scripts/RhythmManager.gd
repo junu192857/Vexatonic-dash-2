@@ -6,32 +6,46 @@ var lanes: Array[Lane]
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
 
-var character: Node2D
+var characters: Array[Character]
 var time: float
 var music_started = false
 var time_start_tick: float
 var music_start_tick: float
+#어느 레인까지 캐릭터가 생성되었는지 체크하는 용도
+var lane_index: int
 
 const COUNTDOWN_TIME = 3000
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
 	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
+	Lane.sort_lanes(lanes)
+	lane_index = 0
+	
 	render_chart()
-
-	print(noteDatas.size())
+	
+	#print(noteDatas.size())
+	for lane:Lane in lanes:
+		lane.print_data()
 	
 	#RhythmScene으로 넘어온 뒤 3초 후 게임 시작
-	place_character()
+	for lane in lanes:
+		if (lane.is_init):
+			place_character(lane)
+			lane_index += 1
 	
 	time_start_tick = Time.get_ticks_msec()
 
-func place_character():
-	var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
-	character = CHARACTER_SCENE.instantiate() as Node2D
-	character.position = Vector2(initial_pos_x, -26)
+func place_character(lane: Lane):
+	#var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
+	var character = CHARACTER_SCENE.instantiate() as Character
+	#sayane.position = Vector2(initial_pos_x, -Setting.CHARACTER_POS_Y)
+	character.set_lane(lane)
+	characters.append(character)
 	add_child(character)
+	
 	
 func _process(delta):
 	if (not music_started):
@@ -42,8 +56,15 @@ func _process(delta):
 			music_started = true
 	else:
 		time = musicPlayer.get_playback_position() * 1000
+	
+	if (lane_index < lanes.size() and lanes[lane_index].get_start_time() < time):
+		place_character(lanes[lane_index])
+		lane_index += 1
 		
-	character.position.x = Setting.get_posx_from_time(time)
+	
+	for character in characters:
+		if character.set_character_position(time):
+			characters.erase(character)
 
 
 #============================== Chart Rendering ===================================
@@ -52,7 +73,7 @@ func _process(delta):
 @export var CONNECTOR_SCENE: PackedScene
 	
 func render_chart():
-	
+	#print("Rendering chart..")
 	var pos_x
 	var previous_time = -1
 	var previous_note
@@ -64,15 +85,15 @@ func render_chart():
 			if (connector):
 				previous_note.add_child(connector)
 				connector.position = Vector2(Setting.NOTE_WIDTH, 0)
-		
+	
 		var cur_note = place_note(noteData, pos_x, true)
 		add_child(cur_note)
 		assign_note(cur_note)
-		
+	
 		previous_time = noteData.time
 		previous_lane = noteData.lane
 		previous_note = cur_note;
-		
+	
 		if (noteData.type == 1): #LongNote
 			var length = Setting.get_posx_from_time(noteData.end_time-noteData.time)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width, noteData.end_time, previous_lane, true)
@@ -118,7 +139,8 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 func place_initial_connector(lane: Lane):
 	if (!lane.notes.is_empty()):
 		if (lane.is_init):
-			var initial_height = lane.keyframes[0].y
+			print("THIS IS INITIAL LANE")
+			#var initial_height = lane.keyframes[0].y
 			var connector = CONNECTOR_SCENE.instantiate() as Node2D
 			connector.position = Vector2(-1500,0)
 			connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
@@ -133,12 +155,16 @@ func place_initial_connector(lane: Lane):
 func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
-		var last_note_time = lane.notes[-1].data.end_time #find last note or marker
+		var last_note_time = lane.notes[-1].get_end_time() #find last note or marker
 		if lane.keyframes[-1].x - last_note_time > Setting.time_per_note_width:
 			var connector_time = last_note_time + Setting.time_per_note_width
 			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].x, lane.lane_index, true)
 			add_child(final_connector)
 			final_connector.position = Vector2(Setting.get_posx_from_time(connector_time), -lane.get_height(last_note_time))
+	else:
+		var final_connector = place_connector(-1, lane.keyframes[0].x, lane.keyframes[-1].x, lane.lane_index, false)
+		add_child(final_connector)
+		final_connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
 	
 func assign_note(note: Note):
 	var lane = Lane.find_lane(lanes, note.data.lane)
@@ -158,7 +184,7 @@ var total_judgements:Array[int] = [0, 0, 0, 0]
 
 func _on_pressed(p_color:int):
 	var pressed_ms = time
-	print("Hello! your color is: %d and pressed_ms: %f and time: %f and character_posx: %f" % [p_color, pressed_ms, time, character.position.x])
+	#print("Hello! your color is: %d and pressed_ms: %f and time: %f and character_posx: %f" % [p_color, pressed_ms, time, character.position.x])
 	
 	for lane:Lane in lanes:
 		if (lane.notes.size() <= lane.note_index):

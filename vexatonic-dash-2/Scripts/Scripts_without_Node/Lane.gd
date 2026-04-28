@@ -12,19 +12,37 @@ func _init(p_index: int, p_is_init: bool):
 	note_index = 0
 
 func add_keyframe(time: float, height: float):
+	delete_middle_keyframe(time - 0.001, time + 0.001)
 	keyframes.append(Vector2(time,height))
 
+func insert_keyframe(time: float, height: float):
+	delete_middle_keyframe(time - 0.001, time + 0.001)
+	var new_kf = Vector2(time, height)
+	for i in range(keyframes.size()):
+		if keyframes[i].x > time:
+			keyframes.insert(i, new_kf)
+			return
+	keyframes.append(new_kf)
+
+func delete_middle_keyframe(time1: float, time2: float):
+	keyframes = keyframes.filter(func(kf: Vector2): return kf.x <= time1 or kf.x >= time2)
+	
 func print_data():
 	print("INDEX: %d" % lane_index)
 	for kf:Vector2 in keyframes:
 		print("time: %f and height: %f" % [kf[0],kf[1]])
 	print("Note Count:%d" % notes.size())
-		
+	for note:Note in notes:
+		print("Note: time %f, color %d, type %d" % [note.get_time(), note.get_color(), note.get_type()])
+	
 func get_height(time_ms: float) -> float:
-	print("My time: %f" % time_ms)
+	#print("My time: %f" % time_ms)
 	if time_ms < keyframes[0].x:
-		push_error("ERROR: 레인 %d 시작 전에 노트가 있습니다. (time: %sms)" % [lane_index, time_ms])
-		return 0.0
+		if (!is_init):
+			push_error("ERROR: 레인 %d 시작 전에 노트가 있습니다. (time: %sms)" % [lane_index, time_ms])
+			return 0.0
+		else:
+			return keyframes[0].y
 
 	if time_ms > keyframes[-1].x:
 		push_error("ERROR: 레인 %d 종료 후에 노트가 있습니다. (time: %sms)" % [lane_index, time_ms])
@@ -46,9 +64,17 @@ func add_Note(note: Note):
 func sort_notes():
 	notes.sort_custom(func(a:Note, b:Note): return a.data.time < b.data.time)
 	
+func get_start_time():
+	return keyframes[0].x
+
+func get_end_time():
+	return keyframes[-1].x
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane:Lane in lanes:
 		if (lane.lane_index == index):
 			return lane
 	return null
+
+static func sort_lanes(lanes: Array[Lane]):
+	lanes.sort_custom(func(a:Lane, b:Lane): return a.keyframes[0].x < b.keyframes[0].x) 
