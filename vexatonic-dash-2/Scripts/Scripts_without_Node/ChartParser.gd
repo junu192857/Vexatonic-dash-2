@@ -42,6 +42,9 @@ static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
 			var color = int(parts[1])
 			var type = int(parts[2])
 			var end_time = float(parts[3]) if type == 1 else time #단노트일 시 시작 시간과 종료 시간이 같음
+			if (type == 1 and time > end_time):
+				push_error("롱노트의 끝이 시작보다 빠릅니다")
+				continue 
 			var lane = int(parts[4])
 
 			noteDatas.append(NoteData.new(time, color, type, end_time, lane))
