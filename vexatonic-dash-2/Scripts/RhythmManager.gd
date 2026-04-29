@@ -89,7 +89,6 @@ func _process(delta):
 
 
 func render_chart():
-	#print("Rendering chart..")
 	var pos_x
 	var previous_time = -1
 	var previous_note
@@ -155,22 +154,30 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 	#print("Place Connector with length %f" % (length-Setting.NOTE_WIDTH))
 	return connector
 	
-# 레인의 첫 번째 노트 이전의 Connector 생성
+# 레인의 첫 번째 노트 이전의 Connector 생성. 첫 번째 노트가 없으면 패스
 func place_initial_connector(lane: Lane):
 	if (!lane.notes.is_empty()):
 		if (lane.is_init):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
-			var connector = CONNECTOR_SCENE.instantiate() as Node2D
-			connector.position = Vector2(Setting.get_posx_from_time(-3000),0)
-			connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
-			add_child(connector)
+			var initial_connector = place_connector(-1, -3000, lane.notes[0].get_time(), lane.lane_index, false)
+			add_child(initial_connector)
+			initial_connector.position = Vector2(Setting.get_posx_from_time(-3000),0)
+			
+			#var connector = CONNECTOR_SCENE.instantiate() as Node2D
+			#connector.position = Vector2(Setting.get_posx_from_time(-3000),0)
+			#connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
+			#add_child(connector)
 		else:
 			if (lane.keyframes[0].x < lane.notes[0].get_time()):
-				var connector = CONNECTOR_SCENE.instantiate() as Node2D
-				connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
-				connector.set_connector_data(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane, false)
-				add_child(connector)
+				var initial_connector = place_connector(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane.lane_index, false)
+				add_child(initial_connector)
+				initial_connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
+				
+				#var connector = CONNECTOR_SCENE.instantiate() as Node2D
+				#connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
+				#connector.set_connector_data(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane, false)
+				#add_child(connector)
 
 # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
 func place_final_connector(lane: Lane):
