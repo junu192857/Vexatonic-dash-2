@@ -78,7 +78,16 @@ func _process(delta):
 
 @export var NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
-	
+
+# render_chart() 후 생성된 Note, Connector, Marker의 관계
+#
+#			   /‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\									 /‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\
+#             /						  \									/						  \
+# RhythmScene --- Note --- Connector NextNote---Connector      LongNote---Connector(롱놋틱) Marker Connector
+#			  \								   					/	    \__________________/
+#			   \_______________________________________________/
+
+
 func render_chart():
 	#print("Rendering chart..")
 	var pos_x
@@ -118,6 +127,7 @@ func render_chart():
 		place_initial_connector(lane)
 		place_final_connector(lane)
 
+# 단노트, 롱노트 시작점 밑 끝점 생성
 func place_note(data:NoteData, pos_x: float, original:bool) -> Node2D:
 	var note = NOTE_SCENE.instantiate() as Node2D
 	note.set_data(data)
@@ -134,15 +144,18 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 	if (end_time - start_time <= 0):
 		return null
 	var connector = CONNECTOR_SCENE.instantiate() as Node2D
-	var connector_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(lanes, lane), first)
-	if (end_time - connector_end_time > Setting.EPSILON):
-		var following_connector = place_connector(p_color, connector_end_time, end_time, lane, false)
+	var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(lanes, lane), first)
+	
+	# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
+	if (end_time - initial_end_time > Setting.EPSILON):
+		var following_connector = place_connector(p_color, initial_end_time, end_time, lane, false)
 		connector.add_child(following_connector)
 		following_connector.position = Vector2(connector.data.length, -connector.data.delta_y)
 
 	#print("Place Connector with length %f" % (length-Setting.NOTE_WIDTH))
 	return connector
 	
+# 레인의 첫 번째 노트 이전의 Connector 생성
 func place_initial_connector(lane: Lane):
 	if (!lane.notes.is_empty()):
 		if (lane.is_init):
@@ -158,7 +171,8 @@ func place_initial_connector(lane: Lane):
 				connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
 				connector.set_connector_data(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane, false)
 				add_child(connector)
-	
+
+# 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
 func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
@@ -172,7 +186,8 @@ func place_final_connector(lane: Lane):
 		var final_connector = place_connector(-1, lane.keyframes[0].x, lane.keyframes[-1].x, lane.lane_index, false)
 		add_child(final_connector)
 		final_connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
-	
+
+# 생성된 노트를 레인의 노트 큐에 할당
 func assign_note(note: Note):
 	var lane = Lane.find_lane(lanes, note.data.lane)
 	lane.add_Note(note)
