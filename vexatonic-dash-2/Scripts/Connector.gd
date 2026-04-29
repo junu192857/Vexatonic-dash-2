@@ -17,6 +17,12 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	if p_lane != null:
 		start_height = p_lane.get_height(start_time - Setting.time_per_note_width) if first else \
 					   p_lane.get_height(start_time)
+		if (first):
+			p_lane.insert_keyframe(start_time - Setting.time_per_note_width, start_height)
+			p_lane.insert_keyframe(start_time, start_height)
+			var deleted = p_lane.delete_middle_keyframe(start_time - Setting.time_per_note_width, start_time)
+			if (deleted != null):
+				p_lane.insert_keyframe(start_time + 2 * Setting.EPSILON, deleted.y)
 		print("STARt height: %f" % start_height)
 		for kf in p_lane.keyframes:
 			if kf.x > start_time:
@@ -26,11 +32,6 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 					calculated_delta_y = kf.y - start_height
 					end_time = kf.x
 				break
-	
-	if (first):
-		p_lane.insert_keyframe(start_time - Setting.time_per_note_width, start_height)
-		p_lane.insert_keyframe(start_time, start_height)
-		p_lane.delete_middle_keyframe(start_time - Setting.time_per_note_width, start_time)
 				
 	print("Calculated_delta_y = %f" % calculated_delta_y)
 	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)

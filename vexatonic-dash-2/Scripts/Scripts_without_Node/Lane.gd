@@ -12,11 +12,11 @@ func _init(p_index: int, p_is_init: bool):
 	note_index = 0
 
 func add_keyframe(time: float, height: float):
-	delete_middle_keyframe(time - 0.001, time + 0.001)
+	delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
 	keyframes.append(Vector2(time,height))
 
 func insert_keyframe(time: float, height: float):
-	delete_middle_keyframe(time - 0.001, time + 0.001)
+	delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
 	var new_kf = Vector2(time, height)
 	for i in range(keyframes.size()):
 		if keyframes[i].x > time:
@@ -25,7 +25,14 @@ func insert_keyframe(time: float, height: float):
 	keyframes.append(new_kf)
 
 func delete_middle_keyframe(time1: float, time2: float):
+	var deleted = keyframes.filter(func(kf: Vector2): return kf.x > time1 and kf.x < time2)
 	keyframes = keyframes.filter(func(kf: Vector2): return kf.x <= time1 or kf.x >= time2)
+	
+	if deleted.is_empty():
+		return null
+	
+	deleted.sort_custom(func(a: Vector2, b: Vector2): return a.x < b.x)
+	return deleted[-1]
 	
 func print_data():
 	print("INDEX: %d" % lane_index)

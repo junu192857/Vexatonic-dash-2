@@ -135,7 +135,7 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 		return null
 	var connector = CONNECTOR_SCENE.instantiate() as Node2D
 	var connector_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(lanes, lane), first)
-	if (end_time - connector_end_time > 0.01):
+	if (end_time - connector_end_time > Setting.EPSILON):
 		var following_connector = place_connector(p_color, connector_end_time, end_time, lane, false)
 		connector.add_child(following_connector)
 		following_connector.position = Vector2(connector.data.length, -connector.data.delta_y)
