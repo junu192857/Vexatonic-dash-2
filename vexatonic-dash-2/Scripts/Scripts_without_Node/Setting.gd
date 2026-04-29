@@ -1,6 +1,6 @@
 class_name Setting
 
-static var speed = 2
+static var speed = 1
 
 static var PX_PER_MS = 0.5
 #단노트의 좌우 길이
@@ -15,3 +15,5 @@ static func get_posx_from_time(time: float) -> float:
 	return time * PX_PER_MS * speed
 	
 static var time_per_note_width = NOTE_WIDTH / (PX_PER_MS * speed)
+
+static var EPSILON = 0.001
