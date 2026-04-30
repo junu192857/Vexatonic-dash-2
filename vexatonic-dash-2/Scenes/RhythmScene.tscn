@@ -8,6 +8,7 @@
 [ext_resource type="AudioStream" uid="uid://c2hh0bkkfx6no" path="res://Sounds/Conquest - Blacksmith (freetouse.com).mp3" id="6_4pq8y"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
+metadata/_edit_vertical_guides_ = [-111.0]
 
 [node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
 script = ExtResource("1_7jauh")
