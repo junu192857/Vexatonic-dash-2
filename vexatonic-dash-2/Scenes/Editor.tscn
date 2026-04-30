@@ -1,3 +1,12 @@
 [gd_scene format=3 uid="uid://jblq2ydyctel"]
 
+[ext_resource type="Script" uid="uid://dwoyq1dcxhyuf" path="res://Scripts/EditorManager.gd" id="1_trcuy"]
+[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="2_6ykgs"]
+[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="3_dfuwn"]
+
 [node name="Editor" type="Node2D" unique_id=375391991]
+script = ExtResource("1_trcuy")
+NOTE_SCENE = ExtResource("2_6ykgs")
+CONNECTOR_SCENE = ExtResource("3_dfuwn")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
