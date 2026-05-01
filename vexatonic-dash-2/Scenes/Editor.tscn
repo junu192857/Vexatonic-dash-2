@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="2_6ykgs"]
 [ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="3_dfuwn"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
+[ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
 
 [node name="Editor" type="Node2D" unique_id=375391991]
 script = ExtResource("1_trcuy")
@@ -14,3 +15,6 @@ CONNECTOR_SCENE = ExtResource("3_dfuwn")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1330927414]
 texture = ExtResource("4_6ykgs")
+
+[node name="EditorInputHandler" type="Node2D" parent="." unique_id=1149392311]
+script = ExtResource("5_dfuwn")
