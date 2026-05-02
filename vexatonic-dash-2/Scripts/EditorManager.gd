@@ -9,10 +9,12 @@ var laneDatas: Array[Lane]
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
 
+
 #Editor에서 Setting.speed는 1인 것으로 가정
 func _ready():
 	inputHandler.move_camera.connect(_on_move_camera)
 	inputHandler.zoom_camera.connect(_on_zoom_camera)
+	
 
 # ================== 에디터 내 카메라 조작 =====================
 var dragging = false

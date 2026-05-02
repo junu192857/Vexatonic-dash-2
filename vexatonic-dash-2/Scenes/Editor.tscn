@@ -18,3 +18,12 @@ texture = ExtResource("4_6ykgs")
 
 [node name="EditorInputHandler" type="Node2D" parent="." unique_id=1149392311]
 script = ExtResource("5_dfuwn")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1936366698]
+
+[node name="Panel" type="Panel" parent="CanvasLayer" unique_id=1195473622]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
