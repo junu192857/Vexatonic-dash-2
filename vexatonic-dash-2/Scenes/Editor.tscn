@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dwoyq1dcxhyuf" path="res://Scripts/EditorManager.gd" id="1_trcuy"]
 [ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="2_6ykgs"]
 [ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="3_dfuwn"]
+[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="4_5v8xv"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
 [ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
 
@@ -12,6 +13,7 @@
 script = ExtResource("1_trcuy")
 NOTE_SCENE = ExtResource("2_6ykgs")
 CONNECTOR_SCENE = ExtResource("3_dfuwn")
+LINE_SCENE = ExtResource("4_5v8xv")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
 
@@ -177,18 +179,54 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "Game Start!"
 
-[node name="SpinBox" type="SpinBox" parent="CanvasLayer/InitialPanel" unique_id=1584789409]
+[node name="MusicTimeBox" type="SpinBox" parent="CanvasLayer/InitialPanel" unique_id=912594053]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_right = 8.25
+offset_left = -35.0
+offset_top = -15.5
+offset_right = 51.5
+offset_bottom = 15.5
 grow_horizontal = 2
 grow_vertical = 2
 max_value = 1000.0
 step = 0.01
 custom_arrow_round = true
+
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/InitialPanel/MusicTimeBox" unique_id=1876505132]
+layout_mode = 0
+offset_left = -91.875
+offset_top = -0.5
+offset_right = -23.375
+offset_bottom = 30.5
+text = "Length:"
+
+[node name="BPMBox" type="SpinBox" parent="CanvasLayer/InitialPanel" unique_id=1584789409]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -34.0
+offset_top = 34.0
+offset_right = 52.5
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+max_value = 1000.0
+step = 0.01
+custom_arrow_round = true
+
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/InitialPanel/BPMBox" unique_id=777879742]
+layout_mode = 0
+offset_left = -91.875
+offset_top = -0.5
+offset_right = -23.375
+offset_bottom = 30.5
+text = "BPM:"
 
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]

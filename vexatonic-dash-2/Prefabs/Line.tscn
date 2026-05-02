@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://byq2jrarp145t"]
 
-[ext_resource type="Texture2D" path="res://Textures/WhiteLine.jpg" id="1_f5xcy"]
+[ext_resource type="Texture2D" uid="uid://dd5j8y6eo4iaf" path="res://Textures/WhiteLine.jpg" id="1_f5xcy"]
 
 [node name="Line" type="Node2D" unique_id=1871678190]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=791330659]
-scale = Vector2(0.005, 6)
+scale = Vector2(0.01, 6)
 texture = ExtResource("1_f5xcy")
