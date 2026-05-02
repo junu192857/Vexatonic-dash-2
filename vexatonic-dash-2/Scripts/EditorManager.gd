@@ -10,10 +10,20 @@ var laneDatas: Array[Lane]
 @onready var camera = $Camera2D
 
 
+var editor_ready = false
+var bpm: float
 #Editor에서 Setting.speed는 1인 것으로 가정
 func _ready():
 	inputHandler.move_camera.connect(_on_move_camera)
 	inputHandler.zoom_camera.connect(_on_zoom_camera)
+	
+# ================== 에디터 시작하기 ==========================
+
+func _on_start_editor():
+	editor_ready = true
+	bpm = $CanvasLayer/InitialPanel/SpinBox.value
+	$CanvasLayer/InitialPanel.visible = false
+	print("BPM: %f" % bpm)
 	
 
 # ================== 에디터 내 카메라 조작 =====================
@@ -22,9 +32,13 @@ var drag_start: Vector2
 var camera_zoom_level: int = 1
 
 func _on_move_camera(delta: Vector2):
+	if !editor_ready:
+		return
 	$Camera2D.position -= delta
 
 func _on_zoom_camera(zoom: bool):
+	if !editor_ready:
+		return
 	if zoom and camera_zoom_level < 5:
 		camera_zoom_level += 1
 	else:
