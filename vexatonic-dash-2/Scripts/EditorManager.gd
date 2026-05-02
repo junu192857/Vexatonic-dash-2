@@ -9,6 +9,7 @@ var laneDatas: Array[Lane]
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
 
+@onready var editorButtons = $CanvasLayer/NoteSelectorPanel
 
 var editor_ready = false
 var bpm: float
@@ -16,6 +17,8 @@ var bpm: float
 func _ready():
 	inputHandler.move_camera.connect(_on_move_camera)
 	inputHandler.zoom_camera.connect(_on_zoom_camera)
+	editorButtons.visible = false
+	
 	
 # ================== 에디터 시작하기 ==========================
 
@@ -23,6 +26,7 @@ func _on_start_editor():
 	editor_ready = true
 	bpm = $CanvasLayer/InitialPanel/SpinBox.value
 	$CanvasLayer/InitialPanel.visible = false
+	editorButtons.visible = true
 	print("BPM: %f" % bpm)
 	
 
