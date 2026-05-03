@@ -83,7 +83,7 @@ func _process(delta):
 #
 #			   /‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\									 /‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\
 #             /						  \									/						  \
-# RhythmScene --- Note --- Connector NextNote---Connector      LongNote---Connector(롱놋틱) Marker Connector
+# RhythmScene --- Note --- Connector   NextNote---Connector    LongNote---Connector(롱놋틱) Marker Connector
 #			  \								   					/	    \__________________/
 #			   \_______________________________________________/
 

@@ -147,14 +147,14 @@ func realign_lines_by_move():
 	
 # ========================= 레인 및 노트 입력 ======================
 
-enum EditMode {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong}
-var current_mode: EditMode
+enum NoteSelection {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong}
+var current_mode: NoteSelection
 var preview: Node2D
 
 func _on_select_mode(mode: int):
 	if (!editor_ready):
 		return
-	if mode in EditMode.values():
+	if mode in NoteSelection.values():
 		current_mode = mode
 		if (preview != null):
 			preview.queue_free()
