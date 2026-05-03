@@ -63,6 +63,7 @@ offset_right = 578.0
 offset_bottom = 263.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "YellowLong"
 
 [node name="Button5" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=562787188]
 layout_mode = 0
@@ -81,6 +82,7 @@ offset_right = 427.0
 offset_bottom = 260.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "BlueLong"
 
 [node name="Button3" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1956327696]
 layout_mode = 0
@@ -91,6 +93,7 @@ offset_bottom = 257.0
 pivot_offset = Vector2(0, 120)
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "RedLong"
 
 [node name="Button10" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=444161378]
 layout_mode = 0
@@ -100,6 +103,7 @@ offset_right = 427.0
 offset_bottom = 131.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "BlueNote"
 
 [node name="Button9" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1223151017]
 layout_mode = 0
@@ -118,6 +122,7 @@ offset_right = 576.0
 offset_bottom = 131.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "YellowNote"
 
 [node name="Button7" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=203646748]
 layout_mode = 0
@@ -127,6 +132,7 @@ offset_right = 277.0
 offset_bottom = 129.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "RedNote"
 
 [node name="Button" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1835172047]
 layout_mode = 0
@@ -136,6 +142,7 @@ offset_right = 130.0
 offset_bottom = 128.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "Lane"
 
 [node name="Button2" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=228103161]
 layout_mode = 0
@@ -229,4 +236,11 @@ offset_right = -23.375
 offset_bottom = 30.5
 text = "BPM:"
 
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [6]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_mode" binds= [5]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_mode" binds= [4]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button10" to="." method="_on_select_mode" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button8" to="." method="_on_select_mode" binds= [3]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_mode" binds= [1]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_mode" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]

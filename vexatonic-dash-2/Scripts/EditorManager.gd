@@ -32,7 +32,6 @@ func _on_start_editor():
 	music_bpm.append(Vector2(0, bpm))
 	music_end_time = music_time * 1000
 	editorButtons.visible = true
-	print("BPM: %f" % bpm)
 	place_bar_lines()
 	
 
@@ -145,3 +144,14 @@ func realign_lines_by_move():
 	for line in lines:
 		line.position.y = camera.global_position.y
 	
+# ========================= 레인 및 노트 입력 ======================
+
+enum EditMode {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong}
+var current_mode: EditMode
+
+func _on_select_mode(mode: int):
+	if mode in EditMode.values():
+		current_mode = mode
+		print("Mode Changed: %d" % current_mode)
+	else:
+		push_error("Invalid EditMode: %d" % mode)
