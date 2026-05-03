@@ -2,6 +2,7 @@ extends Node
 
 signal move_camera(delta: Vector2)
 signal zoom_camera(zoom: int)
+signal move_preview(mouse_pos: Vector2)
 
 var dragging = false
 var drag_start: Vector2
@@ -15,8 +16,10 @@ func _input(event):
 			zoom_camera.emit(true)
 		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			zoom_camera.emit(false)
-	if event is InputEventMouseMotion and dragging:
-		var delta = event.position - drag_start
-		drag_start = event.position
-		move_camera.emit(delta)
-			
+	if event is InputEventMouseMotion:
+		if dragging:
+			var delta = event.position - drag_start
+			drag_start = event.position
+			move_camera.emit(delta)
+		else:
+			move_preview.emit()

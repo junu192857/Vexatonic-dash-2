@@ -17,6 +17,7 @@ var editor_ready = false
 func _ready():
 	inputHandler.move_camera.connect(_on_move_camera)
 	inputHandler.zoom_camera.connect(_on_zoom_camera)
+	inputHandler.move_preview.connect(_on_move_preview)
 	editorButtons.visible = false
 	
 	
@@ -148,10 +149,35 @@ func realign_lines_by_move():
 
 enum EditMode {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong}
 var current_mode: EditMode
+var preview: Node2D
 
 func _on_select_mode(mode: int):
+	if (!editor_ready):
+		return
 	if mode in EditMode.values():
 		current_mode = mode
+		if (preview != null):
+			preview.queue_free()
+			preview = generate_preview(mode)
 		print("Mode Changed: %d" % current_mode)
 	else:
 		push_error("Invalid EditMode: %d" % mode)
+		
+func _on_move_preview():
+	if (!editor_ready):
+		return
+	if (preview == null):
+		return
+	var mouse_pos = get_global_mouse_position()
+
+func generate_preview(mode: int) -> Node2D:
+	var my_preview
+	if (mode == 0): #lane
+		pass
+	else: if (mode % 3 == 1): #red
+		pass
+	else: if (mode % 3 == 2): #blue
+		pass 
+	else: #yellow
+		pass
+	return my_preview
