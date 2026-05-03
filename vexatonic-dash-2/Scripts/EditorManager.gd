@@ -44,18 +44,25 @@ var camera_zoom_level: int = 1
 func _on_move_camera(delta: Vector2):
 	if !editor_ready:
 		return
-	$Camera2D.position -= delta
+	camera.position -= delta
+	realign_lines_by_move()
 
 func _on_zoom_camera(zoom: bool):
 	if !editor_ready:
 		return
-	if zoom and camera_zoom_level < 5:
-		camera_zoom_level += 1
+	if zoom:
+		if camera_zoom_level < 5:
+			camera_zoom_level += 1
+		else:
+			return
 	else:
 		if camera_zoom_level > -5:
 			camera_zoom_level -= 1
+		else:
+			return
 	var real_zoom = pow(1.2, camera_zoom_level)
 	camera.zoom = Vector2.ONE * real_zoom
+	realign_lines_by_zoom(zoom)
 # ===================== 박자 구분선 출력 =====================
 
 var music_bpm: Array[Vector2] # (time, bpm): time부터 bpm
@@ -120,8 +127,21 @@ func place_bar_lines():
 
 func put_line(pos_x: float, major: bool):
 	print("PUTTING LINE..")
-	var major_line = LINE_SCENE.instantiate()
-	line_holder.add_child(major_line)
-	major_line.position = Vector2(pos_x, camera.global_position.y)
-	major_line.scale = Vector2.ONE * pow(1.2, camera_zoom_level + 1 if major else camera_zoom_level)
+	var line = LINE_SCENE.instantiate()
+	line_holder.add_child(line)
+	line.position = Vector2(pos_x, camera.global_position.y)
+	line.scale = Vector2(pow(1.2, 1 if major else -3), 3)
+
+func realign_lines_by_zoom(zoom: bool):
+	var lines = line_holder.get_children()
+	for line in lines:
+		if (zoom):
+			line.scale.x /= 1.2
+		else:
+			line.scale.x *= 1.2
+
+func realign_lines_by_move():
+	var lines = line_holder.get_children()
+	for line in lines:
+		line.position.y = camera.global_position.y
 	
