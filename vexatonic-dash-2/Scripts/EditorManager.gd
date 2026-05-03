@@ -25,6 +25,7 @@ func _ready():
 
 func _on_start_editor():
 	editor_ready = true
+	current_state = EditorState.Ready
 	var bpm = $CanvasLayer/InitialPanel/BPMBox.value
 	var music_time = $CanvasLayer/InitialPanel/MusicTimeBox.value
 	if music_time == 0:
@@ -147,36 +148,43 @@ func realign_lines_by_move():
 	
 # ========================= 레인 및 노트 입력 ======================
 
-enum NoteSelection {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong}
-var current_mode: NoteSelection
+enum NoteSelection {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong, Nothing}
+enum EditorState { Ready, Placing }
+var selected_note: NoteSelection = NoteSelection.Nothing
+var current_state: EditorState
 var preview: Node2D
 
-func _on_select_mode(mode: int):
+func _on_select_mode(selected: int):
 	if (!editor_ready):
 		return
-	if mode in NoteSelection.values():
-		current_mode = mode
+	if selected in NoteSelection.values():
+		selected_note = selected
 		if (preview != null):
 			preview.queue_free()
-			preview = generate_preview(mode)
-		print("Mode Changed: %d" % current_mode)
+			preview = generate_preview(selected_note)
+		print("Note Changed: %d" % selected_note)
 	else:
-		push_error("Invalid EditMode: %d" % mode)
+		push_error("Invalid EditMode: %d" % selected)
 		
 func _on_move_preview():
 	if (!editor_ready):
 		return
 	if (preview == null):
-		return
+		preview = generate_preview(selected_note)
 	var mouse_pos = get_global_mouse_position()
 
-func generate_preview(mode: int) -> Node2D:
+func generate_preview(selected: int) -> Node2D:
 	var my_preview
-	if (mode == 0): #lane
+	if (selected == NoteSelection.Lane): #lane
+		var mouse_pos = get_global_mouse_position()
+		#case 1: 비어 있는 곳에 lane을 찍는 경우
+		#if (fulfill_case1_condition):
+		my_preview = CONNECTOR_SCENE.instantiate()
+		add_child(my_preview)
+		my_preview.position = Vector2(0,mouse_pos.y)
+	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong): #red
 		pass
-	else: if (mode % 3 == 1): #red
-		pass
-	else: if (mode % 3 == 2): #blue
+	else: if (selected == NoteSelection.BlueNote or selected == NoteSelection.BlueLong): #blue
 		pass 
 	else: #yellow
 		pass
