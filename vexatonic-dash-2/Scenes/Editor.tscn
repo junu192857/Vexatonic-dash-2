@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://jblq2ydyctel"]
 
 [ext_resource type="Script" uid="uid://dwoyq1dcxhyuf" path="res://Scripts/EditorManager.gd" id="1_trcuy"]
-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="2_6ykgs"]
-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="3_dfuwn"]
+[ext_resource type="PackedScene" uid="uid://iksp3v0ubmg6" path="res://Prefabs/EditorNote.tscn" id="2_5v8xv"]
+[ext_resource type="PackedScene" uid="uid://br567btcie3o3" path="res://Prefabs/EditorConnector.tscn" id="3_brgpd"]
 [ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="4_5v8xv"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
 [ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
@@ -11,8 +11,8 @@
 
 [node name="Editor" type="Node2D" unique_id=375391991]
 script = ExtResource("1_trcuy")
-NOTE_SCENE = ExtResource("2_6ykgs")
-CONNECTOR_SCENE = ExtResource("3_dfuwn")
+NOTE_SCENE = ExtResource("2_5v8xv")
+CONNECTOR_SCENE = ExtResource("3_brgpd")
 LINE_SCENE = ExtResource("4_5v8xv")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
