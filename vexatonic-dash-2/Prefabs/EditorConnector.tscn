@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://br567btcie3o3"]
+
+[ext_resource type="Script" uid="uid://cpodvpyi2ibbi" path="res://Scripts/EditorConnector.gd" id="1_bpkow"]
+[ext_resource type="Texture2D" uid="uid://b6da4bo2wovn0" path="res://Textures/Connector.jpg" id="2_svias"]
+
+[node name="Connector" type="Node2D" unique_id=691671917]
+script = ExtResource("1_bpkow")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=1789340535]
+texture = ExtResource("2_svias")

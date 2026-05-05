@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://jblq2ydyctel"]
 
 [ext_resource type="Script" uid="uid://dwoyq1dcxhyuf" path="res://Scripts/EditorManager.gd" id="1_trcuy"]
-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="2_6ykgs"]
-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="3_dfuwn"]
+[ext_resource type="PackedScene" uid="uid://iksp3v0ubmg6" path="res://Prefabs/EditorNote.tscn" id="2_5v8xv"]
+[ext_resource type="PackedScene" uid="uid://br567btcie3o3" path="res://Prefabs/EditorConnector.tscn" id="3_brgpd"]
 [ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="4_5v8xv"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
 [ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
@@ -11,8 +11,8 @@
 
 [node name="Editor" type="Node2D" unique_id=375391991]
 script = ExtResource("1_trcuy")
-NOTE_SCENE = ExtResource("2_6ykgs")
-CONNECTOR_SCENE = ExtResource("3_dfuwn")
+NOTE_SCENE = ExtResource("2_5v8xv")
+CONNECTOR_SCENE = ExtResource("3_brgpd")
 LINE_SCENE = ExtResource("4_5v8xv")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
@@ -154,14 +154,6 @@ pivot_offset = Vector2(0, 120)
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 
-[node name="SaveButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=377710792]
-layout_mode = 0
-offset_left = 1751.0
-offset_top = -739.0
-offset_right = 1851.0
-offset_bottom = -639.0
-text = "Save Chart"
-
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
 anchor_left = 0.25
@@ -235,6 +227,96 @@ offset_top = -0.5
 offset_right = -23.375
 offset_bottom = 30.5
 text = "BPM:"
+
+[node name="SettingPanel" type="Panel" parent="CanvasLayer" unique_id=955210483]
+anchors_preset = -1
+anchor_left = 0.85
+anchor_right = 1.0
+anchor_bottom = 0.7
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+
+[node name="SaveButton" type="Button" parent="CanvasLayer/SettingPanel" unique_id=377710792]
+layout_mode = 0
+offset_left = 119.0
+offset_top = 15.0
+offset_right = 210.0
+offset_bottom = 102.0
+text = "Save Chart"
+
+[node name="Button4" type="Button" parent="CanvasLayer/SettingPanel" unique_id=712316614]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 216.0
+offset_right = 204.0
+offset_bottom = 297.0
+text = "32bit"
+
+[node name="Button9" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1945090177]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 506.0
+offset_right = 110.0
+offset_bottom = 587.0
+text = "Free"
+
+[node name="Button8" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1357179055]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 410.0
+offset_right = 207.0
+offset_bottom = 491.0
+text = "48bit"
+
+[node name="Button7" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1021605455]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 406.0
+offset_right = 106.0
+offset_bottom = 487.0
+text = "24bit"
+
+[node name="Button5" type="Button" parent="CanvasLayer/SettingPanel" unique_id=299326015]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 310.0
+offset_right = 104.0
+offset_bottom = 391.0
+text = "6bit"
+
+[node name="Button6" type="Button" parent="CanvasLayer/SettingPanel" unique_id=80114778]
+layout_mode = 0
+offset_left = 126.0
+offset_top = 311.0
+offset_right = 205.0
+offset_bottom = 392.0
+text = "12bit"
+
+[node name="Button2" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1236208991]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 119.0
+offset_right = 102.0
+offset_bottom = 200.0
+text = "4bit"
+
+[node name="Button3" type="Button" parent="CanvasLayer/SettingPanel" unique_id=336537621]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 216.0
+offset_right = 103.0
+offset_bottom = 297.0
+text = "16bit"
+
+[node name="Button" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1637119483]
+layout_mode = 0
+offset_left = 124.0
+offset_top = 121.0
+offset_right = 203.0
+offset_bottom = 202.0
+text = "8bit"
 
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [6]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_mode" binds= [5]]
