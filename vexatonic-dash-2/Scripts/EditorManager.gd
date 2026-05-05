@@ -127,7 +127,6 @@ func place_bar_lines():
 			put_line(x, true)
 
 func put_line(pos_x: float, major: bool):
-	print("PUTTING LINE..")
 	var line = LINE_SCENE.instantiate()
 	line_holder.add_child(line)
 	line.position = Vector2(pos_x, camera.global_position.y)
@@ -150,6 +149,10 @@ func realign_lines_by_move():
 
 enum NoteSelection {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong, Nothing}
 enum EditorState { Ready, Placing }
+#Case 1: Initial lane 제작
+#Case 2: lane 분기
+#Case 3: lane 이어 찍기
+enum LanePlacingCase {Case1, Case2, Case3, None}
 var selected_note: NoteSelection = NoteSelection.Nothing
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
@@ -159,10 +162,11 @@ func _on_select_mode(selected: int):
 		return
 	if selected in NoteSelection.values():
 		selected_note = selected
+		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
-			preview = generate_preview(selected_note)
-		print("Note Changed: %d" % selected_note)
+			#preview = generate_preview(selected_note)
+			print("Note Changed: %d" % selected_note)
 	else:
 		push_error("Invalid EditMode: %d" % selected)
 		
@@ -171,26 +175,27 @@ func _on_move_preview():
 		return
 	if (preview == null):
 		preview = generate_preview(selected_note)
+	else:
+		#update_preview()
+		pass
+
+func update_preview():
+	pass
 
 func generate_preview(selected: int) -> Node2D:
 	var my_preview
 	var mouse_pos = get_global_mouse_position()
-	
-	# 마우스가 화면 아래 30% 지점에 있으면 null 반환
-	var viewport_size = get_viewport_rect().size
-	var camera_pos = camera.global_position
-	var screen_bottom = camera_pos.y + viewport_size.y / 2
-	var threshold_y = screen_bottom - viewport_size.y * 0.3
-	if mouse_pos.y > threshold_y:
+	if (!check_mouse_in_available_area()):
 		return null
 	
 	if (selected == NoteSelection.Lane):
+		var lane_case = find_lane_placing_case(mouse_pos)
+		print("Generating lane..")
 		#case 1: 비어 있는 곳에 lane을 찍는 경우
-		var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
-		if (!is_lane_in_range and camera_left <= 0):
+		if lane_case == LanePlacingCase.Case1:
 			my_preview = CONNECTOR_SCENE.instantiate()
 			add_child(my_preview)
-			my_preview.position = Vector2(0, mouse_pos.y)
+		my_preview.position = get_preview_pos(mouse_pos, lane_case)
 	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong):
 		pass
 	else: if (selected == NoteSelection.BlueNote or selected == NoteSelection.BlueLong):
@@ -200,6 +205,10 @@ func generate_preview(selected: int) -> Node2D:
 	return my_preview
 
 func is_lane_in_range(x_start: float, x_end: float, y: float) -> bool:
+	if (x_start >= x_end):
+		push_error("Why x_start is higher than x_end?!")
+		return false
+	
 	for lane in laneDatas:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
@@ -227,3 +236,23 @@ func is_lane_in_range(x_start: float, x_end: float, y: float) -> bool:
 			return true
 	
 	return false
+
+func check_mouse_in_available_area() -> bool:
+	var mouse_pos = get_global_mouse_position()
+	if (mouse_pos.x < 0):
+		return false
+	var viewport_size = get_viewport_rect().size
+	var camera_pos = camera.global_position
+	var screen_bottom = camera_pos.y + viewport_size.y / 2
+	var threshold_y = screen_bottom - viewport_size.y * 0.3
+	return mouse_pos.y <= threshold_y
+
+func find_lane_placing_case(mouse_pos:Vector2) -> LanePlacingCase:
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
+	if (camera_left <= 0 and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
+		return LanePlacingCase.Case1
+	return LanePlacingCase.None
+
+func get_preview_pos(mouse_pos: Vector2, case: LanePlacingCase):
+	if (case == LanePlacingCase.Case1):
+		return Vector2(0, mouse_pos.y)
