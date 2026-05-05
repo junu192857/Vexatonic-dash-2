@@ -176,11 +176,12 @@ func _on_move_preview():
 	if (preview == null):
 		preview = generate_preview(selected_note)
 	else:
-		#update_preview()
-		pass
-
+		update_preview()
+		
 func update_preview():
-	pass
+	var mouse_pos = get_global_mouse_position()
+	var case = find_lane_placing_case(mouse_pos)
+	preview.position = get_preview_pos(mouse_pos, case)
 
 func generate_preview(selected: int) -> Node2D:
 	var my_preview
@@ -253,6 +254,7 @@ func find_lane_placing_case(mouse_pos:Vector2) -> LanePlacingCase:
 		return LanePlacingCase.Case1
 	return LanePlacingCase.None
 
-func get_preview_pos(mouse_pos: Vector2, case: LanePlacingCase):
+func get_preview_pos(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
+	return Vector2.ZERO
