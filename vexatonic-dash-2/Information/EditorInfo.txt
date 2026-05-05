@@ -8,9 +8,9 @@ Ready: 아직 Lane 찍기를 시작하지 않은 단계.
 Placing: Ready 이후 단계.
 
 -Ready 단계에서의 case-
-1. 비어 있는 곳에 Lane을 찍으려 한다면 x=0인 지점에 preview가 생기며, 해당 레인은 자동으로 Initial lane이 됨.
-2. 레인 위에 마우스를 올려놓고 Lane을 찍으려 한다면 해당 레인에 preview가 생기며, 해당 지점부터 lane이 분기가 됨.
-3. 레인의 끝에서 Lane을 찍으려 한다면 해당 지점에 preview가 생기며, 그 지점은 lane의 keyframe(관절)이 됨.
+Case 1. 비어 있는 곳에 Lane을 찍으려 한다면 x=0인 지점에 preview가 생기며, 해당 레인은 자동으로 Initial lane이 됨.
+Case 2. 레인 위에 마우스를 올려놓고 Lane을 찍으려 한다면 해당 레인에 preview가 생기며, 해당 지점부터 lane이 분기가 됨.
+Case 3. 레인의 끝에서 Lane을 찍으려 한다면 해당 지점에 preview가 생기며, 그 지점은 lane의 keyframe(관절)이 됨.
 1, 2, 3 셋 중 하나의 단계를 거치면 Ready에서 Placing으로 이동.
 
 -Placing 단계에서의 case-

@@ -43,10 +43,10 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 
 func _ready():
 	polygon.polygon = PackedVector2Array([
-		Vector2(0,-25), #좌상
-		Vector2(data.length,-25-data.delta_y), #우상
-		Vector2(data.length,25-data.delta_y), #우하
-		Vector2(0,25) #좌하
+		Vector2(0,-Setting.HALF_CONNECTOR_HEIGHT), #좌상
+		Vector2(data.length,-Setting.HALF_CONNECTOR_HEIGHT-data.delta_y), #우상
+		Vector2(data.length,Setting.HALF_CONNECTOR_HEIGHT-data.delta_y), #우하
+		Vector2(0,Setting.HALF_CONNECTOR_HEIGHT) #좌하
 	])
 	polygon.uv = PackedVector2Array([
 		Vector2(0,0),

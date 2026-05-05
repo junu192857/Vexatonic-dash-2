@@ -151,7 +151,7 @@ func realign_lines_by_move():
 enum NoteSelection {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong, Nothing}
 enum EditorState { Ready, Placing }
 var selected_note: NoteSelection = NoteSelection.Nothing
-var current_state: EditorState
+var current_state: EditorState = EditorState.Ready
 var preview: Node2D
 
 func _on_select_mode(selected: int):
@@ -171,21 +171,59 @@ func _on_move_preview():
 		return
 	if (preview == null):
 		preview = generate_preview(selected_note)
-	var mouse_pos = get_global_mouse_position()
 
 func generate_preview(selected: int) -> Node2D:
 	var my_preview
-	if (selected == NoteSelection.Lane): #lane
-		var mouse_pos = get_global_mouse_position()
+	var mouse_pos = get_global_mouse_position()
+	
+	# 마우스가 화면 아래 30% 지점에 있으면 null 반환
+	var viewport_size = get_viewport_rect().size
+	var camera_pos = camera.global_position
+	var screen_bottom = camera_pos.y + viewport_size.y / 2
+	var threshold_y = screen_bottom - viewport_size.y * 0.3
+	if mouse_pos.y > threshold_y:
+		return null
+	
+	if (selected == NoteSelection.Lane):
 		#case 1: 비어 있는 곳에 lane을 찍는 경우
-		#if (fulfill_case1_condition):
-		my_preview = CONNECTOR_SCENE.instantiate()
-		add_child(my_preview)
-		my_preview.position = Vector2(0,mouse_pos.y)
-	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong): #red
+		var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
+		if (!is_lane_in_range and camera_left <= 0):
+			my_preview = CONNECTOR_SCENE.instantiate()
+			add_child(my_preview)
+			my_preview.position = Vector2(0, mouse_pos.y)
+	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong):
 		pass
-	else: if (selected == NoteSelection.BlueNote or selected == NoteSelection.BlueLong): #blue
-		pass 
-	else: #yellow
+	else: if (selected == NoteSelection.BlueNote or selected == NoteSelection.BlueLong):
+		pass
+	else:
 		pass
 	return my_preview
+
+func is_lane_in_range(x_start: float, x_end: float, y: float) -> bool:
+	for lane in laneDatas:
+		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		
+		# x 범위가 겹치는지 확인
+		if lane_x_end < x_start or lane_x_start > x_end:
+			continue
+		
+		# 겹치는 x 구간에서 레인의 y좌표 확인
+		var check_x_start = max(x_start, lane_x_start)
+		var check_x_end = min(x_end, lane_x_end)
+		var check_time_start = Setting.get_time_from_posx(check_x_start)
+		var check_time_end = Setting.get_time_from_posx(check_x_end)
+		
+		for kf in lane.keyframes:
+			if kf.x < check_time_start or kf.x > check_time_end:
+				continue
+			if abs(lane.get_height(kf.x) - y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+				return true
+		
+		# 시작/끝 지점도 체크
+		if abs(lane.get_height(check_time_start) - y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+			return true
+		if abs(lane.get_height(check_time_end) - y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+			return true
+	
+	return false
