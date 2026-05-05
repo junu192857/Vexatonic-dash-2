@@ -153,6 +153,7 @@ enum EditorState { Ready, Placing }
 #Case 2: lane 분기
 #Case 3: lane 이어 찍기
 enum LanePlacingCase {Case1, Case2, Case3, None}
+var lane_case : LanePlacingCase
 var selected_note: NoteSelection = NoteSelection.Nothing
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
@@ -165,6 +166,7 @@ func _on_select_mode(selected: int):
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
+			preview = null
 			#preview = generate_preview(selected_note)
 			print("Note Changed: %d" % selected_note)
 	else:
@@ -176,27 +178,34 @@ func _on_move_preview():
 	if (preview == null):
 		preview = generate_preview(selected_note)
 	else:
-		update_preview()
+		update_preview(selected_note)
 		
-func update_preview():
+func update_preview(selected: int):
 	var mouse_pos = get_global_mouse_position()
-	var case = find_lane_placing_case(mouse_pos)
-	preview.position = get_preview_pos(mouse_pos, case)
+	if (selected == NoteSelection.Lane):
+		lane_case = find_lane_placing_case(mouse_pos)
+		if (lane_case == LanePlacingCase.None):
+			preview.queue_free()
+			preview = null
+		else: 
+			preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 
 func generate_preview(selected: int) -> Node2D:
 	var my_preview
 	var mouse_pos = get_global_mouse_position()
-	if (!check_mouse_in_available_area()):
+	if (!check_mouse_in_available_area(mouse_pos)):
 		return null
 	
 	if (selected == NoteSelection.Lane):
-		var lane_case = find_lane_placing_case(mouse_pos)
+		lane_case = find_lane_placing_case(mouse_pos)
 		print("Generating lane..")
 		#case 1: 비어 있는 곳에 lane을 찍는 경우
+		if lane_case == LanePlacingCase.None:
+			return null
 		if lane_case == LanePlacingCase.Case1:
 			my_preview = CONNECTOR_SCENE.instantiate()
 			add_child(my_preview)
-		my_preview.position = get_preview_pos(mouse_pos, lane_case)
+		my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong):
 		pass
 	else: if (selected == NoteSelection.BlueNote or selected == NoteSelection.BlueLong):
@@ -205,6 +214,7 @@ func generate_preview(selected: int) -> Node2D:
 		pass
 	return my_preview
 
+#(x_start, y) 와 (x_end, y)의 직선 구간 사이에 레인이 있는지 확인.
 func is_lane_in_range(x_start: float, x_end: float, y: float) -> bool:
 	if (x_start >= x_end):
 		push_error("Why x_start is higher than x_end?!")
@@ -238,8 +248,8 @@ func is_lane_in_range(x_start: float, x_end: float, y: float) -> bool:
 	
 	return false
 
-func check_mouse_in_available_area() -> bool:
-	var mouse_pos = get_global_mouse_position()
+# 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
+func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
 	if (mouse_pos.x < 0):
 		return false
 	var viewport_size = get_viewport_rect().size
@@ -248,13 +258,35 @@ func check_mouse_in_available_area() -> bool:
 	var threshold_y = screen_bottom - viewport_size.y * 0.3
 	return mouse_pos.y <= threshold_y
 
-func find_lane_placing_case(mouse_pos:Vector2) -> LanePlacingCase:
+func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
+	if (!check_mouse_in_available_area(mouse_pos)):
+		return LanePlacingCase.None
+
+	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
+	for lane in laneDatas:
+		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
+			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
+			if abs(lane_y - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+				return LanePlacingCase.Case2
+
+	# Case 3 체크: 마우스가 레인 끝보다 오른쪽이고 왼쪽에 레인이 있는 경우
+	for lane in laneDatas:
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		if mouse_pos.x > lane_x_end:
+			var lane_y_end = lane.keyframes[-1].y
+			if abs(lane_y_end - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+				return LanePlacingCase.Case3
+
+	# Case 1 체크
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
 	if (camera_left <= 0 and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
 		return LanePlacingCase.Case1
+
 	return LanePlacingCase.None
 
-func get_preview_pos(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
+func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
 	return Vector2.ZERO
