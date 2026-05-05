@@ -26,3 +26,8 @@ func set_polygon_dynamically():
 		Vector2(data.length,Setting.HALF_CONNECTOR_HEIGHT-data.delta_y), #우하
 		Vector2(0,Setting.HALF_CONNECTOR_HEIGHT) #좌하
 	])
+
+func set_data(start_pos:Vector2, end_pos:Vector2):
+	data.set_length(end_pos.x - start_pos.x)
+	data.set_delta_y(start_pos.y - end_pos.y)
+	set_polygon_dynamically()

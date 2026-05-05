@@ -18,6 +18,7 @@ func _ready():
 	inputHandler.move_camera.connect(_on_move_camera)
 	inputHandler.zoom_camera.connect(_on_zoom_camera)
 	inputHandler.move_preview.connect(_on_move_preview)
+	inputHandler.put_note.connect(_on_put_note)
 	editorButtons.visible = false
 	
 	
@@ -154,6 +155,8 @@ enum EditorState { Ready, Placing }
 #Case 3: lane 이어 찍기
 enum LanePlacingCase {Case1, Case2, Case3, None}
 var lane_case : LanePlacingCase
+var lane_start_pos: Vector2
+	
 var selected_note: NoteSelection = NoteSelection.Nothing
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
@@ -183,13 +186,20 @@ func _on_move_preview():
 func update_preview(selected: int):
 	var mouse_pos = get_global_mouse_position()
 	if (selected == NoteSelection.Lane):
-		lane_case = find_lane_placing_case(mouse_pos)
-		if (lane_case == LanePlacingCase.None):
-			preview.queue_free()
-			preview = null
-		else: 
-			preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
-
+		if (current_state == EditorState.Ready):
+			lane_case = find_lane_placing_case(mouse_pos)
+			if (lane_case == LanePlacingCase.None):
+				preview.queue_free()
+				preview = null
+			else: 
+				preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
+		else:
+			if (lane_start_pos.x >= mouse_pos.x):
+				preview.queue_free()
+				preview == null
+			else:
+				preview.set_data(lane_start_pos, mouse_pos)
+				
 func generate_preview(selected: int) -> Node2D:
 	var my_preview
 	var mouse_pos = get_global_mouse_position()
@@ -197,15 +207,22 @@ func generate_preview(selected: int) -> Node2D:
 		return null
 	
 	if (selected == NoteSelection.Lane):
-		lane_case = find_lane_placing_case(mouse_pos)
-		print("Generating lane..")
-		#case 1: 비어 있는 곳에 lane을 찍는 경우
-		if lane_case == LanePlacingCase.None:
-			return null
-		if lane_case == LanePlacingCase.Case1:
+		if (current_state == EditorState.Ready):
+			lane_case = find_lane_placing_case(mouse_pos)
+			print("Generating lane..")
+			#case 1: 비어 있는 곳에 lane을 찍는 경우
+			if lane_case == LanePlacingCase.None:
+				return null
+			if lane_case == LanePlacingCase.Case1:
+				my_preview = CONNECTOR_SCENE.instantiate()
+				add_child(my_preview)
+			my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
+		else:
 			my_preview = CONNECTOR_SCENE.instantiate()
+			#lane_start_pos와 현재 mouse_pos로 lane 찍기
 			add_child(my_preview)
-		my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
+			my_preview.set_data(lane_start_pos, mouse_pos)
+			my_preview.position = lane_start_pos
 	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong):
 		pass
 	else: if (selected == NoteSelection.BlueNote or selected == NoteSelection.BlueLong):
@@ -290,3 +307,13 @@ func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vect
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
 	return Vector2.ZERO
+	
+func _on_put_note():
+	if (!editor_ready):
+		return
+	if (preview == null):
+		return
+	if (current_state == EditorState.Ready):
+		current_state = EditorState.Placing
+		if (selected_note == NoteSelection.Lane):
+			lane_start_pos = preview.global_position
