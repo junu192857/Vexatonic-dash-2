@@ -14,6 +14,6 @@ func set_color(p_color: int):
 
 func set_length(p_length: float):
 	length = p_length
-	
+
 func set_delta_y(p_delta: float):
 	delta_y = p_delta

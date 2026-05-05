@@ -96,4 +96,14 @@ static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	return null
 
 static func sort_lanes(lanes: Array[Lane]):
-	lanes.sort_custom(func(a:Lane, b:Lane): return a.keyframes[0].x < b.keyframes[0].x) 
+	lanes.sort_custom(func(a:Lane, b:Lane): return a.keyframes[0].x < b.keyframes[0].x)
+	
+static func find_free_index(lanes: Array[Lane]) -> int:
+	if lanes.is_empty():
+		return 0
+	
+	var used_indices = lanes.map(func(lane: Lane): return lane.lane_index)
+	var i = 0
+	while i in used_indices:
+		i += 1
+	return i

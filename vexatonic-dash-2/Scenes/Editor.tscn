@@ -256,18 +256,18 @@ text = "32bit"
 
 [node name="Button9" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1945090177]
 layout_mode = 0
-offset_left = 31.0
-offset_top = 506.0
-offset_right = 110.0
-offset_bottom = 587.0
+offset_left = 27.0
+offset_top = 501.0
+offset_right = 106.0
+offset_bottom = 582.0
 text = "Free"
 
 [node name="Button8" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1357179055]
 layout_mode = 0
-offset_left = 128.0
-offset_top = 410.0
-offset_right = 207.0
-offset_bottom = 491.0
+offset_left = 126.0
+offset_top = 408.0
+offset_right = 205.0
+offset_bottom = 489.0
 text = "48bit"
 
 [node name="Button7" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1021605455]
