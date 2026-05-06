@@ -295,7 +295,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if mouse_pos.x > lane_x_end:
 			var lane_y_end = lane.keyframes[-1].y
-			if abs(lane_y_end - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+			if abs(lane_y_end - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				print("CASE 3")
 				return LanePlacingCase.Case3
 
@@ -327,10 +327,11 @@ func _on_put_note():
 				print("HELLO?")
 				var new_index = Lane.find_free_index(laneDatas)
 				var new_lane = Lane.new(new_index, true)
-				laneDatas.append(new_lane)
+				
 				new_lane.add_keyframe(0, preview.global_position.y)
 				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), preview.get_end_pos(lane_start_pos).y)
 				print("New initial line added with initial y %f and next y %f" % [preview.global_position.y,preview.get_end_pos(lane_start_pos).y ])
+				laneDatas.append(new_lane)
 				preview.set_lane_index(new_index)
 				preview = null
 			lane_case = LanePlacingCase.None
