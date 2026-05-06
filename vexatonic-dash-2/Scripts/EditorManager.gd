@@ -10,7 +10,8 @@ var laneDatas: Array[Lane]
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
 
-@onready var editorButtons = $CanvasLayer/NoteSelectorPanel
+@onready var noteSelectorPanel = $CanvasLayer/NoteSelectorPanel
+@onready var settingPanel = $CanvasLayer/SettingPanel
 
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
@@ -19,7 +20,8 @@ func _ready():
 	inputHandler.zoom_camera.connect(_on_zoom_camera)
 	inputHandler.move_preview.connect(_on_move_preview)
 	inputHandler.put_note.connect(_on_put_note)
-	editorButtons.visible = false
+	noteSelectorPanel.visible = false
+	settingPanel.visible = false
 	
 	
 # ================== 에디터 시작하기 ==========================
@@ -34,7 +36,8 @@ func _on_start_editor():
 	$CanvasLayer/InitialPanel.visible = false
 	music_bpm.append(Vector2(0, bpm))
 	music_end_time = music_time * 1000
-	editorButtons.visible = true
+	noteSelectorPanel.visible = true
+	settingPanel.visible = true
 	place_bar_lines()
 	
 
@@ -156,7 +159,7 @@ enum EditorState { Ready, Placing }
 enum LanePlacingCase {Case1, Case2, Case3, None}
 var lane_case : LanePlacingCase
 var lane_start_pos: Vector2
-	
+
 var selected_note: NoteSelection = NoteSelection.Nothing
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
@@ -203,20 +206,17 @@ func update_preview(selected: int):
 func generate_preview(selected: int) -> Node2D:
 	var my_preview
 	var mouse_pos = get_global_mouse_position()
-	if (!check_mouse_in_available_area(mouse_pos)):
-		return null
 	
 	if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
-			print("Generating lane..")
 			#case 1: 비어 있는 곳에 lane을 찍는 경우
 			if lane_case == LanePlacingCase.None:
 				return null
 			if lane_case == LanePlacingCase.Case1:
 				my_preview = CONNECTOR_SCENE.instantiate()
 				add_child(my_preview)
-			my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
+				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
@@ -314,6 +314,19 @@ func _on_put_note():
 	if (preview == null):
 		return
 	if (current_state == EditorState.Ready):
-		current_state = EditorState.Placing
 		if (selected_note == NoteSelection.Lane):
 			lane_start_pos = preview.global_position
+		current_state = EditorState.Placing
+	else: if (current_state == EditorState.Placing):
+		if (selected_note == NoteSelection.Lane):
+			if (lane_case == LanePlacingCase.Case1):
+				print("HELLO?")
+				var new_index = Lane.find_free_index(laneDatas)
+				var new_lane = Lane.new(new_index, true)
+				laneDatas.append(new_lane)
+				new_lane.add_keyframe(0, -preview.global_position.y)
+				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), -preview.get_end_pos(lane_start_pos).y)
+				preview.set_lane_index(new_index)
+				preview = null
+			lane_case = LanePlacingCase.None
+		current_state = EditorState.Ready

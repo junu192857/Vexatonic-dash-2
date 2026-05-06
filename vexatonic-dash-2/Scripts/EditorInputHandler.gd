@@ -17,7 +17,7 @@ func _input(event):
 			zoom_camera.emit(true)
 		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			zoom_camera.emit(false)
-		if event.button_index == MOUSE_BUTTON_LEFT:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			put_note.emit()
 			
 	if event is InputEventMouseMotion:
