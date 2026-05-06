@@ -286,8 +286,8 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
-			if abs(lane_y - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				print("CASE 2")
 				return LanePlacingCase.Case2
 
 	# Case 3 체크: 마우스가 레인 끝보다 오른쪽이고 왼쪽에 레인이 있는 경우
