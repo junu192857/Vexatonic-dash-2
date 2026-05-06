@@ -22,18 +22,18 @@ func _ready():
 func set_polygon_dynamically():
 	polygon.polygon = PackedVector2Array([
 		Vector2(0,-Setting.HALF_CONNECTOR_HEIGHT), #좌상
-		Vector2(data.length,-Setting.HALF_CONNECTOR_HEIGHT-data.delta_y), #우상
-		Vector2(data.length,Setting.HALF_CONNECTOR_HEIGHT-data.delta_y), #우하
+		Vector2(data.length,-Setting.HALF_CONNECTOR_HEIGHT+data.delta_y), #우상
+		Vector2(data.length,Setting.HALF_CONNECTOR_HEIGHT+data.delta_y), #우하
 		Vector2(0,Setting.HALF_CONNECTOR_HEIGHT) #좌하
 	])
 
 func set_data(start_pos:Vector2, end_pos:Vector2):
 	data.set_length(end_pos.x - start_pos.x)
-	data.set_delta_y(start_pos.y - end_pos.y)
+	data.set_delta_y(end_pos.y - start_pos.y)
 	set_polygon_dynamically()
 
 func get_end_pos(start_pos:Vector2):
-	return start_pos + Vector2(data.length, -data.delta_y)
+	return start_pos + Vector2(data.length, data.delta_y)
 
 func set_lane_index(index:int):
 	lane_index = index

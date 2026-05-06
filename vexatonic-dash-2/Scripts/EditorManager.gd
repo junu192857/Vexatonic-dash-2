@@ -200,7 +200,7 @@ func update_preview(selected: int):
 		else:
 			if (lane_start_pos.x >= mouse_pos.x):
 				preview.queue_free()
-				preview == null
+				preview = null
 			else:
 				preview.set_data(lane_start_pos, mouse_pos)
 				
@@ -296,11 +296,13 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 		if mouse_pos.x > lane_x_end:
 			var lane_y_end = lane.keyframes[-1].y
 			if abs(lane_y_end - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+				print("CASE 3")
 				return LanePlacingCase.Case3
 
 	# Case 1 체크
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
 	if (camera_left <= 0 and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
+		print("CASE 1")
 		return LanePlacingCase.Case1
 
 	return LanePlacingCase.None
@@ -326,8 +328,9 @@ func _on_put_note():
 				var new_index = Lane.find_free_index(laneDatas)
 				var new_lane = Lane.new(new_index, true)
 				laneDatas.append(new_lane)
-				new_lane.add_keyframe(0, -preview.global_position.y)
-				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), -preview.get_end_pos(lane_start_pos).y)
+				new_lane.add_keyframe(0, preview.global_position.y)
+				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), preview.get_end_pos(lane_start_pos).y)
+				print("New initial line added with initial y %f and next y %f" % [preview.global_position.y,preview.get_end_pos(lane_start_pos).y ])
 				preview.set_lane_index(new_index)
 				preview = null
 			lane_case = LanePlacingCase.None

@@ -126,9 +126,9 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 	var lane = Lane.find_lane(lanes, data.lane)
 	parent.add_child(note)
 	if !is_marker:
-		note.position = Vector2(pos_x, -lane.get_height(data.time))
+		note.position = Vector2(pos_x, lane.get_height(data.time))
 	else:
-		note.position = Vector2(pos_x, -(lane.get_height(data.end_time) - lane.get_height(data.time)))
+		note.position = Vector2(pos_x, lane.get_height(data.end_time) - lane.get_height(data.time))
 	#print("Place Note at %f"% pos_x)
 	
 	return note
@@ -143,7 +143,7 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 	# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
 	if (end_time - initial_end_time > Setting.EPSILON):
 		var following_connector = place_connector(p_color, initial_end_time, end_time, lane, false,\
-								  connector, Vector2(connector.data.length, -connector.data.delta_y))
+								  connector, Vector2(connector.data.length, connector.data.delta_y))
 
 	parent.add_child(connector)
 	connector.position = p_pos
@@ -165,7 +165,7 @@ func place_initial_connector(lane: Lane):
 		else:
 			if (lane.keyframes[0].x < lane.notes[0].get_time()):
 				var initial_connector = place_connector(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane.lane_index,\
-										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y))
+										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), lane.keyframes[0].y))
 				
 				#var connector = CONNECTOR_SCENE.instantiate() as Node2D
 				#connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
@@ -180,10 +180,10 @@ func place_final_connector(lane: Lane):
 		if lane.keyframes[-1].x - last_note_time > Setting.time_per_note_width:
 			var connector_time = last_note_time + Setting.time_per_note_width
 			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].x, lane.lane_index, true,\
-								  self,  Vector2(Setting.get_posx_from_time(connector_time), -lane.get_height(last_note_time)))
+								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
 	else:
 		var final_connector = place_connector(-1, lane.keyframes[0].x, lane.keyframes[-1].x, lane.lane_index, false,\
-							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y))
+							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), lane.keyframes[0].y))
 
 # 생성된 노트를 레인의 노트 큐에 할당
 func assign_note(note: Note):
