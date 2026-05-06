@@ -159,6 +159,7 @@ enum EditorState { Ready, Placing }
 enum LanePlacingCase {Case1, Case2, Case3, None}
 var lane_case : LanePlacingCase
 var lane_start_pos: Vector2
+var target_lane
 
 var selected_note: NoteSelection = NoteSelection.Nothing
 var current_state: EditorState = EditorState.Ready
@@ -213,7 +214,7 @@ func generate_preview(selected: int) -> Node2D:
 			#case 1: 비어 있는 곳에 lane을 찍는 경우
 			if lane_case == LanePlacingCase.None:
 				return null
-			if lane_case == LanePlacingCase.Case1:
+			else:
 				my_preview = CONNECTOR_SCENE.instantiate()
 				add_child(my_preview)
 				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
@@ -286,6 +287,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
+			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				return LanePlacingCase.Case2
 
 	# Case 3 체크: 마우스가 레인 끝보다 오른쪽이고 왼쪽에 레인이 있는 경우
