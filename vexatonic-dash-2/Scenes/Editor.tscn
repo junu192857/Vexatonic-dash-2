@@ -246,6 +246,14 @@ offset_right = 210.0
 offset_bottom = 102.0
 text = "Save Chart"
 
+[node name="SaveButton" type="Button" parent="CanvasLayer/SettingPanel/SaveButton" unique_id=900100908]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 573.0
+offset_right = 94.0
+offset_bottom = 660.0
+text = "Debug Lane"
+
 [node name="Button4" type="Button" parent="CanvasLayer/SettingPanel" unique_id=712316614]
 layout_mode = 0
 offset_left = 125.0
@@ -326,3 +334,4 @@ text = "8bit"
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_mode" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_mode" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]
+[connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton/SaveButton" to="." method="print_lane_info"]
