@@ -272,9 +272,13 @@ func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
 		return false
 	var viewport_size = get_viewport_rect().size
 	var camera_pos = camera.global_position
+	
 	var screen_bottom = camera_pos.y + viewport_size.y / 2
 	var threshold_y = screen_bottom - viewport_size.y * 0.3
-	return mouse_pos.y <= threshold_y
+	
+	var screen_right = camera_pos.x + viewport_size.x / 2
+	var threshold_x = screen_right - viewport_size.x * 0.15
+	return mouse_pos.y <= threshold_y and mouse_pos.x <= threshold_x
 
 func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	if (!check_mouse_in_available_area(mouse_pos)):
