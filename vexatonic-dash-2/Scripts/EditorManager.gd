@@ -159,7 +159,7 @@ enum EditorState { Ready, Placing }
 enum LanePlacingCase {Case1, Case2, Case3, None}
 var lane_case : LanePlacingCase
 var lane_start_pos: Vector2
-var target_lane
+var target_lane: Lane
 
 var selected_note: NoteSelection = NoteSelection.Nothing
 var current_state: EditorState = EditorState.Ready
@@ -292,6 +292,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				print("CASE 2")
+				target_lane = lane
 				return LanePlacingCase.Case2
 
 	# Case 3 체크: 마우스가 레인 끝보다 오른쪽이고 왼쪽에 레인이 있는 경우
@@ -301,6 +302,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 			var lane_y_end = lane.keyframes[-1].y
 			if abs(lane_y_end - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				print("CASE 3")
+				target_lane = lane
 				return LanePlacingCase.Case3
 
 	# Case 1 체크
@@ -311,9 +313,12 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 
 	return LanePlacingCase.None
 
+# Ready 단계에서 Lane의 preview의 위치 구하기.
 func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
+	else: if (case == LanePlacingCase.Case2):
+		return Vector2(mouse_pos.x, target_lane.get_height(Setting.get_time_from_posx(mouse_pos.x)))
 	return Vector2.ZERO
 	
 func _on_put_note():
