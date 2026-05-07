@@ -333,13 +333,22 @@ func _on_put_note():
 	else: if (current_state == EditorState.Placing):
 		if (selected_note == NoteSelection.Lane):
 			if (lane_case == LanePlacingCase.Case1):
-				print("HELLO?")
+				print("CASE 1 ACTIVATED")
 				var new_index = Lane.find_free_index(laneDatas)
 				var new_lane = Lane.new(new_index, true)
 				
-				new_lane.add_keyframe(0, preview.global_position.y)
+				new_lane.add_keyframe(0, lane_start_pos.y)
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
-				print("New initial line added with initial y %f and next y %f" % [preview.global_position.y,preview.get_end_pos(lane_start_pos).y ])
+				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
+				laneDatas.append(new_lane)
+				preview.set_lane_index(new_index)
+				preview = null
+			else: if (lane_case == LanePlacingCase.Case2):
+				print("CASE 2 ACTIVATED")
+				var new_index = Lane.find_free_index(laneDatas)
+				var new_lane = Lane.new(new_index, false)
+				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
+				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 				laneDatas.append(new_lane)
 				preview.set_lane_index(new_index)
 				preview = null
