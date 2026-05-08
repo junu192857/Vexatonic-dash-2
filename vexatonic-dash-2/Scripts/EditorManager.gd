@@ -12,6 +12,7 @@ var laneDatas: Array[Lane]
 
 @onready var noteSelectorPanel = $CanvasLayer/NoteSelectorPanel
 @onready var settingPanel = $CanvasLayer/SettingPanel
+@onready var savePanel = $CanvasLayer/SavePanel
 
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
@@ -159,6 +160,7 @@ enum EditorState { Ready, Placing }
 enum LanePlacingCase {Case1, Case2, Case3, None}
 var lane_case : LanePlacingCase
 var lane_start_pos: Vector2
+var target_lane: Lane
 
 var selected_note: NoteSelection = NoteSelection.Nothing
 var current_state: EditorState = EditorState.Ready
@@ -213,11 +215,13 @@ func generate_preview(selected: int) -> Node2D:
 			#case 1: 비어 있는 곳에 lane을 찍는 경우
 			if lane_case == LanePlacingCase.None:
 				return null
-			if lane_case == LanePlacingCase.Case1:
+			else:
 				my_preview = CONNECTOR_SCENE.instantiate()
 				add_child(my_preview)
 				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
+			if (lane_start_pos.x >= mouse_pos.x):
+				return null
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
 			add_child(my_preview)
@@ -271,9 +275,13 @@ func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
 		return false
 	var viewport_size = get_viewport_rect().size
 	var camera_pos = camera.global_position
+	
 	var screen_bottom = camera_pos.y + viewport_size.y / 2
 	var threshold_y = screen_bottom - viewport_size.y * 0.3
-	return mouse_pos.y <= threshold_y
+	
+	var screen_right = camera_pos.x + viewport_size.x / 2
+	var threshold_x = screen_right - viewport_size.x * 0.15
+	return mouse_pos.y <= threshold_y and mouse_pos.x <= threshold_x
 
 func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	if (!check_mouse_in_available_area(mouse_pos)):
@@ -285,30 +293,36 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
-			if abs(lane_y - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
-				print("CASE 2")
+			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				target_lane = lane
 				return LanePlacingCase.Case2
 
 	# Case 3 체크: 마우스가 레인 끝보다 오른쪽이고 왼쪽에 레인이 있는 경우
 	for lane in laneDatas:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if mouse_pos.x > lane_x_end:
-			var lane_y_end = lane.keyframes[-1].y
-			if abs(lane_y_end - mouse_pos.y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
-				print("CASE 3")
-				return LanePlacingCase.Case3
+			var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
+			if (camera_left < lane_x_end):
+				var lane_y_end = lane.keyframes[-1].y
+				if abs(lane_y_end - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+					target_lane = lane
+					return LanePlacingCase.Case3
 
 	# Case 1 체크
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
-	if (camera_left <= 0 and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
-		print("CASE 1")
+	if (camera_left <= 0): #and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
 		return LanePlacingCase.Case1
 
 	return LanePlacingCase.None
 
+# Ready 단계에서 Lane의 preview의 위치 구하기.
 func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
+	else: if (case == LanePlacingCase.Case2):
+		return Vector2(mouse_pos.x, target_lane.get_height(Setting.get_time_from_posx(mouse_pos.x)))
+	else: if (case == LanePlacingCase.Case3):
+		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].x),target_lane.keyframes[-1].y)
 	return Vector2.ZERO
 	
 func _on_put_note():
@@ -323,14 +337,69 @@ func _on_put_note():
 	else: if (current_state == EditorState.Placing):
 		if (selected_note == NoteSelection.Lane):
 			if (lane_case == LanePlacingCase.Case1):
-				print("HELLO?")
+				print("CASE 1 ACTIVATED")
 				var new_index = Lane.find_free_index(laneDatas)
 				var new_lane = Lane.new(new_index, true)
+				
+				new_lane.add_keyframe(0, lane_start_pos.y)
+				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
 				laneDatas.append(new_lane)
-				new_lane.add_keyframe(0, preview.global_position.y)
-				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), preview.get_end_pos(lane_start_pos).y)
-				print("New initial line added with initial y %f and next y %f" % [preview.global_position.y,preview.get_end_pos(lane_start_pos).y ])
 				preview.set_lane_index(new_index)
+				preview = null
+			else: if (lane_case == LanePlacingCase.Case2):
+				print("CASE 2 ACTIVATED")
+				var new_index = Lane.find_free_index(laneDatas)
+				var new_lane = Lane.new(new_index, false)
+				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
+				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
+				laneDatas.append(new_lane)
+				preview.set_lane_index(new_index)
+				preview = null
+			else: if (lane_case == LanePlacingCase.Case3):
+				print("CASE 3 ACTIVATED")
+				target_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+				print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
+				preview.set_lane_index(target_lane.lane_index)
 				preview = null
 			lane_case = LanePlacingCase.None
 		current_state = EditorState.Ready
+		
+# ======================== Testing ===================================
+
+func print_lane_info():
+	for lane in laneDatas:
+		print("LANE INDEX %d" % lane.lane_index)
+		for keyframe in lane.keyframes:
+			print("my lane's keyframe: time %f and height %f" % [keyframe.x, keyframe.y])
+			
+			
+# ======================== Save Chart ================================
+
+func open_save_panel():
+	editor_ready = false
+	savePanel.visible = true
+
+func quit_save_panel():
+	savePanel.visible = false
+	editor_ready = false
+
+func save_chart():
+	var file_name = savePanel.get_node("LineEdit").text
+	if file_name.is_empty():
+		push_error("파일 이름을 입력해주세요!")
+		return
+	
+	var file = FileAccess.open("res://Charts/" + file_name + ".csv", FileAccess.WRITE)
+	if file == null:
+		push_error("ERROR: 파일을 열 수 없습니다.: " + file_name)
+		return
+	
+	for lane in laneDatas:
+		file.store_line("LANE %d %d" % [lane.lane_index, 1 if lane.is_init else 0])
+		for kf in lane.keyframes:
+			file.store_line("%s %s" % [kf.x, kf.y])
+		file.store_line("END")
+	
+	quit_save_panel()
