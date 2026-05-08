@@ -171,6 +171,7 @@ func place_initial_connector(lane: Lane):
 				#connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
 				#connector.set_connector_data(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane, false)
 				#add_child(connector)
+	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
 # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
 func place_final_connector(lane: Lane):
