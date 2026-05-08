@@ -182,7 +182,7 @@ func update_preview(selected: int):
 	if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
-			if (lane_case == LanePlacingCase.None):
+			if lane_case == LanePlacingCase.None:
 				preview.queue_free()
 				preview = null
 			else: 
@@ -249,7 +249,8 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	for lane in laneDatas:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
-		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
+		var snapped_x = get_snapped_x(mouse_pos.x)
+		if snapped_x >= lane_x_start and snapped_x < lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				target_lane = lane
@@ -280,6 +281,23 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 
 	return LanePlacingCase.None
 
+func find_note_placing_case(mouse_pos: Vector2) -> bool:
+	if (!check_mouse_in_available_area(mouse_pos)):
+		return false
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
+
+	for lane in laneDatas:
+		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		var snapped_x = get_snapped_x(mouse_pos.x)
+		if snapped_x >= lane_x_start and snapped_x < lane_x_end:
+			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
+			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				target_lane = lane
+				return true
+	
+	return false
+	
 # Ready 단계에서 Lane의 preview의 위치 구하기.
 func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
