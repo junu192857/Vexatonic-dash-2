@@ -357,7 +357,11 @@ func _on_put_note():
 				preview.set_lane_index(new_index)
 				preview = null
 			else: if (lane_case == LanePlacingCase.Case3):
-				pass
+				print("CASE 3 ACTIVATED")
+				target_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+				print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
+				preview.set_lane_index(target_lane.lane_index)
+				preview = null
 			lane_case = LanePlacingCase.None
 		current_state = EditorState.Ready
 		
