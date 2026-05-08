@@ -36,6 +36,7 @@ func _on_start_editor():
 		music_time = 180
 	$CanvasLayer/InitialPanel.visible = false
 	music_bpm.append(Vector2(0, bpm))
+	music_bpm.append(Vector2(INF, 60))
 	music_end_time = music_time * 1000
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
@@ -73,63 +74,51 @@ func _on_zoom_camera(zoom: bool):
 
 var music_bpm: Array[Vector2] # (time, bpm): time부터 bpm
 var music_end_time : float = 180000
+var bit: int = 16
 @onready var line_holder = $LineHolder
 
-#func calculate_camera_boundary() -> Vector4:
-#	var viewport_size = get_viewport_rect().size / camera.zoom
-#	var camera_pos = camera.global_position
-#
-#	var top_left = camera_pos - 3 * viewport_size / 2
-#	var bottom_right = camera_pos + 3 * viewport_size / 2
-#
-#	var top = top_left.y
-#	var bottom = bottom_right.y
-#	var left = top_left.x
-#	var right = bottom_right.x
-#	
-#	return Vector4(top, bottom, left, right)
+func set_bit(p_bit: int):
+	bit = p_bit # 4, 6, 8, 12, 16, 24, 32, 48, free(0)
+	place_bar_lines()
 
 #현재 camera의 zoom과 position에 맞춰서 마디 구분선 출력
 func place_bar_lines():
-	for i in range(music_bpm.size()):
+	for bar in line_holder.get_children():
+		bar.queue_free()
+	
+	var effective_bit = bit if bit != 0 else 4
+	
+	for i in range(music_bpm.size() - 1):
+		if music_bpm[i].x > music_bpm[i+1].x:
+			push_error("Please sort by time ascending")
+			return
 		var bpm_start_time = music_bpm[i].x
 		var bpm = music_bpm[i].y
-		var bpm_end_time = music_bpm[i + 1].x if i + 1 < music_bpm.size() else music_end_time
-		print(bpm_start_time)
-		print(bpm_end_time)
+		var bpm_end_time = min(music_bpm[i + 1].x, music_end_time)
 		if bpm_start_time < 0:
 			push_error("time cannot be negative")
 			return
-		if bpm_start_time > bpm_end_time:
-			push_error("Please sort music_bpm by time ascending")
+		if bpm_start_time > music_end_time:
 			return
-		if bpm_end_time > music_end_time:
-			push_error("BPM end time cannot be later than music end time")
-			return
-
+		
 		var beat_duration = 60000.0 / bpm
-		var bar_duration = beat_duration * 4
-
+		var snap_duration = beat_duration * 4.0 / effective_bit
 		var time = bpm_start_time
-		var beat_count = 0
-
+		var snap_count = 0
+		
 		while true:
 			var x = Setting.get_posx_from_time(time)
-
-			if beat_count % 4 == 0:
-				put_line(x, true)
+			if snap_count % effective_bit == 0:
+				put_line(x, true)  # 마디 시작 (굵은 선)
 			else:
 				put_line(x, false)
-
-			beat_count += 1
-			time += beat_duration
-
+			snap_count += 1
+			time += snap_duration
 			if time >= bpm_end_time - Setting.EPSILON:
 				break
-
-		if i + 1 < music_bpm.size():
-			var x = Setting.get_posx_from_time(bpm_end_time)
-			put_line(x, true)
+		
+		var x = Setting.get_posx_from_time(bpm_end_time)
+		put_line(x, true)
 
 func put_line(pos_x: float, major: bool):
 	var line = LINE_SCENE.instantiate()
@@ -199,11 +188,12 @@ func update_preview(selected: int):
 			else: 
 				preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
-			if (lane_start_pos.x >= mouse_pos.x):
+			var snapped_x = get_snapped_x(mouse_pos.x)
+			if (!check_mouse_in_available_area(mouse_pos) or lane_start_pos.x >= snapped_x):
 				preview.queue_free()
 				preview = null
 			else:
-				preview.set_data(lane_start_pos, mouse_pos)
+				preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
 				
 func generate_preview(selected: int) -> Node2D:
 	var my_preview
@@ -220,12 +210,13 @@ func generate_preview(selected: int) -> Node2D:
 				add_child(my_preview)
 				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
-			if (lane_start_pos.x >= mouse_pos.x):
+			var snapped_x = get_snapped_x(mouse_pos.x)
+			if (!check_mouse_in_available_area(mouse_pos) or lane_start_pos.x >= snapped_x):
 				return null
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
 			add_child(my_preview)
-			my_preview.set_data(lane_start_pos, mouse_pos)
+			my_preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
 			my_preview.position = lane_start_pos
 	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong):
 		pass
@@ -286,6 +277,7 @@ func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
 func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	if (!check_mouse_in_available_area(mouse_pos)):
 		return LanePlacingCase.None
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
 
 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
 	for lane in laneDatas:
@@ -297,19 +289,26 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 				target_lane = lane
 				return LanePlacingCase.Case2
 
-	# Case 3 체크: 마우스가 레인 끝보다 오른쪽이고 왼쪽에 레인이 있는 경우
+	# Case 3 체크
+	var closest_lane: Lane = null
+	var closest_dist: float = INF
+
 	for lane in laneDatas:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if mouse_pos.x > lane_x_end:
-			var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
-			if (camera_left < lane_x_end):
+			if camera_left < lane_x_end:
 				var lane_y_end = lane.keyframes[-1].y
 				if abs(lane_y_end - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
-					target_lane = lane
-					return LanePlacingCase.Case3
+					var dist = mouse_pos.x - lane_x_end
+					if dist < closest_dist:
+						closest_dist = dist
+						closest_lane = lane
+
+	if closest_lane != null:
+		target_lane = closest_lane
+		return LanePlacingCase.Case3
 
 	# Case 1 체크
-	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
 	if (camera_left <= 0): #and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
 		return LanePlacingCase.Case1
 
@@ -320,7 +319,8 @@ func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vect
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
 	else: if (case == LanePlacingCase.Case2):
-		return Vector2(mouse_pos.x, target_lane.get_height(Setting.get_time_from_posx(mouse_pos.x)))
+		var snapped_x = get_snapped_x(mouse_pos.x)
+		return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 	else: if (case == LanePlacingCase.Case3):
 		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].x),target_lane.keyframes[-1].y)
 	return Vector2.ZERO
@@ -365,7 +365,29 @@ func _on_put_note():
 				preview = null
 			lane_case = LanePlacingCase.None
 		current_state = EditorState.Ready
-		
+
+func get_snapped_x(mouse_x: float) -> float:
+	if bit == 0:
+		return mouse_x
+	
+	var time = Setting.get_time_from_posx(mouse_x)
+	
+	var bpm = music_bpm[0].y
+	var bpm_start_time = music_bpm[0].x
+	for i in range(music_bpm.size() - 1):
+		if time >= music_bpm[i].x and time < music_bpm[i + 1].x:
+			bpm = music_bpm[i].y
+			bpm_start_time = music_bpm[i].x
+			break
+	
+	var beat_duration = 60000.0 / bpm
+	var snap_duration = beat_duration * 4.0 / bit
+	
+	var elapsed = time - bpm_start_time
+	var snapped_time = bpm_start_time + round(elapsed / snap_duration) * snap_duration
+	
+	return Setting.get_posx_from_time(snapped_time)
+
 # ======================== Testing ===================================
 
 func print_lane_info():
@@ -403,3 +425,7 @@ func save_chart():
 		file.store_line("END")
 	
 	quit_save_panel()
+
+
+func _on_button_7_pressed(extra_arg_0: int) -> void:
+	pass # Replace with function body.
