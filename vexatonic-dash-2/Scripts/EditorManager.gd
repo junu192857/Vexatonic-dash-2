@@ -226,40 +226,6 @@ func generate_preview(selected: int) -> Node2D:
 		pass
 	return my_preview
 
-#(x_start, y) 와 (x_end, y)의 직선 구간 사이에 레인이 있는지 확인.
-func is_lane_in_range(x_start: float, x_end: float, y: float) -> bool:
-	if (x_start >= x_end):
-		push_error("Why x_start is higher than x_end?!")
-		return false
-	
-	for lane in laneDatas:
-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
-		
-		# x 범위가 겹치는지 확인
-		if lane_x_end < x_start or lane_x_start > x_end:
-			continue
-		
-		# 겹치는 x 구간에서 레인의 y좌표 확인
-		var check_x_start = max(x_start, lane_x_start)
-		var check_x_end = min(x_end, lane_x_end)
-		var check_time_start = Setting.get_time_from_posx(check_x_start)
-		var check_time_end = Setting.get_time_from_posx(check_x_end)
-		
-		for kf in lane.keyframes:
-			if kf.x < check_time_start or kf.x > check_time_end:
-				continue
-			if abs(lane.get_height(kf.x) - y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
-				return true
-		
-		# 시작/끝 지점도 체크
-		if abs(lane.get_height(check_time_start) - y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
-			return true
-		if abs(lane.get_height(check_time_end) - y) <= 2 * Setting.HALF_CONNECTOR_HEIGHT:
-			return true
-	
-	return false
-
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
 func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
 	if (mouse_pos.x < 0):
