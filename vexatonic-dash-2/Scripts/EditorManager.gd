@@ -219,6 +219,8 @@ func generate_preview(selected: int) -> Node2D:
 				add_child(my_preview)
 				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
+			if (lane_start_pos.x >= mouse_pos.x):
+				return null
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
 			add_child(my_preview)
@@ -291,7 +293,6 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
-				print("CASE 2")
 				target_lane = lane
 				return LanePlacingCase.Case2
 
@@ -299,16 +300,16 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	for lane in laneDatas:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if mouse_pos.x > lane_x_end:
-			var lane_y_end = lane.keyframes[-1].y
-			if abs(lane_y_end - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
-				print("CASE 3")
-				target_lane = lane
-				return LanePlacingCase.Case3
+			var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
+			if (camera_left < lane_x_end):
+				var lane_y_end = lane.keyframes[-1].y
+				if abs(lane_y_end - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+					target_lane = lane
+					return LanePlacingCase.Case3
 
 	# Case 1 체크
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
-	if (camera_left <= 0 and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
-		print("CASE 1")
+	if (camera_left <= 0): #and !is_lane_in_range(0, mouse_pos.x, mouse_pos.y)):
 		return LanePlacingCase.Case1
 
 	return LanePlacingCase.None
@@ -319,6 +320,8 @@ func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vect
 		return Vector2(0, mouse_pos.y)
 	else: if (case == LanePlacingCase.Case2):
 		return Vector2(mouse_pos.x, target_lane.get_height(Setting.get_time_from_posx(mouse_pos.x)))
+	else: if (case == LanePlacingCase.Case3):
+		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].x),target_lane.keyframes[-1].y)
 	return Vector2.ZERO
 	
 func _on_put_note():
@@ -349,9 +352,12 @@ func _on_put_note():
 				var new_lane = Lane.new(new_index, false)
 				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
 				laneDatas.append(new_lane)
 				preview.set_lane_index(new_index)
 				preview = null
+			else: if (lane_case == LanePlacingCase.Case3):
+				pass
 			lane_case = LanePlacingCase.None
 		current_state = EditorState.Ready
 		
