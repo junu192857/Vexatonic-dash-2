@@ -12,6 +12,7 @@ var laneDatas: Array[Lane]
 
 @onready var noteSelectorPanel = $CanvasLayer/NoteSelectorPanel
 @onready var settingPanel = $CanvasLayer/SettingPanel
+@onready var savePanel = $CanvasLayer/SavePanel
 
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
@@ -372,3 +373,33 @@ func print_lane_info():
 		print("LANE INDEX %d" % lane.lane_index)
 		for keyframe in lane.keyframes:
 			print("my lane's keyframe: time %f and height %f" % [keyframe.x, keyframe.y])
+			
+			
+# ======================== Save Chart ================================
+
+func open_save_panel():
+	editor_ready = false
+	savePanel.visible = true
+
+func quit_save_panel():
+	savePanel.visible = false
+	editor_ready = false
+
+func save_chart():
+	var file_name = savePanel.get_node("LineEdit").text
+	if file_name.is_empty():
+		push_error("파일 이름을 입력해주세요!")
+		return
+	
+	var file = FileAccess.open("res://Charts/" + file_name + ".csv", FileAccess.WRITE)
+	if file == null:
+		push_error("ERROR: 파일을 열 수 없습니다.: " + file_name)
+		return
+	
+	for lane in laneDatas:
+		file.store_line("LANE %d %d" % [lane.lane_index, 1 if lane.is_init else 0])
+		for kf in lane.keyframes:
+			file.store_line("%s %s" % [kf.x, kf.y])
+		file.store_line("END")
+	
+	quit_save_panel()
