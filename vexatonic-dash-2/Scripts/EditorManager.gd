@@ -409,7 +409,3 @@ func save_chart():
 		file.store_line("END")
 	
 	quit_save_panel()
-
-
-func _on_button_7_pressed(extra_arg_0: int) -> void:
-	pass # Replace with function body.
