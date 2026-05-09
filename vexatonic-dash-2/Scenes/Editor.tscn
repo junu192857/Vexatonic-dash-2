@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://br567btcie3o3" path="res://Prefabs/EditorConnector.tscn" id="3_brgpd"]
 [ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="4_5v8xv"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
-[ext_resource type="Script" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
+[ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_dfuwn"]
 

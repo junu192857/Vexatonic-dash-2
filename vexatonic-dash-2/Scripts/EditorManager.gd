@@ -230,7 +230,7 @@ func generate_preview(selected: int) -> Node2D:
 func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
 	if (mouse_pos.x < 0):
 		return false
-	var viewport_size = get_viewport_rect().size
+	var viewport_size = get_viewport_rect().size / camera.zoom
 	var camera_pos = camera.global_position
 	
 	var screen_bottom = camera_pos.y + viewport_size.y / 2
