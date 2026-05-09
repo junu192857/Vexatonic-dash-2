@@ -164,8 +164,8 @@ func _on_select_mode(selected: int):
 	if (!editor_ready):
 		return
 	if selected in NoteSelection.values():
-		selected_note = selected
-		selected_color = selected % 10
+		selected_note = selected as NoteSelection
+		selected_color = selected % 10 - 1
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
@@ -246,7 +246,7 @@ func generate_preview(selected: int) -> Node2D:
 		my_preview = NOTE_SCENE.instantiate()
 		add_child(my_preview)
 		my_preview.position = get_preview_pos_for_note(mouse_pos)
-		my_preview.set_color(selected_color - 1)
+		my_preview.set_color(selected_color)
 	return my_preview
 
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
@@ -307,7 +307,6 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 func find_note_placing_case(mouse_pos: Vector2) -> bool:
 	if (!check_mouse_in_available_area(mouse_pos)):
 		return false
-	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
 
 	for lane in laneDatas:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
@@ -344,6 +343,13 @@ func _on_put_note():
 	if (current_state == EditorState.Ready):
 		if (selected_note == NoteSelection.Lane):
 			lane_start_pos = preview.global_position
+		else: if (selected_note / 10 == 0): # 단노트
+			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
+			noteDatas.append(data)
+			preview.set_data(data)
+			print("New Note added")
+			preview = null
+			return
 		current_state = EditorState.Placing
 	else: if (current_state == EditorState.Placing):
 		if (selected_note == NoteSelection.Lane):
