@@ -230,13 +230,13 @@ func update_preview(selected: int):
 					if existing_connector == null:
 						existing_connector = CONNECTOR_SCENE.instantiate()
 						preview.add_child(existing_connector)
-						existing_connector.position = Vector2.RIGHT * Setting.NOTE_WIDTH
 						existing_connector.set_color(selected_color)
-					var start_pos = Vector2(connector_start_x, target_lane.get_height(connector_start_x))
-					var end_pos = Vector2(snapped_x, target_lane.get_height(snapped_x))
+					var start_pos = Vector2(connector_start_x, target_lane.get_height(Setting.get_time_from_posx(connector_start_x)))
+					var end_pos = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					print("Start_pos_y : %f and End_pos_y: %f" % [start_pos.y, end_pos.y])
 					existing_connector.set_data(start_pos, end_pos)
-				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(snapped_x))
+					existing_connector.global_position = start_pos
+				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 		
 				
 func generate_preview(selected: int) -> Node2D:
@@ -286,15 +286,15 @@ func generate_preview(selected: int) -> Node2D:
 			if (snapped_x > connector_start_x):
 				var longNote_connector = CONNECTOR_SCENE.instantiate()
 				my_preview.add_child(longNote_connector)
-				longNote_connector.position = Vector2.RIGHT * Setting.NOTE_WIDTH
 				longNote_connector.set_color(selected_color)
-				var start_pos = Vector2(connector_start_x, target_lane.get_height(connector_start_x))
-				var end_pos = Vector2(snapped_x, target_lane.get_height(snapped_x))
+				var start_pos = Vector2(connector_start_x, target_lane.get_height(Setting.get_time_from_posx(connector_start_x)))
+				var end_pos = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 				longNote_connector.set_data(start_pos, end_pos)
+				longNote_connector.global_position = start_pos
 			
 			var my_marker = NOTE_SCENE.instantiate()
 			my_preview.add_child(my_marker)
-			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(snapped_x))
+			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 			my_marker.set_color(selected_color)
 				
 	return my_preview
@@ -424,7 +424,7 @@ func _on_put_note():
 				
 				new_lane.add_keyframe(0, lane_start_pos.y)
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
-				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
+				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
 				laneDatas.append(new_lane)
 				preview.set_lane_index(new_index)
 				preview = null

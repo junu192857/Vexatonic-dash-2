@@ -45,6 +45,7 @@ func print_data():
 func check_note_error() -> bool:
 	var lane_start = keyframes[0].x
 	var lane_end = keyframes[-1].x
+	
 	for note:Note in notes:
 		if (note.get_time() < lane_start or note.get_time() > lane_end):
 			push_error("ERROR: 레인 시작 전 또는 종료 후에 노트가 있습니다.")
