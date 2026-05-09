@@ -141,7 +141,10 @@ func realign_lines_by_move():
 	
 # ========================= 레인 및 노트 입력 ======================
 
-enum NoteSelection {Lane, RedNote, BlueNote, YellowNote, RedLong, BlueLong, YellowLong, Nothing}
+const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
+const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
+
+enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, YellowLong = 13, Nothing = 100}
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
 #Case 2: lane 분기
@@ -152,6 +155,8 @@ var lane_start_pos: Vector2
 var target_lane: Lane
 
 var selected_note: NoteSelection = NoteSelection.Nothing
+var selected_color
+var note_case: bool
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
 
@@ -160,12 +165,13 @@ func _on_select_mode(selected: int):
 		return
 	if selected in NoteSelection.values():
 		selected_note = selected
+		selected_color = selected % 10
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
 			preview = null
 			#preview = generate_preview(selected_note)
-			print("Note Changed: %d" % selected_note)
+		print("Note Changed: %d" % selected_note)
 	else:
 		push_error("Invalid EditMode: %d" % selected)
 		
@@ -178,6 +184,8 @@ func _on_move_preview():
 		update_preview(selected_note)
 		
 func update_preview(selected: int):
+	if (selected == NoteSelection.Nothing):
+		return
 	var mouse_pos = get_global_mouse_position()
 	if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
@@ -194,9 +202,21 @@ func update_preview(selected: int):
 				preview = null
 			else:
 				preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
+	else:
+		if (current_state == EditorState.Ready):
+			note_case = find_note_placing_case(mouse_pos)
+			if (!note_case):
+				preview.queue_free()
+				preview = null
+			else:
+				preview.position = get_preview_pos_for_note(mouse_pos)
+		
 				
 func generate_preview(selected: int) -> Node2D:
-	var my_preview
+	if (selected == NoteSelection.Nothing):
+		return null
+	
+	var my_preview = null
 	var mouse_pos = get_global_mouse_position()
 	
 	if (selected == NoteSelection.Lane):
@@ -218,12 +238,15 @@ func generate_preview(selected: int) -> Node2D:
 			add_child(my_preview)
 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
 			my_preview.position = lane_start_pos
-	else: if (selected == NoteSelection.RedNote or selected == NoteSelection.RedLong):
-		pass
-	else: if (selected == NoteSelection.BlueNote or selected == NoteSelection.BlueLong):
-		pass
-	else:
-		pass
+	else: #Note인 경우
+		if (current_state == EditorState.Ready):
+			note_case = find_note_placing_case(mouse_pos)
+		if (!note_case):
+			return null
+		my_preview = NOTE_SCENE.instantiate()
+		add_child(my_preview)
+		my_preview.position = get_preview_pos_for_note(mouse_pos)
+		my_preview.set_color(selected_color - 1)
 	return my_preview
 
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
@@ -309,6 +332,10 @@ func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vect
 		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].x),target_lane.keyframes[-1].y)
 	return Vector2.ZERO
 	
+func get_preview_pos_for_note(mouse_pos: Vector2) -> Vector2:
+	var snapped_x = get_snapped_x(mouse_pos.x)
+	return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+
 func _on_put_note():
 	if (!editor_ready):
 		return
