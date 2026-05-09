@@ -241,12 +241,12 @@ func generate_preview(selected: int) -> Node2D:
 	else: #Note인 경우
 		if (current_state == EditorState.Ready):
 			note_case = find_note_placing_case(mouse_pos)
-		if (!note_case):
-			return null
-		my_preview = NOTE_SCENE.instantiate()
-		add_child(my_preview)
-		my_preview.position = get_preview_pos_for_note(mouse_pos)
-		my_preview.set_color(selected_color)
+			if (!note_case):
+				return null
+			my_preview = NOTE_SCENE.instantiate()
+			add_child(my_preview)
+			my_preview.position = get_preview_pos_for_note(mouse_pos)
+			my_preview.set_color(selected_color)
 	return my_preview
 
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
