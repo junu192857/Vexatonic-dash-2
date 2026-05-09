@@ -153,6 +153,7 @@ enum LanePlacingCase {Case1, Case2, Case3, None}
 var lane_case : LanePlacingCase
 var lane_start_pos: Vector2
 var target_lane: Lane
+var long_start_pos: Vector2
 
 var selected_note: NoteSelection = NoteSelection.Nothing
 var selected_color
@@ -204,12 +205,38 @@ func update_preview(selected: int):
 				preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
 	else:
 		if (current_state == EditorState.Ready):
-			note_case = find_note_placing_case(mouse_pos)
+			note_case = find_note_placing_available(mouse_pos)
 			if (!note_case):
 				preview.queue_free()
 				preview = null
 			else:
 				preview.position = get_preview_pos_for_note(mouse_pos)
+		else:
+			var snapped_x = get_snapped_x(mouse_pos.x)
+			if (!find_longNote_placing_available(mouse_pos, snapped_x)):
+				preview.queue_free()
+				preview = null
+			else:
+				var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH
+				var existing_marker = null
+				var existing_connector = null
+				for child in preview.get_children():
+					if child is EConnector:
+						existing_connector = child
+						continue
+					if child is ENote:
+						existing_marker = child
+				if (snapped_x > connector_start_x):
+					if existing_connector == null:
+						existing_connector = CONNECTOR_SCENE.instantiate()
+						preview.add_child(existing_connector)
+						existing_connector.position = Vector2.RIGHT * Setting.NOTE_WIDTH
+						existing_connector.set_color(selected_color)
+					var start_pos = Vector2(connector_start_x, target_lane.get_height(connector_start_x))
+					var end_pos = Vector2(snapped_x, target_lane.get_height(snapped_x))
+					print("Start_pos_y : %f and End_pos_y: %f" % [start_pos.y, end_pos.y])
+					existing_connector.set_data(start_pos, end_pos)
+				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(snapped_x))
 		
 				
 func generate_preview(selected: int) -> Node2D:
@@ -222,7 +249,6 @@ func generate_preview(selected: int) -> Node2D:
 	if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
-			#case 1: 비어 있는 곳에 lane을 찍는 경우
 			if lane_case == LanePlacingCase.None:
 				return null
 			else:
@@ -240,13 +266,37 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.position = lane_start_pos
 	else: #Note인 경우
 		if (current_state == EditorState.Ready):
-			note_case = find_note_placing_case(mouse_pos)
+			note_case = find_note_placing_available(mouse_pos)
 			if (!note_case):
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
 			my_preview.position = get_preview_pos_for_note(mouse_pos)
 			my_preview.set_color(selected_color)
+		else: #Note이고 Placing인 경우: 무조건 LongNote
+			var snapped_x = get_snapped_x(mouse_pos.x)
+			if (!find_longNote_placing_available(mouse_pos, snapped_x)):
+				return null
+			my_preview = NOTE_SCENE.instantiate()
+			add_child(my_preview)
+			my_preview.position = long_start_pos
+			my_preview.set_color(selected_color)
+			
+			var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH
+			if (snapped_x > connector_start_x):
+				var longNote_connector = CONNECTOR_SCENE.instantiate()
+				my_preview.add_child(longNote_connector)
+				longNote_connector.position = Vector2.RIGHT * Setting.NOTE_WIDTH
+				longNote_connector.set_color(selected_color)
+				var start_pos = Vector2(connector_start_x, target_lane.get_height(connector_start_x))
+				var end_pos = Vector2(snapped_x, target_lane.get_height(snapped_x))
+				longNote_connector.set_data(start_pos, end_pos)
+			
+			var my_marker = NOTE_SCENE.instantiate()
+			my_preview.add_child(my_marker)
+			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(snapped_x))
+			my_marker.set_color(selected_color)
+				
 	return my_preview
 
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
@@ -304,7 +354,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 
 	return LanePlacingCase.None
 
-func find_note_placing_case(mouse_pos: Vector2) -> bool:
+func find_note_placing_available(mouse_pos: Vector2) -> bool:
 	if (!check_mouse_in_available_area(mouse_pos)):
 		return false
 
@@ -319,7 +369,14 @@ func find_note_placing_case(mouse_pos: Vector2) -> bool:
 				return true
 	
 	return false
-	
+
+func find_longNote_placing_available(mouse_pos: Vector2, snapped_x : float) -> bool:
+	if (!check_mouse_in_available_area(mouse_pos) or long_start_pos.x >= snapped_x):
+		return false
+	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].x)
+	if (snapped_x > lane_x_end):
+		return false
+	return true
 # Ready 단계에서 Lane의 preview의 위치 구하기.
 func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
@@ -351,14 +408,11 @@ func _on_put_note():
 			preview = null
 			return
 		else: if (selected_note / 10 == 1): #롱노트
-			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
+			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, 0, target_lane.lane_index)
 			noteDatas.append(data)
 			preview.set_data(data)
+			long_start_pos = preview.global_position
 			print("New LongNote init added")
-			var longNote_connector = CONNECTOR_SCENE.instantiate()
-			preview.add_child(longNote_connector)
-			longNote_connector.position = Vector2.RIGHT * Setting.NOTE_WIDTH
-			preview = longNote_connector
 			pass
 		current_state = EditorState.Placing
 	else: if (current_state == EditorState.Placing):
