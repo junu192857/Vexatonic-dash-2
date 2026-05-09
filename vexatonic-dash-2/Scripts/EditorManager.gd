@@ -350,6 +350,16 @@ func _on_put_note():
 			print("New Note added")
 			preview = null
 			return
+		else: if (selected_note / 10 == 1): #롱노트
+			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
+			noteDatas.append(data)
+			preview.set_data(data)
+			print("New LongNote init added")
+			var longNote_connector = CONNECTOR_SCENE.instantiate()
+			preview.add_child(longNote_connector)
+			longNote_connector.position = Vector2.RIGHT * Setting.NOTE_WIDTH
+			preview = longNote_connector
+			pass
 		current_state = EditorState.Placing
 	else: if (current_state == EditorState.Placing):
 		if (selected_note == NoteSelection.Lane):
