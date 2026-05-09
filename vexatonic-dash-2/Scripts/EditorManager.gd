@@ -154,6 +154,7 @@ var lane_case : LanePlacingCase
 var lane_start_pos: Vector2
 var target_lane: Lane
 var long_start_pos: Vector2
+var long_end_time: float
 
 var selected_note: NoteSelection = NoteSelection.Nothing
 var selected_color
@@ -233,9 +234,13 @@ func update_preview(selected: int):
 						existing_connector.set_color(selected_color)
 					var start_pos = Vector2(connector_start_x, target_lane.get_height(Setting.get_time_from_posx(connector_start_x)))
 					var end_pos = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
-					print("Start_pos_y : %f and End_pos_y: %f" % [start_pos.y, end_pos.y])
 					existing_connector.set_data(start_pos, end_pos)
 					existing_connector.global_position = start_pos
+				if (existing_marker == null):
+					existing_marker = NOTE_SCENE.instantiate()
+					preview.add_child(existing_marker)
+					existing_marker.set_color(selected_color)
+				long_end_time = Setting.get_time_from_posx(existing_marker.global_position.x)
 				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 		
 				
@@ -296,7 +301,7 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.add_child(my_marker)
 			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 			my_marker.set_color(selected_color)
-				
+			long_end_time = Setting.get_time_from_posx(my_marker.global_position.x)
 	return my_preview
 
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
@@ -374,6 +379,7 @@ func find_longNote_placing_available(mouse_pos: Vector2, snapped_x : float) -> b
 	if (!check_mouse_in_available_area(mouse_pos) or long_start_pos.x >= snapped_x):
 		return false
 	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].x)
+	print("Snapped_x: %f, land_x_end: %f" % [snapped_x, lane_x_end])
 	if (snapped_x > lane_x_end):
 		return false
 	return true
@@ -408,9 +414,6 @@ func _on_put_note():
 			preview = null
 			return
 		else: if (selected_note / 10 == 1): #롱노트
-			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, 0, target_lane.lane_index)
-			noteDatas.append(data)
-			preview.set_data(data)
 			long_start_pos = preview.global_position
 			print("New LongNote init added")
 			pass
@@ -445,6 +448,13 @@ func _on_put_note():
 				preview.set_lane_index(target_lane.lane_index)
 				preview = null
 			lane_case = LanePlacingCase.None
+		else:
+			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
+			print("New LongNote added: start time %f and end time %f" % [Setting.get_time_from_posx(preview.global_position.x), long_end_time])
+			noteDatas.append(data)
+			preview.set_data(data)
+			preview = null
+			
 		current_state = EditorState.Ready
 
 func get_snapped_x(mouse_x: float) -> float:
