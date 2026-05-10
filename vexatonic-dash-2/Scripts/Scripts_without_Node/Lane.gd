@@ -2,7 +2,8 @@ class_name Lane
 
 var lane_index: int
 var keyframes: Array[Vector2]
-var notes: Array[Node2D]
+var notes: Array[Note]
+
 var note_index: int
 var is_init: bool
 
@@ -80,7 +81,7 @@ func get_height(time_ms: float) -> float:
 
 	return 0.0
 	
-func add_Note(note: Note):
+func add_note(note: Note):
 	notes.append(note)
 
 func sort_notes():

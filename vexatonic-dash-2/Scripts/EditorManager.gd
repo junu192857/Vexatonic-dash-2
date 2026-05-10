@@ -466,6 +466,7 @@ func _on_put_note():
 			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
 			noteDatas.append(data)
 			preview.set_data(data)
+			target_lane.add_note(preview)
 			print("New Note added")
 			preview = null
 			return
@@ -510,6 +511,7 @@ func _on_put_note():
 			print("New LongNote added: start time %f and end time %f and lane index %d" % [Setting.get_time_from_posx(preview.global_position.x), long_end_time, target_lane.lane_index])
 			noteDatas.append(data)
 			preview.set_data(data)
+			target_lane.add_note(preview)
 			preview = null
 		current_state = EditorState.Ready
 

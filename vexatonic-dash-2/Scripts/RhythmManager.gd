@@ -21,7 +21,7 @@ func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
-	ChartParser.parse("res://Charts/HolyTest.csv", lanes, noteDatas)
+	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
 	Lane.sort_lanes(lanes)
 	lane_index = 0
 	noteDatas.sort_custom(func(a: NoteData, b: NoteData):
@@ -189,7 +189,7 @@ func place_final_connector(lane: Lane):
 # 생성된 노트를 레인의 노트 큐에 할당
 func assign_note(note: Note):
 	var lane = Lane.find_lane(lanes, note.data.lane)
-	lane.add_Note(note)
+	lane.add_note(note)
 
 #==================================================================================
 
