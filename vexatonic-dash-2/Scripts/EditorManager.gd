@@ -575,6 +575,26 @@ func save_chart():
 	
 	quit_save_panel()
 
+# =============================== Load Chart ==========================
+
+func parse():
+	ChartParser.parse("res://Charts/HolyTest.csv", laneDatas, noteDatas)
+	for lane in laneDatas:
+		for i in range(lane.keyframes.size() - 1):
+			var start_time = lane.keyframes[i].x
+			var end_time = lane.keyframes[i + 1].x
+			var start_pos = Vector2(Setting.get_posx_from_time(start_time), lane.keyframes[i].y)
+			var end_pos = Vector2(Setting.get_posx_from_time(end_time), lane.keyframes[i + 1].y)
+			
+			var connector = CONNECTOR_SCENE.instantiate()
+			add_child(connector)
+			connector.set_color(-1)
+			connector.set_data(start_pos, end_pos)
+			connector.global_position = start_pos
+			lane.add_editor_connector(connector)
+			connector.set_lane_index(lane.lane_index)
+	
+
 # ================================ 편의 기능 ============================
 
 func set_target_lane(p_target_lane: Lane):
