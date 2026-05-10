@@ -243,6 +243,7 @@ func update_preview(selected: int):
 						existing_connector = CONNECTOR_SCENE.instantiate()
 						preview.add_child(existing_connector)
 						existing_connector.set_color(selected_color)
+						print("new connector added")
 					
 					# 체인 순회하면서 재사용/생성/삭제
 					var current = existing_connector
@@ -257,7 +258,11 @@ func update_preview(selected: int):
 						if i < points.size() - 2:
 							print("Hello?")
 							# 다음 구간이 더 있음
-							var child_connector = current.get_child(0) if current.get_child_count() > 0 else null
+							var child_connector
+							for child in current.get_children():
+								if child is EConnector:
+									child_connector = child
+									break
 							if child_connector == null:
 								child_connector = CONNECTOR_SCENE.instantiate()
 								current.add_child(child_connector)
@@ -266,7 +271,11 @@ func update_preview(selected: int):
 						else:
 							print("HELLO@?")
 							# 마지막 구간: 남은 자식 Connector 삭제
-							var child_connector = current.get_child(0) if current.get_child_count() > 0 else null
+							var child_connector
+							for child in current.get_children():
+								if child is EConnector:
+									child_connector = child
+									break
 							if child_connector != null:
 								child_connector.queue_free()
 								child_connector = null
@@ -330,6 +339,8 @@ func generate_preview(selected: int) -> Node2D:
 					var kf_x = Setting.get_posx_from_time(kf.x)
 					if kf_x > connector_start_x and kf_x < snapped_x:
 						points.append(kf_x)
+					if kf_x > snapped_x:
+						break
 				points.append(snapped_x)
 				
 				var parent_node = my_preview
@@ -500,7 +511,7 @@ func _on_put_note():
 			lane_case = LanePlacingCase.None
 		else:
 			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
-			print("New LongNote added: start time %f and end time %f" % [Setting.get_time_from_posx(preview.global_position.x), long_end_time])
+			print("New LongNote added: start time %f and end time %f and lane index %d" % [Setting.get_time_from_posx(preview.global_position.x), long_end_time, target_lane.lane_index])
 			noteDatas.append(data)
 			preview.set_data(data)
 			preview = null
@@ -563,5 +574,8 @@ func save_chart():
 		for kf in lane.keyframes:
 			file.store_line("%s %s" % [kf.x, kf.y])
 		file.store_line("END")
+	
+	for note in noteDatas:
+		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
 	
 	quit_save_panel()

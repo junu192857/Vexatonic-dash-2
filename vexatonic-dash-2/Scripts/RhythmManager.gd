@@ -21,7 +21,7 @@ func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
-	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
+	ChartParser.parse("res://Charts/HolyTest.csv", lanes, noteDatas)
 	Lane.sort_lanes(lanes)
 	lane_index = 0
 	noteDatas.sort_custom(func(a: NoteData, b: NoteData):
