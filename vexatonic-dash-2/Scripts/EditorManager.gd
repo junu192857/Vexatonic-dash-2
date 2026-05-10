@@ -227,15 +227,51 @@ func update_preview(selected: int):
 						continue
 					if child is ENote:
 						existing_marker = child
-				if (snapped_x > connector_start_x):
+				if snapped_x > connector_start_x:
+					# 구간 포인트 수집
+					var points = [connector_start_x]
+					for kf in target_lane.keyframes:
+						var kf_x = Setting.get_posx_from_time(kf.x)
+						if kf_x > connector_start_x and kf_x < snapped_x:
+							points.append(kf_x)
+						if kf_x >= snapped_x:
+							break
+					points.append(snapped_x)
+					
+					# existing_connector 없으면 생성
 					if existing_connector == null:
 						existing_connector = CONNECTOR_SCENE.instantiate()
 						preview.add_child(existing_connector)
 						existing_connector.set_color(selected_color)
-					var start_pos = Vector2(connector_start_x, target_lane.get_height(Setting.get_time_from_posx(connector_start_x)))
-					var end_pos = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
-					existing_connector.set_data(start_pos, end_pos)
-					existing_connector.global_position = start_pos
+					
+					# 체인 순회하면서 재사용/생성/삭제
+					var current = existing_connector
+					
+					print("points.size:  %d" % points.size())
+					for i in range(points.size() - 1):
+						var start_pos = Vector2(points[i], target_lane.get_height(Setting.get_time_from_posx(points[i])))
+						var end_pos = Vector2(points[i + 1], target_lane.get_height(Setting.get_time_from_posx(points[i + 1])))
+						current.set_data(start_pos, end_pos)
+						current.global_position = start_pos
+						
+						if i < points.size() - 2:
+							print("Hello?")
+							# 다음 구간이 더 있음
+							var child_connector = current.get_child(0) if current.get_child_count() > 0 else null
+							if child_connector == null:
+								child_connector = CONNECTOR_SCENE.instantiate()
+								current.add_child(child_connector)
+								child_connector.set_color(selected_color)
+							current = child_connector
+						else:
+							print("HELLO@?")
+							# 마지막 구간: 남은 자식 Connector 삭제
+							var child_connector = current.get_child(0) if current.get_child_count() > 0 else null
+							if child_connector != null:
+								child_connector.queue_free()
+								child_connector = null
+								print("child_connector deleted")
+				
 				if (existing_marker == null):
 					existing_marker = NOTE_SCENE.instantiate()
 					preview.add_child(existing_marker)
@@ -288,14 +324,28 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.set_color(selected_color)
 			
 			var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH
-			if (snapped_x > connector_start_x):
-				var longNote_connector = CONNECTOR_SCENE.instantiate()
-				my_preview.add_child(longNote_connector)
-				longNote_connector.set_color(selected_color)
-				var start_pos = Vector2(connector_start_x, target_lane.get_height(Setting.get_time_from_posx(connector_start_x)))
-				var end_pos = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
-				longNote_connector.set_data(start_pos, end_pos)
-				longNote_connector.global_position = start_pos
+			if snapped_x > connector_start_x:
+				var points = [connector_start_x]
+				for kf in target_lane.keyframes:
+					var kf_x = Setting.get_posx_from_time(kf.x)
+					if kf_x > connector_start_x and kf_x < snapped_x:
+						points.append(kf_x)
+				points.append(snapped_x)
+				
+				var parent_node = my_preview
+				for i in range(points.size() - 1):
+					var start_x = points[i]
+					var end_x = points[i + 1]
+					var start_pos = Vector2(start_x, target_lane.get_height(Setting.get_time_from_posx(start_x)))
+					var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
+					
+					var longNote_connector = CONNECTOR_SCENE.instantiate()
+					parent_node.add_child(longNote_connector)
+					longNote_connector.set_color(selected_color)
+					longNote_connector.set_data(start_pos, end_pos)
+					longNote_connector.global_position = start_pos
+					parent_node = longNote_connector
+					print("Generating: connector added")
 			
 			var my_marker = NOTE_SCENE.instantiate()
 			my_preview.add_child(my_marker)
@@ -454,7 +504,6 @@ func _on_put_note():
 			noteDatas.append(data)
 			preview.set_data(data)
 			preview = null
-			
 		current_state = EditorState.Ready
 
 func get_snapped_x(mouse_x: float) -> float:
