@@ -162,6 +162,10 @@ var note_case: bool
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
 
+var mouse_pos: Vector2
+var snapped_x: float
+var prev_snapped_x: float = -INF
+
 func _on_select_mode(selected: int):
 	if (!editor_ready):
 		return
@@ -180,15 +184,18 @@ func _on_select_mode(selected: int):
 func _on_move_preview():
 	if (!editor_ready):
 		return
-	if (preview == null):
-		preview = generate_preview(selected_note)
-	else:
-		update_preview(selected_note)
+	mouse_pos = get_global_mouse_position()
+	snapped_x = get_snapped_x(mouse_pos.x)
+	if (snapped_x != prev_snapped_x):
+		if (preview == null):
+			preview = generate_preview(selected_note, mouse_pos, snapped_x)
+		else:
+			update_preview(selected_note, mouse_pos, snapped_x)
+		prev_snapped_x = snapped_x
 		
-func update_preview(selected: int):
+func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 	if (selected == NoteSelection.Nothing):
 		return
-	var mouse_pos = get_global_mouse_position()
 	if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
@@ -198,7 +205,6 @@ func update_preview(selected: int):
 			else: 
 				preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
-			var snapped_x = get_snapped_x(mouse_pos.x)
 			if (!check_mouse_in_available_area(mouse_pos) or lane_start_pos.x >= snapped_x):
 				preview.queue_free()
 				preview = null
@@ -213,7 +219,6 @@ func update_preview(selected: int):
 			else:
 				preview.position = get_preview_pos_for_note(mouse_pos)
 		else:
-			var snapped_x = get_snapped_x(mouse_pos.x)
 			if (!find_longNote_placing_available(mouse_pos, snapped_x)):
 				preview.queue_free()
 				preview = null
@@ -289,12 +294,11 @@ func update_preview(selected: int):
 				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 		
 				
-func generate_preview(selected: int) -> Node2D:
+func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> Node2D:
 	if (selected == NoteSelection.Nothing):
 		return null
 	
 	var my_preview = null
-	var mouse_pos = get_global_mouse_position()
 	
 	if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
@@ -306,7 +310,6 @@ func generate_preview(selected: int) -> Node2D:
 				add_child(my_preview)
 				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
-			var snapped_x = get_snapped_x(mouse_pos.x)
 			if (!check_mouse_in_available_area(mouse_pos) or lane_start_pos.x >= snapped_x):
 				return null
 			my_preview = CONNECTOR_SCENE.instantiate()
@@ -324,7 +327,6 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.position = get_preview_pos_for_note(mouse_pos)
 			my_preview.set_color(selected_color)
 		else: #Note이고 Placing인 경우: 무조건 LongNote
-			var snapped_x = get_snapped_x(mouse_pos.x)
 			if (!find_longNote_placing_available(mouse_pos, snapped_x)):
 				return null
 			my_preview = NOTE_SCENE.instantiate()
@@ -388,7 +390,6 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	for lane in laneDatas:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
-		var snapped_x = get_snapped_x(mouse_pos.x)
 		if snapped_x >= lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
@@ -427,7 +428,6 @@ func find_note_placing_available(mouse_pos: Vector2) -> bool:
 	for lane in laneDatas:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
-		var snapped_x = get_snapped_x(mouse_pos.x)
 		if snapped_x >= lane_x_start and snapped_x <= lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
@@ -449,14 +449,12 @@ func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vect
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
 	else: if (case == LanePlacingCase.Case2):
-		var snapped_x = get_snapped_x(mouse_pos.x)
 		return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 	else: if (case == LanePlacingCase.Case3):
 		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].x),target_lane.keyframes[-1].y)
 	return Vector2.ZERO
 	
 func get_preview_pos_for_note(mouse_pos: Vector2) -> Vector2:
-	var snapped_x = get_snapped_x(mouse_pos.x)
 	return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 
 func _on_put_note():
