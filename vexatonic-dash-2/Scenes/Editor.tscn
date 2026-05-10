@@ -395,7 +395,7 @@ text = "8bit"
 
 [connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [6]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [13]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_mode" binds= [12]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_mode" binds= [11]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button10" to="." method="_on_select_mode" binds= [2]]

@@ -164,7 +164,6 @@ var preview: Node2D
 
 var mouse_pos: Vector2
 var snapped_x: float
-var prev_snapped_x: float = -INF
 
 func _on_select_mode(selected: int):
 	if (!editor_ready):
@@ -186,12 +185,10 @@ func _on_move_preview():
 		return
 	mouse_pos = get_global_mouse_position()
 	snapped_x = get_snapped_x(mouse_pos.x)
-	if (snapped_x != prev_snapped_x):
-		if (preview == null):
-			preview = generate_preview(selected_note, mouse_pos, snapped_x)
-		else:
-			update_preview(selected_note, mouse_pos, snapped_x)
-		prev_snapped_x = snapped_x
+	if (preview == null):
+		preview = generate_preview(selected_note, mouse_pos, snapped_x)
+	else:
+		update_preview(selected_note, mouse_pos, snapped_x)
 		
 func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 	if (selected == NoteSelection.Nothing):
@@ -488,8 +485,8 @@ func _on_put_note():
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
 				laneDatas.append(new_lane)
+				new_lane.add_editor_connector(preview)
 				preview.set_lane_index(new_index)
-				preview = null
 			else: if (lane_case == LanePlacingCase.Case2):
 				print("CASE 2 ACTIVATED")
 				var new_index = Lane.find_free_index(laneDatas)
@@ -498,14 +495,15 @@ func _on_put_note():
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
 				laneDatas.append(new_lane)
+				target_lane.add_editor_connector(preview)
 				preview.set_lane_index(new_index)
-				preview = null
 			else: if (lane_case == LanePlacingCase.Case3):
 				print("CASE 3 ACTIVATED")
 				target_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 				print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
+				target_lane.add_editor_connector(preview)
 				preview.set_lane_index(target_lane.lane_index)
-				preview = null
+			preview = null
 			lane_case = LanePlacingCase.None
 		else:
 			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
@@ -544,8 +542,7 @@ func print_lane_info():
 		print("LANE INDEX %d" % lane.lane_index)
 		for keyframe in lane.keyframes:
 			print("my lane's keyframe: time %f and height %f" % [keyframe.x, keyframe.y])
-			
-			
+
 # ======================== Save Chart ================================
 
 func open_save_panel():
@@ -577,3 +574,9 @@ func save_chart():
 		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
 	
 	quit_save_panel()
+
+# ================================ 편의 기능 ============================
+
+func set_target_lane(p_target_lane: Lane):
+	target_lane = p_target_lane
+	
