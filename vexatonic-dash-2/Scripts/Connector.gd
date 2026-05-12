@@ -1,4 +1,5 @@
 extends Node2D
+class_name Connector
 
 @onready var polygon:Polygon2D = $Polygon2D
 
