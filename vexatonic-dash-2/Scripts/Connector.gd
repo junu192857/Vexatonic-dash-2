@@ -5,7 +5,7 @@ extends Node2D
 var data:ConnectorData
 var lane
 
-const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
+const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 
@@ -54,7 +54,10 @@ func _ready():
 		Vector2(240,500),
 		Vector2(0,500)
 	])
+	set_color()
+	
+func set_color():
 	if (data.color == -1):
 		polygon.modulate = Color(1,1,1)
 	else:
-		polygon.modulate = UNPROCECSSED_COLORS[data.color]
+		polygon.modulate = UNPROCESSED_COLORS[data.color]

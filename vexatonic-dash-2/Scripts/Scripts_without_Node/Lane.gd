@@ -2,9 +2,12 @@ class_name Lane
 
 var lane_index: int
 var keyframes: Array[Vector2]
-var notes: Array[Node2D]
+var notes: Array[Note]
+
 var note_index: int
 var is_init: bool
+
+var editor_connectors: Array[EConnector]
 
 func _init(p_index: int, p_is_init: bool):
 	lane_index = p_index
@@ -45,6 +48,7 @@ func print_data():
 func check_note_error() -> bool:
 	var lane_start = keyframes[0].x
 	var lane_end = keyframes[-1].x
+	
 	for note:Note in notes:
 		if (note.get_time() < lane_start or note.get_time() > lane_end):
 			push_error("ERROR: 레인 시작 전 또는 종료 후에 노트가 있습니다.")
@@ -77,7 +81,7 @@ func get_height(time_ms: float) -> float:
 
 	return 0.0
 	
-func add_Note(note: Note):
+func add_note(note: Note):
 	notes.append(note)
 
 func sort_notes():
@@ -88,6 +92,9 @@ func get_start_time():
 
 func get_end_time():
 	return keyframes[-1].x
+
+func add_editor_connector(connector: EConnector):
+	editor_connectors.append(connector)
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane:Lane in lanes:
