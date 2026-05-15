@@ -37,9 +37,13 @@ func _on_start_editor():
 func initiate_editor():
 	editor_ready = true
 	current_state = EditorState.Ready
+	#변수들을 levelData와 연결
 	levelData = LevelData.new()
 	laneDatas = levelData.lanes
 	noteDatas = levelData.noteDatas
+	music_bpm = levelData.bpm
+	music_end_time = levelData.length
+	
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
@@ -602,13 +606,16 @@ func save_chart():
 
 func set_difficulty(difficulty:int):
 	save_difficulty = difficulty
+# =============================== Load Chart ==========================
 
 func load_chart():
 	initiate_editor()
 	parse()
+	music_bpm.append(Vector2(INF, 60))
+	for bpm in music_bpm:
+		print("time: %f bpm:%f" % [bpm.x, bpm.y])
+	music_end_time = 180000
 	place_bar_lines()
-
-# =============================== Load Chart ==========================
 
 func parse():
 	ChartParser.parse_chart("res://Charts/Test/Easy.txt", levelData, true)
