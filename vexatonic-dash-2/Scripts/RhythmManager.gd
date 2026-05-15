@@ -20,7 +20,7 @@ func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
-	levelData = ChartParser.parse("res://Charts/Test", 0)
+	levelData = ChartParser.parse("res://Charts/Test", 2)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
