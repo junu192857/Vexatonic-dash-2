@@ -1,7 +1,8 @@
 extends Node2D
 
-var noteDatas: Array[NoteData]
-var lanes: Array[Lane]
+var levelData: LevelData
+var lanes
+var noteDatas
 
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
@@ -21,7 +22,9 @@ func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
-	ChartParser.parse("res://Charts/test.csv", lanes, noteDatas)
+	levelData = ChartParser.parse("res://Charts/Test", ChartParser.Difficulty.Easy)
+	lanes = levelData.lanes
+	noteDatas = levelData.noteDatas
 	Lane.sort_lanes(lanes)
 	lane_index = 0
 	noteDatas.sort_custom(func(a: NoteData, b: NoteData):

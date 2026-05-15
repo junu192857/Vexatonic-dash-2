@@ -1,0 +1,4 @@
+NAME HolyTest
+MUSIC HolyTest.mp3
+LEVEL 1 2 3
+LENGTH 180000
