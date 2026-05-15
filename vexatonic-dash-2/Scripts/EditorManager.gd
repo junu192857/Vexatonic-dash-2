@@ -1,5 +1,6 @@
 extends Node2D
 
+var levelData: LevelData
 var noteDatas: Array[NoteData]
 var laneDatas: Array[Lane]
 
@@ -31,18 +32,23 @@ func _ready():
 func _on_start_editor():
 	editor_ready = true
 	current_state = EditorState.Ready
-	var bpm = $CanvasLayer/InitialPanel/BPMBox.value
-	var music_time = $CanvasLayer/InitialPanel/MusicTimeBox.value
+	levelData = LevelData.new()
+	laneDatas = levelData.lanes
+	noteDatas = levelData.noteDatas
+	initialPanel.visible = false
+	noteSelectorPanel.visible = true
+	settingPanel.visible = true
+	set_initial_value()
+	place_bar_lines()
+
+func set_initial_value():
+	var bpm = initialPanel.get_node("BPMBox").value
+	var music_time = initialPanel.get_node("MusicTimeBox").value
 	if music_time == 0:
 		music_time = 180
-	initialPanel.visible = false
 	music_bpm.append(Vector2(0, bpm))
 	music_bpm.append(Vector2(INF, 60))
 	music_end_time = music_time * 1000
-	noteSelectorPanel.visible = true
-	settingPanel.visible = true
-	place_bar_lines()
-	
 
 # ================== 에디터 내 카메라 조작 =====================
 var dragging = false
@@ -593,7 +599,7 @@ func load_chart():
 # =============================== Load Chart ==========================
 
 func parse():
-	ChartParser.parse("res://Charts/HolyTest.csv", laneDatas, noteDatas, music_bpm)
+	ChartParser.parse_chart("res://Charts/Test/Easy.txt", levelData, true)
 	for lane in laneDatas:
 		for i in range(lane.keyframes.size() - 1):
 			var start_time = lane.keyframes[i].x
