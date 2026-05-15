@@ -11,6 +11,8 @@ static var HALF_CONNECTOR_HEIGHT = 25
 #레인 중앙 기준 캐릭터의 발 위치
 static var CHARACTER_POS_Y = -26
 
+const DIFFICULTY_NAMES = ["Easy", "Hard", "Vex"]
+
 static func get_speed() -> float:
 	return speed
 

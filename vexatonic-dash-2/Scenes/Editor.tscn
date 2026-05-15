@@ -51,15 +51,6 @@ offset_right = 280.0
 offset_bottom = 96.0
 pivot_offset = Vector2(80, 20)
 
-[node name="TextEdit" type="TextEdit" parent="CanvasLayer/SavePanel" unique_id=1245498722]
-layout_mode = 0
-offset_left = 127.0
-offset_top = 13.0
-offset_right = 275.0
-offset_bottom = 47.0
-text = "Enter Level name"
-editable = false
-
 [node name="QuitButton" type="Button" parent="CanvasLayer/SavePanel" unique_id=527542015]
 layout_mode = 0
 offset_left = 335.0
@@ -70,11 +61,43 @@ text = "Quit"
 
 [node name="SaveButton" type="Button" parent="CanvasLayer/SavePanel" unique_id=431638425]
 layout_mode = 0
-offset_left = 154.0
-offset_top = 141.0
-offset_right = 245.0
-offset_bottom = 174.0
+offset_left = 155.0
+offset_top = 158.0
+offset_right = 246.0
+offset_bottom = 191.0
 text = "Save!!"
+
+[node name="Label" type="Label" parent="CanvasLayer/SavePanel" unique_id=1518965152]
+layout_mode = 0
+offset_left = 129.0
+offset_top = 23.0
+offset_right = 286.0
+offset_bottom = 46.0
+text = "Enter Level Name!!"
+
+[node name="Button3" type="Button" parent="CanvasLayer/SavePanel" unique_id=455518065]
+layout_mode = 0
+offset_left = 235.0
+offset_top = 106.0
+offset_right = 278.0
+offset_bottom = 150.0
+text = "Vex"
+
+[node name="Button2" type="Button" parent="CanvasLayer/SavePanel" unique_id=1253078000]
+layout_mode = 0
+offset_left = 178.0
+offset_top = 107.0
+offset_right = 225.0
+offset_bottom = 151.0
+text = "Hard"
+
+[node name="Button" type="Button" parent="CanvasLayer/SavePanel" unique_id=272347291]
+layout_mode = 0
+offset_left = 126.0
+offset_top = 106.0
+offset_right = 169.0
+offset_bottom = 150.0
+text = "Easy"
 
 [node name="NoteSelectorPanel" type="Panel" parent="CanvasLayer" unique_id=1195473622]
 anchors_preset = -1
@@ -403,6 +426,9 @@ text = "8bit"
 
 [connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
+[connection signal="pressed" from="CanvasLayer/SavePanel/Button3" to="." method="set_difficulty" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/Button2" to="." method="set_difficulty" binds= [1]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/Button" to="." method="set_difficulty" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [13]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_mode" binds= [12]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_mode" binds= [11]]

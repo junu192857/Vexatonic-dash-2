@@ -30,6 +30,11 @@ func _ready():
 # ================== 에디터 시작하기 ==========================
 
 func _on_start_editor():
+	initiate_editor()
+	set_initial_value()
+	place_bar_lines()
+
+func initiate_editor():
 	editor_ready = true
 	current_state = EditorState.Ready
 	levelData = LevelData.new()
@@ -38,8 +43,6 @@ func _on_start_editor():
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
-	set_initial_value()
-	place_bar_lines()
 
 func set_initial_value():
 	var bpm = initialPanel.get_node("BPMBox").value
@@ -554,6 +557,8 @@ func print_lane_info():
 
 # ======================== Save Chart ================================
 
+var save_difficulty
+
 func open_save_panel():
 	editor_ready = false
 	savePanel.visible = true
@@ -563,37 +568,44 @@ func quit_save_panel():
 	editor_ready = false
 
 func save_chart():
-	var file_name = savePanel.get_node("LineEdit").text
-	if file_name.is_empty():
+	var folder_name = savePanel.get_node("LineEdit").text
+	if folder_name.is_empty():
 		push_error("파일 이름을 입력해주세요!")
 		return
 	
-	var file = FileAccess.open("res://Charts/" + file_name + ".csv", FileAccess.WRITE)
+	var dir_path = "res://Charts/" + folder_name
+	DirAccess.make_dir_recursive_absolute(dir_path)
+	
+	# 채보 파일 저장
+	var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
+	var file = FileAccess.open(dir_path + "/" + difficulty_name + ".txt", FileAccess.WRITE)
 	if file == null:
-		push_error("ERROR: 파일을 열 수 없습니다.: " + file_name)
+		push_error("ERROR: 채보 파일을 열 수 없습니다.")
 		return
 	
+	# BPM 저장
+	for bpm in levelData.bpm:
+		file.store_line("BPM %s %s" % [bpm.x, bpm.y])
+	
+	# LANE 저장
 	for lane in laneDatas:
 		file.store_line("LANE %d %d" % [lane.lane_index, 1 if lane.is_init else 0])
 		for kf in lane.keyframes:
 			file.store_line("%s %s" % [kf.x, kf.y])
 		file.store_line("END")
 	
+	# 노트 저장
 	for note in noteDatas:
 		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
 	
 	quit_save_panel()
 
+func set_difficulty(difficulty:int):
+	save_difficulty = difficulty
+
 func load_chart():
-	editor_ready = true
-	current_state = EditorState.Ready
-	initialPanel.visible = false
-	noteSelectorPanel.visible = true
-	settingPanel.visible = true
-	#test
-	music_end_time = 180000
+	initiate_editor()
 	parse()
-	music_bpm.append(Vector2(INF, 60))
 	place_bar_lines()
 
 # =============================== Load Chart ==========================
