@@ -1,9 +1,8 @@
 class_name ChartParser
 
-enum Difficulty { Easy, Normal, Hard }
-const DIFFICULTY_NAMES = ["Easy", "Normal", "Hard"]
 
-static func parse(chart_dir: String, difficulty: Difficulty) -> LevelData:
+
+static func parse(chart_dir: String, difficulty: int) -> LevelData:
 	var data = LevelData.new()
 	
 	# METADATA 파싱
@@ -24,7 +23,7 @@ static func parse(chart_dir: String, difficulty: Difficulty) -> LevelData:
 			"LENGTH": data.length = int(parts[1])
 	
 	# 채보 파싱
-	var chart_path = chart_dir + "/" + DIFFICULTY_NAMES[difficulty] + ".txt"
+	var chart_path = chart_dir + "/" + Setting.DIFFICULTY_NAMES[difficulty] + ".txt"
 	parse_chart(chart_path, data, false)
 	
 	return data

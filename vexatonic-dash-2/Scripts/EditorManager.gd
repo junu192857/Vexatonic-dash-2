@@ -1,8 +1,6 @@
 extends Node2D
 
 var levelData: LevelData
-var noteDatas: Array[NoteData]
-var laneDatas: Array[Lane]
 
 @export var NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
@@ -30,25 +28,29 @@ func _ready():
 # ================== 에디터 시작하기 ==========================
 
 func _on_start_editor():
+	initiate_editor()
+	set_initial_value()
+	place_bar_lines()
+
+func initiate_editor():
 	editor_ready = true
 	current_state = EditorState.Ready
+	#변수들을 levelData와 연결
 	levelData = LevelData.new()
-	laneDatas = levelData.lanes
-	noteDatas = levelData.noteDatas
+	levelData.length = levelData.length
+	
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
-	set_initial_value()
-	place_bar_lines()
 
 func set_initial_value():
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
 	if music_time == 0:
 		music_time = 180
-	music_bpm.append(Vector2(0, bpm))
-	music_bpm.append(Vector2(INF, 60))
-	music_end_time = music_time * 1000
+	levelData.bpm.append(Vector2(0, bpm))
+	levelData.bpm.append(Vector2(INF, 60))
+	levelData.length = music_time * 1000
 
 # ================== 에디터 내 카메라 조작 =====================
 var dragging = false
@@ -79,8 +81,6 @@ func _on_zoom_camera(zoom: bool):
 	realign_lines_by_zoom(zoom)
 # ===================== 박자 구분선 출력 =====================
 
-var music_bpm: Array[Vector2] # (time, bpm): time부터 bpm
-var music_end_time : float = 180000
 var bit: int = 16
 @onready var line_holder = $LineHolder
 
@@ -95,17 +95,17 @@ func place_bar_lines():
 	
 	var effective_bit = bit if bit != 0 else 4
 	
-	for i in range(music_bpm.size() - 1):
-		if music_bpm[i].x > music_bpm[i+1].x:
+	for i in range(levelData.bpm.size() - 1):
+		if levelData.bpm[i].x > levelData.bpm[i+1].x:
 			push_error("Please sort by time ascending")
 			return
-		var bpm_start_time = music_bpm[i].x
-		var bpm = music_bpm[i].y
-		var bpm_end_time = min(music_bpm[i + 1].x, music_end_time)
+		var bpm_start_time = levelData.bpm[i].x
+		var bpm = levelData.bpm[i].y
+		var bpm_end_time = min(levelData.bpm[i + 1].x, levelData.length)
 		if bpm_start_time < 0:
 			push_error("time cannot be negative")
 			return
-		if bpm_start_time > music_end_time:
+		if bpm_start_time > levelData.length:
 			return
 		
 		var beat_duration = 60000.0 / bpm
@@ -391,7 +391,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
 
 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
-	for lane in laneDatas:
+	for lane in levelData.lanes:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
@@ -404,7 +404,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	var closest_lane: Lane = null
 	var closest_dist: float = INF
 
-	for lane in laneDatas:
+	for lane in levelData.lanes:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if mouse_pos.x > lane_x_end:
 			if camera_left < lane_x_end:
@@ -429,7 +429,7 @@ func find_note_placing_available(mouse_pos: Vector2) -> bool:
 	if (!check_mouse_in_available_area(mouse_pos)):
 		return false
 
-	for lane in laneDatas:
+	for lane in levelData.lanes:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
 		if snapped_x >= lane_x_start and mouse_pos.x >= lane_x_start and snapped_x <= lane_x_end and mouse_pos.x <= lane_x_end:
@@ -471,7 +471,7 @@ func _on_put_note():
 			lane_start_pos = preview.global_position
 		else: if (selected_note / 10 == 0): # 단노트
 			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
-			noteDatas.append(data)
+			levelData.noteDatas.append(data)
 			preview.set_data(data)
 			target_lane.add_note(preview)
 			print("New Note added")
@@ -486,22 +486,22 @@ func _on_put_note():
 		if (selected_note == NoteSelection.Lane):
 			if (lane_case == LanePlacingCase.Case1):
 				print("CASE 1 ACTIVATED")
-				var new_index = Lane.find_free_index(laneDatas)
+				var new_index = Lane.find_free_index(levelData.lanes)
 				var new_lane = Lane.new(new_index, true)
 				new_lane.add_keyframe(0, lane_start_pos.y)
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
-				laneDatas.append(new_lane)
+				levelData.lanes.append(new_lane)
 				new_lane.add_editor_connector(preview)
 				preview.set_lane_index(new_index)
 			else: if (lane_case == LanePlacingCase.Case2):
 				print("CASE 2 ACTIVATED")
-				var new_index = Lane.find_free_index(laneDatas)
+				var new_index = Lane.find_free_index(levelData.lanes)
 				var new_lane = Lane.new(new_index, false)
 				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
-				laneDatas.append(new_lane)
+				levelData.lanes.append(new_lane)
 				target_lane.add_editor_connector(preview)
 				preview.set_lane_index(new_index)
 			else: if (lane_case == LanePlacingCase.Case3):
@@ -515,7 +515,7 @@ func _on_put_note():
 		else:
 			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
 			print("New LongNote added: start time %f and end time %f and lane index %d" % [Setting.get_time_from_posx(preview.global_position.x), long_end_time, target_lane.lane_index])
-			noteDatas.append(data)
+			levelData.noteDatas.append(data)
 			preview.set_data(data)
 			target_lane.add_note(preview)
 			preview = null
@@ -528,12 +528,12 @@ func get_snapped_x(mouse_x: float) -> float:
 	
 	var time = Setting.get_time_from_posx(mouse_x)
 	
-	var bpm = music_bpm[0].y
-	var bpm_start_time = music_bpm[0].x
-	for i in range(music_bpm.size() - 1):
-		if time >= music_bpm[i].x and time < music_bpm[i + 1].x:
-			bpm = music_bpm[i].y
-			bpm_start_time = music_bpm[i].x
+	var bpm = levelData.bpm[0].y
+	var bpm_start_time = levelData.bpm[0].x
+	for i in range(levelData.bpm.size() - 1):
+		if time >= levelData.bpm[i].x and time < levelData.bpm[i + 1].x:
+			bpm = levelData.bpm[i].y
+			bpm_start_time = levelData.bpm[i].x
 			break
 	
 	var beat_duration = 60000.0 / bpm
@@ -547,12 +547,14 @@ func get_snapped_x(mouse_x: float) -> float:
 # ======================== Testing ===================================
 
 func print_lane_info():
-	for lane in laneDatas:
+	for lane in levelData.lanes:
 		print("LANE INDEX %d" % lane.lane_index)
 		for keyframe in lane.keyframes:
 			print("my lane's keyframe: time %f and height %f" % [keyframe.x, keyframe.y])
 
 # ======================== Save Chart ================================
+
+var save_difficulty
 
 func open_save_panel():
 	editor_ready = false
@@ -563,44 +565,54 @@ func quit_save_panel():
 	editor_ready = false
 
 func save_chart():
-	var file_name = savePanel.get_node("LineEdit").text
-	if file_name.is_empty():
+	var folder_name = savePanel.get_node("LineEdit").text
+	if folder_name.is_empty():
 		push_error("파일 이름을 입력해주세요!")
 		return
 	
-	var file = FileAccess.open("res://Charts/" + file_name + ".csv", FileAccess.WRITE)
+	var dir_path = "res://Charts/" + folder_name
+	DirAccess.make_dir_recursive_absolute(dir_path)
+	
+	# 채보 파일 저장
+	var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
+	var file = FileAccess.open(dir_path + "/" + difficulty_name + ".txt", FileAccess.WRITE)
 	if file == null:
-		push_error("ERROR: 파일을 열 수 없습니다.: " + file_name)
+		push_error("ERROR: 채보 파일을 열 수 없습니다.")
 		return
 	
-	for lane in laneDatas:
+	# BPM 저장
+	for bpm in levelData.bpm:
+		file.store_line("BPM %s %s" % [bpm.x, bpm.y])
+	
+	# LANE 저장
+	for lane in levelData.lanes:
 		file.store_line("LANE %d %d" % [lane.lane_index, 1 if lane.is_init else 0])
 		for kf in lane.keyframes:
 			file.store_line("%s %s" % [kf.x, kf.y])
 		file.store_line("END")
 	
-	for note in noteDatas:
+	# 노트 저장
+	for note in levelData.noteDatas:
 		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
 	
 	quit_save_panel()
 
-func load_chart():
-	editor_ready = true
-	current_state = EditorState.Ready
-	initialPanel.visible = false
-	noteSelectorPanel.visible = true
-	settingPanel.visible = true
-	#test
-	music_end_time = 180000
-	parse()
-	music_bpm.append(Vector2(INF, 60))
-	place_bar_lines()
-
+func set_difficulty(difficulty:int):
+	save_difficulty = difficulty
 # =============================== Load Chart ==========================
+
+func load_chart():
+	initiate_editor()
+	parse()
+	levelData.bpm.append(Vector2(INF, 60))
+	for bpm in levelData.bpm:
+		print("time: %f bpm:%f" % [bpm.x, bpm.y])
+	levelData.length = 180000
+	place_bar_lines()
 
 func parse():
 	ChartParser.parse_chart("res://Charts/Test/Easy.txt", levelData, true)
-	for lane in laneDatas:
+	for lane in levelData.lanes:
 		for i in range(lane.keyframes.size() - 1):
 			var start_time = lane.keyframes[i].x
 			var end_time = lane.keyframes[i + 1].x
@@ -615,9 +627,9 @@ func parse():
 			lane.add_editor_connector(connector)
 			connector.set_lane_index(lane.lane_index)
 	
-	for noteData in noteDatas:
+	for noteData in levelData.noteDatas:
 		var note: ENote = NOTE_SCENE.instantiate()
-		var lane = Lane.find_lane(laneDatas, noteData.lane)
+		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
 		note.set_data(noteData)
 		add_child(note)
 		note.position = Vector2(Setting.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
