@@ -1,6 +1,6 @@
 class_name ChartParser
 
-static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
+static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData], bpmDatas: Array[Vector2] = []):
 	#var notes: Array[NoteData]
 	
 	var file = FileAccess.open(path, FileAccess.READ)
@@ -18,6 +18,11 @@ static func parse(path:String, lanes: Array[Lane], noteDatas: Array[NoteData]):
 			continue
 		
 		var parts = line.split(" ")
+		
+		if parts[0] == "BPM":
+			var time = float(parts[1])
+			var bpm = float(parts[2])
+			bpmDatas.append(Vector2(time, bpm))
 		
 		if parts[0] == "LANE":
 			var index = int(parts[1])
