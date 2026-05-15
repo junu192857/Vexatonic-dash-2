@@ -251,7 +251,7 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 					if existing_connector == null:
 						existing_connector = CONNECTOR_SCENE.instantiate()
 						preview.add_child(existing_connector)
-						existing_connector.set_color(selected_color)
+						existing_connector.set_editor_color(selected_color)
 						print("new connector added")
 					
 					# 체인 순회하면서 재사용/생성/삭제
@@ -275,7 +275,7 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 							if child_connector == null:
 								child_connector = CONNECTOR_SCENE.instantiate()
 								current.add_child(child_connector)
-								child_connector.set_color(selected_color)
+								child_connector.set_editor_color(selected_color)
 							current = child_connector
 						else:
 							print("HELLO@?")
@@ -358,7 +358,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 					
 					var longNote_connector = CONNECTOR_SCENE.instantiate()
 					parent_node.add_child(longNote_connector)
-					longNote_connector.set_color(selected_color)
+					longNote_connector.set_editor_color(selected_color)
 					longNote_connector.set_data(start_pos, end_pos)
 					longNote_connector.global_position = start_pos
 					parent_node = longNote_connector
@@ -394,7 +394,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	for lane in laneDatas:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
-		if snapped_x >= lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
+		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				target_lane = lane
@@ -432,7 +432,7 @@ func find_note_placing_available(mouse_pos: Vector2) -> bool:
 	for lane in laneDatas:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
-		if snapped_x >= lane_x_start and snapped_x <= lane_x_end and mouse_pos.x <= lane_x_end:
+		if snapped_x >= lane_x_start and mouse_pos.x >= lane_x_start and snapped_x <= lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				target_lane = lane
@@ -488,7 +488,6 @@ func _on_put_note():
 				print("CASE 1 ACTIVATED")
 				var new_index = Lane.find_free_index(laneDatas)
 				var new_lane = Lane.new(new_index, true)
-				
 				new_lane.add_keyframe(0, lane_start_pos.y)
 				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
@@ -521,6 +520,7 @@ func _on_put_note():
 			target_lane.add_note(preview)
 			preview = null
 		current_state = EditorState.Ready
+
 
 func get_snapped_x(mouse_x: float) -> float:
 	if bit == 0:
@@ -584,6 +584,18 @@ func save_chart():
 	
 	quit_save_panel()
 
+func load_chart():
+	editor_ready = true
+	current_state = EditorState.Ready
+	initialPanel.visible = false
+	noteSelectorPanel.visible = true
+	settingPanel.visible = true
+	#test
+	music_end_time = 180000
+	parse()
+	music_bpm.append(Vector2(INF, 60))
+	place_bar_lines()
+
 # =============================== Load Chart ==========================
 
 func parse():
@@ -597,12 +609,55 @@ func parse():
 			
 			var connector = CONNECTOR_SCENE.instantiate()
 			add_child(connector)
-			connector.set_color(-1)
+			connector.set_editor_color(-1)
 			connector.set_data(start_pos, end_pos)
 			connector.global_position = start_pos
 			lane.add_editor_connector(connector)
 			connector.set_lane_index(lane.lane_index)
 	
+	for noteData in noteDatas:
+		var note: ENote = NOTE_SCENE.instantiate()
+		var lane = Lane.find_lane(laneDatas, noteData.lane)
+		note.set_data(noteData)
+		add_child(note)
+		note.position = Vector2(Setting.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
+		note.set_color(noteData.color)
+		lane.add_note(note)
+		
+		var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH
+		var connector_end_x = Setting.get_posx_from_time(noteData.end_time)
+		if (noteData.type == 1):
+			if connector_start_x < connector_end_x:
+				var points = [connector_start_x]
+				for kf in lane.keyframes:
+					if kf.x > noteData.time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.x < noteData.end_time:
+						points.append(Setting.get_posx_from_time(kf.x))
+					if kf.x > noteData.end_time:
+						break
+				points.append(connector_end_x)
+				var parent_node = note
+				var start_x
+				var start_pos
+				var end_x
+				var end_pos
+				for i in range(points.size() - 1):
+					start_x = points[i]
+					end_x = points[i + 1]
+					start_pos = Vector2(start_x, lane.get_height(Setting.get_time_from_posx(start_x)))
+					end_pos = Vector2(end_x, lane.get_height(Setting.get_time_from_posx(end_x)))
+					
+					var longNote_connector = CONNECTOR_SCENE.instantiate()
+					parent_node.add_child(longNote_connector)
+					longNote_connector.set_editor_color(noteData.color)
+					longNote_connector.set_data(start_pos, end_pos)
+					longNote_connector.global_position = start_pos
+					parent_node = longNote_connector
+			
+			var marker = NOTE_SCENE.instantiate()
+			note.add_child(marker)
+			marker.set_color(noteData.color)
+			marker.global_position = Vector2(connector_end_x, lane.get_height(noteData.end_time))
+			
 
 # ================================ 편의 기능 ============================
 

@@ -1,12 +1,12 @@
-extends Node2D
+extends Connector
 class_name EConnector
 
-@onready var polygon:Polygon2D = $Polygon2D
+#@onready var polygon:Polygon2D = $Polygon2D
 
-var data:ConnectorData
+#var data:ConnectorData
 var lane_index: int
 
-const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
+#const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 func _ready():
 	data = ConnectorData.new(-1, 24, 0)
@@ -38,5 +38,5 @@ func get_end_pos(start_pos:Vector2):
 func set_lane_index(index:int):
 	lane_index = index
 	
-func set_color(color: int):
-	polygon.modulate = PROCESSED_COLORS[color]
+func set_editor_color(color: int):
+	polygon.modulate = Color(1,1,1) if color == -1 else PROCESSED_COLORS[color]

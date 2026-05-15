@@ -277,6 +277,14 @@ offset_right = -23.375
 offset_bottom = 30.5
 text = "BPM:"
 
+[node name="Button2" type="Button" parent="CanvasLayer/InitialPanel" unique_id=1399891099]
+layout_mode = 0
+offset_left = 819.0
+offset_top = 25.0
+offset_right = 973.0
+offset_bottom = 93.0
+text = "LoadTest"
+
 [node name="SettingPanel" type="Panel" parent="CanvasLayer" unique_id=955210483]
 anchors_preset = -1
 anchor_left = 0.85
@@ -403,6 +411,7 @@ text = "8bit"
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_mode" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_mode" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]
+[connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="load_chart"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton2" to="." method="print_lane_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton" to="." method="open_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button4" to="." method="set_bit" binds= [32]]
