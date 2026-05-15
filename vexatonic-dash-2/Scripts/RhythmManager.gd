@@ -1,8 +1,6 @@
 extends Node2D
 
 var levelData: LevelData
-var lanes
-var noteDatas
 
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
@@ -23,11 +21,9 @@ func _ready() -> void:
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
 	levelData = ChartParser.parse("res://Charts/Test", 0)
-	lanes = levelData.lanes
-	noteDatas = levelData.noteDatas
-	Lane.sort_lanes(lanes)
+	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
-	noteDatas.sort_custom(func(a: NoteData, b: NoteData):
+	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
 		if a.lane != b.lane:
 			return a.lane < b.lane
 		return a.time < b.time
@@ -36,12 +32,12 @@ func _ready() -> void:
 	# 채보 찍기
 	render_chart()
 	
-	#print(noteDatas.size())
-	for lane:Lane in lanes:
+	#print(levelData.noteDatas.size())
+	for lane:Lane in levelData.lanes:
 		lane.print_data()
 	
 	# 최초의 lane들에 캐릭터 생성
-	for lane in lanes:
+	for lane in levelData.lanes:
 		if (lane.is_init):
 			place_character(lane)
 			lane_index += 1
@@ -67,8 +63,8 @@ func _process(delta):
 	else:
 		time = musicPlayer.get_playback_position() * 1000
 	
-	if (lane_index < lanes.size() and lanes[lane_index].get_start_time() < time):
-		place_character(lanes[lane_index])
+	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
+		place_character(levelData.lanes[lane_index])
 		lane_index += 1
 		
 	
@@ -96,7 +92,7 @@ func render_chart():
 	var previous_time = -1
 	var previous_note
 	var previous_lane = -1
-	for noteData in noteDatas:
+	for noteData in levelData.noteDatas:
 		pos_x = Setting.get_posx_from_time(noteData.time)
 		if (previous_time >= 0):
 			var connector = place_connector(-1, previous_time + Setting.time_per_note_width, noteData.time, \
@@ -116,7 +112,7 @@ func render_chart():
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
-	for lane:Lane in lanes:
+	for lane:Lane in levelData.lanes:
 		lane.print_data()
 		lane.sort_notes()
 		place_initial_connector(lane)
@@ -126,7 +122,7 @@ func render_chart():
 func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Node2D:
 	var note = NOTE_SCENE.instantiate() as Node2D
 	note.set_data(data)
-	var lane = Lane.find_lane(lanes, data.lane)
+	var lane = Lane.find_lane(levelData.lanes, data.lane)
 	parent.add_child(note)
 	if !is_marker:
 		note.position = Vector2(pos_x, lane.get_height(data.time))
@@ -141,7 +137,7 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 	if (end_time - start_time <= 0):
 		return
 	var connector = CONNECTOR_SCENE.instantiate() as Node2D
-	var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(lanes, lane), first)
+	var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
 	
 	# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
 	if (end_time - initial_end_time > Setting.EPSILON):
@@ -191,7 +187,7 @@ func place_final_connector(lane: Lane):
 
 # 생성된 노트를 레인의 노트 큐에 할당
 func assign_note(note: Note):
-	var lane = Lane.find_lane(lanes, note.data.lane)
+	var lane = Lane.find_lane(levelData.lanes, note.data.lane)
 	lane.add_note(note)
 
 #==================================================================================
@@ -210,7 +206,7 @@ func _on_pressed(p_color:int):
 	var pressed_ms = time
 	#print("Hello! your color is: %d and pressed_ms: %f and time: %f and character_posx: %f" % [p_color, pressed_ms, time, character.position.x])
 	
-	for lane:Lane in lanes:
+	for lane:Lane in levelData.lanes:
 		if (lane.notes.size() <= lane.note_index):
 			continue
 		else:
