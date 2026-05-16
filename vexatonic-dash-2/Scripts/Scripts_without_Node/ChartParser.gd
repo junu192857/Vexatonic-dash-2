@@ -43,6 +43,7 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 		
 		if parts[0] == "BPM":
 			data.bpm.append(Vector2(float(parts[1]), float(parts[2])))
+			print("BPM added")
 			continue
 		
 		if parts[0] == "LANE":

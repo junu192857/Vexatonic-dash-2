@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
 [ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
 
+[sub_resource type="ButtonGroup" id="ButtonGroup_brgpd"]
+
 [sub_resource type="ButtonGroup" id="ButtonGroup_dfuwn"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_5v8xv"]
@@ -39,17 +41,9 @@ anchor_bottom = 0.5
 offset_left = -200.0
 offset_top = -100.0
 offset_right = 200.0
-offset_bottom = 100.0
+offset_bottom = 140.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/SavePanel" unique_id=316064508]
-layout_mode = 0
-offset_left = 120.0
-offset_top = 56.0
-offset_right = 280.0
-offset_bottom = 96.0
-pivot_offset = Vector2(80, 20)
 
 [node name="QuitButton" type="Button" parent="CanvasLayer/SavePanel" unique_id=527542015]
 layout_mode = 0
@@ -67,7 +61,10 @@ offset_right = 246.0
 offset_bottom = 191.0
 text = "Save!!"
 
-[node name="Label" type="Label" parent="CanvasLayer/SavePanel" unique_id=1518965152]
+[node name="OnlyForNewSave" type="Control" parent="CanvasLayer/SavePanel" unique_id=1769331625]
+anchors_preset = 0
+
+[node name="Label" type="Label" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=1518965152]
 layout_mode = 0
 offset_left = 129.0
 offset_top = 23.0
@@ -75,29 +72,65 @@ offset_right = 286.0
 offset_bottom = 46.0
 text = "Enter Level Name!!"
 
-[node name="Button3" type="Button" parent="CanvasLayer/SavePanel" unique_id=455518065]
+[node name="WarningLabel" type="Label" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=716578086]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 207.0
+offset_right = 309.0
+offset_bottom = 230.0
+
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=316064508]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 56.0
+offset_right = 280.0
+offset_bottom = 96.0
+pivot_offset = Vector2(80, 20)
+
+[node name="Button3" type="Button" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=455518065]
 layout_mode = 0
 offset_left = 235.0
 offset_top = 106.0
 offset_right = 278.0
 offset_bottom = 150.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_brgpd")
 text = "Vex"
 
-[node name="Button2" type="Button" parent="CanvasLayer/SavePanel" unique_id=1253078000]
+[node name="Button2" type="Button" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=1253078000]
 layout_mode = 0
 offset_left = 178.0
 offset_top = 107.0
 offset_right = 225.0
 offset_bottom = 151.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_brgpd")
 text = "Hard"
 
-[node name="Button" type="Button" parent="CanvasLayer/SavePanel" unique_id=272347291]
+[node name="Button" type="Button" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=272347291]
 layout_mode = 0
 offset_left = 126.0
 offset_top = 106.0
 offset_right = 169.0
 offset_bottom = 150.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_brgpd")
 text = "Easy"
+
+[node name="OnlyForLoaded" type="Control" parent="CanvasLayer/SavePanel" unique_id=432093991]
+visible = false
+anchors_preset = 0
+offset_left = 42.0
+offset_top = 73.0
+offset_right = 42.0
+offset_bottom = 73.0
+
+[node name="Label" type="Label" parent="CanvasLayer/SavePanel/OnlyForLoaded" unique_id=761252457]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 31.0
+offset_right = 326.0
+offset_bottom = 54.0
 
 [node name="NoteSelectorPanel" type="Panel" parent="CanvasLayer" unique_id=1195473622]
 anchors_preset = -1
@@ -257,10 +290,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -35.0
-offset_top = -15.5
-offset_right = 51.5
-offset_bottom = 15.5
+offset_left = 12.0
+offset_top = -15.0
+offset_right = 98.5
+offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
 max_value = 1000.0
@@ -282,10 +315,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -34.0
-offset_top = 34.0
-offset_right = 52.5
-offset_bottom = 65.0
+offset_left = 11.0
+offset_top = 30.0
+offset_right = 97.5
+offset_bottom = 61.0
 grow_horizontal = 2
 grow_vertical = 2
 max_value = 1000.0
@@ -307,6 +340,38 @@ offset_top = 25.0
 offset_right = 973.0
 offset_bottom = 93.0
 text = "LoadTest"
+
+[node name="Button3" type="Button" parent="CanvasLayer/InitialPanel" unique_id=357968154]
+layout_mode = 0
+offset_left = 447.0
+offset_top = 164.0
+offset_right = 565.0
+offset_bottom = 213.0
+text = "Select Music"
+
+[node name="MusicText" type="Label" parent="CanvasLayer/InitialPanel" unique_id=1884758539]
+layout_mode = 0
+offset_left = 321.0
+offset_top = 225.0
+offset_right = 715.0
+offset_bottom = 254.0
+text = "Please select music using upper button"
+horizontal_alignment = 1
+
+[node name="WarningLabel" type="Label" parent="CanvasLayer/InitialPanel" unique_id=135071618]
+layout_mode = 0
+offset_left = 302.0
+offset_top = 388.0
+offset_right = 636.0
+offset_bottom = 424.0
+horizontal_alignment = 1
+
+[node name="FileDialog" type="FileDialog" parent="CanvasLayer/InitialPanel" unique_id=923584041]
+oversampling_override = 1.0
+title = "Open a File"
+position = Vector2i(0, 36)
+file_mode = 0
+access = 2
 
 [node name="SettingPanel" type="Panel" parent="CanvasLayer" unique_id=955210483]
 anchors_preset = -1
@@ -424,11 +489,61 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_5v8xv")
 text = "8bit"
 
+[node name="LoadPanel" type="Panel" parent="CanvasLayer" unique_id=1101582062]
+visible = false
+offset_left = 677.0
+offset_top = 345.0
+offset_right = 1223.0
+offset_bottom = 686.0
+
+[node name="Button" type="Button" parent="CanvasLayer/LoadPanel" unique_id=1619523593]
+layout_mode = 0
+offset_left = 202.0
+offset_top = 270.0
+offset_right = 367.0
+offset_bottom = 318.0
+text = "Load Chart"
+
+[node name="Button2" type="Button" parent="CanvasLayer/LoadPanel" unique_id=1744612057]
+layout_mode = 0
+offset_left = 201.0
+offset_top = 37.0
+offset_right = 363.0
+offset_bottom = 89.0
+text = "Find Chart..."
+
+[node name="FileDialog" type="FileDialog" parent="CanvasLayer/LoadPanel" unique_id=666052920]
+title = "Open a File"
+file_mode = 0
+
+[node name="LengthLabel" type="Label" parent="CanvasLayer/LoadPanel" unique_id=16729852]
+layout_mode = 0
+offset_left = 173.0
+offset_top = 221.0
+offset_right = 393.0
+offset_bottom = 263.0
+
+[node name="MusicLabel" type="Label" parent="CanvasLayer/LoadPanel" unique_id=1562858408]
+layout_mode = 0
+offset_left = 177.0
+offset_top = 161.0
+offset_right = 397.0
+offset_bottom = 203.0
+
+[node name="NameLabel" type="Label" parent="CanvasLayer/LoadPanel" unique_id=1971119977]
+layout_mode = 0
+offset_left = 172.0
+offset_top = 104.0
+offset_right = 392.0
+offset_bottom = 146.0
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=787913441]
+
 [connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
-[connection signal="pressed" from="CanvasLayer/SavePanel/Button3" to="." method="set_difficulty" binds= [2]]
-[connection signal="pressed" from="CanvasLayer/SavePanel/Button2" to="." method="set_difficulty" binds= [1]]
-[connection signal="pressed" from="CanvasLayer/SavePanel/Button" to="." method="set_difficulty" binds= [0]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button3" to="." method="set_difficulty" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button2" to="." method="set_difficulty" binds= [1]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button" to="." method="set_difficulty" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [13]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_mode" binds= [12]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_mode" binds= [11]]
@@ -437,7 +552,9 @@ text = "8bit"
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_mode" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_mode" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]
-[connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="load_chart"]
+[connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
+[connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
+[connection signal="file_selected" from="CanvasLayer/InitialPanel/FileDialog" to="." method="select_music"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton2" to="." method="print_lane_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton" to="." method="open_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button4" to="." method="set_bit" binds= [32]]
@@ -449,3 +566,6 @@ text = "8bit"
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button2" to="." method="set_bit" binds= [4]]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button3" to="." method="set_bit" binds= [16]]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button" to="." method="set_bit" binds= [8]]
+[connection signal="pressed" from="CanvasLayer/LoadPanel/Button" to="." method="finish_load_chart"]
+[connection signal="pressed" from="CanvasLayer/LoadPanel/Button2" to="." method="find_chart"]
+[connection signal="file_selected" from="CanvasLayer/LoadPanel/FileDialog" to="." method="select_chart"]
