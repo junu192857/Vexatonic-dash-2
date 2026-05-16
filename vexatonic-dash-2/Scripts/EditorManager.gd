@@ -49,19 +49,17 @@ func check_everything_done() -> bool:
 func initiate_editor():
 	editor_ready = true
 	current_state = EditorState.Ready
-	#변수들을 levelData와 연결
-	levelData = LevelData.new()
-	levelData.length = levelData.length
-	levelData.music_path = music_path.get_file()
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
 
 func set_initial_value():
+	levelData = LevelData.new()
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
 	levelData.bpm.append(Vector2(0, bpm))
 	levelData.bpm.append(Vector2(INF, 60))
+	levelData.music_path = music_path.get_file()
 	levelData.length = music_time * 1000
 
 func start_find_music():
@@ -591,11 +589,11 @@ func quit_save_panel():
 
 func save_chart():
 	if save_difficulty == -1:
-		push_error("Please select difficulty")
+		savePanel.get_node("WarningLabel").text = "WARNING: Please set difficulty"
 		return
 	var folder_name = savePanel.get_node("LineEdit").text
 	if folder_name.is_empty():
-		push_error("파일 이름을 입력해주세요!")
+		savePanel.get_note("WarningLabel").text = "WARNING: Please set level name"
 		return
 	
 	var dir_path = "res://Charts/" + folder_name
