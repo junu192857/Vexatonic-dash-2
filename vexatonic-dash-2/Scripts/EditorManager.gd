@@ -694,6 +694,10 @@ func select_chart(path: String):
 		_:
 			save_difficulty = -1
 			
+	if (save_difficulty == -1):
+		loadPanel.get_node("MusicLabel").text = "Please load chart file with valid name"
+		return
+			
 	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
 	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.music_path
 	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.length / 1000)
