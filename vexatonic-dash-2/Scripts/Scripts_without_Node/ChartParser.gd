@@ -62,4 +62,5 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 			continue
 		
 		if current_lane == null and parts.size() >= 5:
-			data.noteDatas.append(NoteData.new(float(parts[0]), int(parts[1]), int(parts[2]), float(parts[3]), int(parts[4])))
+			data.noteDatas.append(NoteData.new(float(parts[0]), int(parts[1]), int(parts[2]), \
+					float(parts[3]) if int(parts[2]) == 1 else float(parts[0]), int(parts[4])))

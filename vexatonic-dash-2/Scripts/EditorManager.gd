@@ -59,7 +59,7 @@ func set_initial_value():
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
 	levelData.bpm.append(Vector2(0, bpm))
-	levelData.bpm.append(Vector2(INF, 60))
+	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
 	levelData.music_path = music_path.get_file()
 	levelData.length = music_time * 1000
 	chart_loaded = false
@@ -118,6 +118,9 @@ func place_bar_lines():
 		bar.queue_free()
 	
 	var effective_bit = bit if bit != 0 else 4
+	
+	for i in range(levelData.bpm.size() - 1):
+		print("bpm time: %f" % levelData.bpm[i].x)
 	
 	for i in range(levelData.bpm.size() - 1):
 		if levelData.bpm[i].x > levelData.bpm[i+1].x:
@@ -426,7 +429,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 
 	# Case 3 체크
 	var closest_lane: Lane = null
-	var closest_dist: float = INF
+	var closest_dist: float = Setting.INFINITE
 
 	for lane in levelData.lanes:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
@@ -698,7 +701,7 @@ func select_chart(path: String):
 
 func finish_load_chart():
 	parse(chart_path)
-	levelData.bpm.append(Vector2(INF, 60))
+	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
 	for bpm in levelData.bpm:
 		print("time: %f bpm:%f" % [bpm.x, bpm.y])
 	chart_loaded = true
