@@ -18,7 +18,7 @@ static func parse(chart_dir: String, difficulty: int) -> LevelData:
 		var parts = line.split(" ")
 		match parts[0]:
 			"NAME":   data.name = parts[1]
-			"MUSIC":  data.music_path = chart_dir + "/" + parts[1]
+			"MUSIC":  data.music_path = parts[1]
 			"LEVEL":  data.difficulty = [int(parts[1]), int(parts[2]), int(parts[3])]
 			"LENGTH": data.length = int(parts[1])
 	

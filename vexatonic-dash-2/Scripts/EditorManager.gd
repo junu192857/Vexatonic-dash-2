@@ -8,6 +8,7 @@ var levelData: LevelData
 
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
+@onready var musicPlayer = $AudioStreamPlayer
 
 @onready var initialPanel = $CanvasLayer/InitialPanel
 @onready var noteSelectorPanel = $CanvasLayer/NoteSelectorPanel
@@ -69,11 +70,10 @@ func start_find_music():
 	
 func select_music(path: String):
 	var stream = AudioStreamMP3.new()
-	var audioStreamPlayer = $AudioStreamPlayer
 	stream.data = FileAccess.get_file_as_bytes(path)
-	audioStreamPlayer.stream = stream
+	musicPlayer.stream = stream
 	music_path = path
-	initialPanel.get_node("MusicTimeBox").value = audioStreamPlayer.stream.get_length()
+	initialPanel.get_node("MusicTimeBox").value = musicPlayer.stream.get_length()
 	initialPanel.get_node("MusicText").text = path.get_file()
 
 # ================== 에디터 내 카메라 조작 =====================
@@ -159,6 +159,7 @@ func put_line(pos_x: float, major: bool):
 	line_holder.add_child(line)
 	line.position = Vector2(pos_x, camera.global_position.y)
 	line.scale = Vector2(pow(1.2, 1 if major else -3), 3)
+	return line
 
 func realign_lines_by_zoom(zoom: bool):
 	var lines = line_holder.get_children()
@@ -674,9 +675,8 @@ func select_chart(path: String):
 			break
 	
 	var stream = AudioStreamMP3.new()
-	var audioStreamPlayer = $AudioStreamPlayer
 	stream.data = FileAccess.get_file_as_bytes(music_path)
-	audioStreamPlayer.stream = stream
+	musicPlayer.stream = stream
 	
 	levelData = LevelData.new()
 	levelData.name = path.get_base_dir().get_file()
@@ -772,6 +772,34 @@ func parse(chart_path: String):
 			
 
 # ================================ 편의 기능 ============================
+
+var music_playing: bool = false
+var music_bar
+
+func toggle_music():
+	if (!music_playing):
+		noteSelectorPanel.get_node("PlayMusicButton").text = "Stop Music"
+		music_playing = true
+		var initial_pos_x = get_music_start_pos()
+		var music_start_time = Setting.get_time_from_posx(initial_pos_x) / 1000
+		musicPlayer.play(music_start_time)
+		music_bar = put_line(initial_pos_x, true)
+		music_bar.get_child(0).modulate = Color(120,120,0)
+		music_bar.scale.x = pow(1.2, 2-camera_zoom_level)
+	else:
+		noteSelectorPanel.get_node("PlayMusicButton").text = "Play Music"
+		music_playing = false
+		music_bar.queue_free()
+		music_bar = null
+		musicPlayer.stop()
+
+func get_music_start_pos() -> float:
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
+	return max(0.0, camera_left)
+
+func _process(delta:float):
+	if (music_bar != null):
+		music_bar.global_position.x = Setting.get_posx_from_time(musicPlayer.get_playback_position() * 1000)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane

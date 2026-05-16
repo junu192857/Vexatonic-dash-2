@@ -259,6 +259,14 @@ pivot_offset = Vector2(0, 120)
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 
+[node name="PlayMusicButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1614325007]
+layout_mode = 0
+offset_left = 1614.0
+offset_top = 31.0
+offset_right = 1708.0
+offset_bottom = 127.0
+text = "Play Music"
+
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
 anchor_left = 0.25
@@ -551,6 +559,7 @@ offset_bottom = 146.0
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button8" to="." method="_on_select_mode" binds= [3]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_mode" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_mode" binds= [0]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/PlayMusicButton" to="." method="toggle_music"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]

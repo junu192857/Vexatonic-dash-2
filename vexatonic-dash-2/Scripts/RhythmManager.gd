@@ -32,9 +32,10 @@ func _ready() -> void:
 	# 채보 찍기
 	render_chart()
 	
-	#var stream = AudioStreamMP3.new()
-	#stream.data = FileAccess.get_file_as_bytes("res://Charts/Test" + "/" +  levelData.music_path)
-	#musicPlayer.stream = stream
+	var stream = AudioStreamMP3.new()
+	print("MUSIC_PATH: " + levelData.music_path)
+	stream.data = FileAccess.get_file_as_bytes("res://Charts/Test" + "/" +  levelData.music_path)
+	musicPlayer.stream = stream
 	
 	
 	#print(levelData.noteDatas.size())
@@ -182,7 +183,6 @@ func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
 		var last_note_time = lane.notes[-1].get_end_time() #find last note or marker
-		print("last_note_time: %f", last_note_time)
 		if lane.keyframes[-1].x - last_note_time > Setting.time_per_note_width:
 			var connector_time = last_note_time + Setting.time_per_note_width
 			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].x, lane.lane_index, true,\
