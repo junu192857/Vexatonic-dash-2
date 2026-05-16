@@ -13,6 +13,7 @@ var levelData: LevelData
 @onready var noteSelectorPanel = $CanvasLayer/NoteSelectorPanel
 @onready var settingPanel = $CanvasLayer/SettingPanel
 @onready var savePanel = $CanvasLayer/SavePanel
+@onready var loadPanel = $CanvasLayer/LoadPanel
 
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
@@ -61,9 +62,10 @@ func set_initial_value():
 	levelData.bpm.append(Vector2(INF, 60))
 	levelData.music_path = music_path.get_file()
 	levelData.length = music_time * 1000
+	chart_loaded = false
 
 func start_find_music():
-	$FileDialog.popup()
+	initialPanel.get_node("FileDialog").popup()
 	
 func select_music(path: String):
 	var stream = AudioStreamMP3.new()
@@ -582,46 +584,54 @@ var music_path = ""
 func open_save_panel():
 	editor_ready = false
 	savePanel.visible = true
+	if (chart_loaded):
+		savePanel.get_node("OnlyForNewSave").visible = false
+		savePanel.get_node("OnlyForLoaded").visible = true
+		savePanel.get_node("OnlyForLoaded/Label").text = "Do you want to save %s %s?" % [levelData.name, Setting.DIFFICULTY_NAMES[save_difficulty]]
 
 func quit_save_panel():
 	savePanel.visible = false
 	editor_ready = false
 
 func save_chart():
-	if save_difficulty == -1:
-		savePanel.get_node("WarningLabel").text = "WARNING: Please set difficulty"
-		return
-	var folder_name = savePanel.get_node("LineEdit").text
-	if folder_name.is_empty():
-		savePanel.get_note("WarningLabel").text = "WARNING: Please set level name"
-		return
+	if (!chart_loaded):
+		if save_difficulty == -1:
+			savePanel.get_node("WarningLabel").text = "WARNING: Please set difficulty"
+			return
+		var folder_name = savePanel.get_node("OnlyForNewSave/LineEdit").text
+		if folder_name.is_empty():
+			savePanel.get_note("WarningLabel").text = "WARNING: Please set level name"
+			return
+		
+		var dir_path = "res://Charts/" + folder_name
+		DirAccess.make_dir_recursive_absolute(dir_path)
+		
+		# METADATA.txt 저장
+		var meta_file = FileAccess.open(dir_path + "/METADATA.txt", FileAccess.WRITE)
+		if meta_file == null:
+			push_error("ERROR: METADATA.txt를 열 수 없습니다.")
+			return
+		meta_file.store_line("NAME " + folder_name)
+		meta_file.store_line("MUSIC " + levelData.music_path)
+		meta_file.store_line("LEVEL 1 2 3")
+		meta_file.store_line("LENGTH %d" % levelData.length)
 	
-	var dir_path = "res://Charts/" + folder_name
-	DirAccess.make_dir_recursive_absolute(dir_path)
-	
-	# METADATA.txt 저장
-	var meta_file = FileAccess.open(dir_path + "/METADATA.txt", FileAccess.WRITE)
-	if meta_file == null:
-		push_error("ERROR: METADATA.txt를 열 수 없습니다.")
-		return
-	meta_file.store_line("NAME " + folder_name)
-	meta_file.store_line("MUSIC " + levelData.music_path)
-	meta_file.store_line("LEVEL 1 2 3")
-	meta_file.store_line("LENGTH %d" % levelData.length)
-	
-	# 음악 파일 저장
-	DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.music_path)
+		# 음악 파일 저장
+		DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.music_path)
+		
+		var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
+		chart_path = dir_path + "/" + difficulty_name + ".txt"
 	
 	# 채보 파일 저장
-	var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
-	var file = FileAccess.open(dir_path + "/" + difficulty_name + ".txt", FileAccess.WRITE)
+
+	var file = FileAccess.open(chart_path, FileAccess.WRITE)
 	if file == null:
 		push_error("ERROR: 채보 파일을 열 수 없습니다.")
 		return
 	
 	# BPM 저장
-	for bpm in levelData.bpm:
-		file.store_line("BPM %s %s" % [bpm.x, bpm.y])
+	for i in range(levelData.bpm.size() - 1):
+		file.store_line("BPM %s %s" % [levelData.bpm[i].x, levelData.bpm[i].y])
 	
 	# LANE 저장
 	for lane in levelData.lanes:
@@ -635,22 +645,70 @@ func save_chart():
 		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
 	
 	quit_save_panel()
+	
 
 func set_difficulty(difficulty:int):
 	save_difficulty = difficulty
 # =============================== Load Chart ==========================
+var chart_path
+var chart_loaded : bool
 
-func load_chart():
-	initiate_editor()
-	parse()
+func on_push_load_chart_button():
+	loadPanel.visible = true
+	initialPanel.visible = false
+	
+
+func find_chart():
+	loadPanel.get_node("FileDialog").popup()
+
+func select_chart(path: String):
+	chart_path = path
+	var dir = DirAccess.open(path.get_base_dir())
+	for file in dir.get_files():
+		if file.ends_with(".mp3"):
+			music_path = path.get_base_dir() + "/" + file
+			print(music_path)
+			break
+	
+	var stream = AudioStreamMP3.new()
+	var audioStreamPlayer = $AudioStreamPlayer
+	stream.data = FileAccess.get_file_as_bytes(music_path)
+	audioStreamPlayer.stream = stream
+	
+	levelData = LevelData.new()
+	levelData.name = path.get_base_dir().get_file()
+	levelData.music_path = music_path.get_file()
+	levelData.length = stream.get_length() * 1000
+	
+	
+	match chart_path.get_file():
+		Setting.DIFFICULTY_NAMES[0] + ".txt":
+			save_difficulty = 0
+		Setting.DIFFICULTY_NAMES[1] + ".txt":
+			save_difficulty = 1
+		Setting.DIFFICULTY_NAMES[2] + ".txt":
+			save_difficulty = 2
+		_:
+			save_difficulty = -1
+			
+	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
+	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.music_path
+	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.length / 1000)
+	
+
+func finish_load_chart():
+	parse(chart_path)
 	levelData.bpm.append(Vector2(INF, 60))
 	for bpm in levelData.bpm:
 		print("time: %f bpm:%f" % [bpm.x, bpm.y])
-	levelData.length = 180000
+	chart_loaded = true
+	loadPanel.visible = false
+	initiate_editor()
 	place_bar_lines()
+	
 
-func parse():
-	ChartParser.parse_chart("res://Charts/Test/Easy.txt", levelData, true)
+func parse(chart_path: String):
+	ChartParser.parse_chart(chart_path, levelData, true)
 	for lane in levelData.lanes:
 		for i in range(lane.keyframes.size() - 1):
 			var start_time = lane.keyframes[i].x
