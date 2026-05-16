@@ -70,11 +70,19 @@ func start_find_music():
 	
 func select_music(path: String):
 	var stream = AudioStreamMP3.new()
+	var data = FileAccess.get_file_as_bytes(path)
+	if (data.is_empty()):
+		initialPanel.get_node("MusicText").text = "Please load valid music file"
+		initialPanel.get_node("StartButton").visible = false
+		return
 	stream.data = FileAccess.get_file_as_bytes(path)
+
 	musicPlayer.stream = stream
 	music_path = path
 	initialPanel.get_node("MusicTimeBox").value = musicPlayer.stream.get_length()
 	initialPanel.get_node("MusicText").text = path.get_file()
+	
+	initialPanel.get_node("StartButton").visible = true
 
 # ================== 에디터 내 카메라 조작 =====================
 var dragging = false
@@ -604,7 +612,7 @@ func save_chart():
 			return
 		var folder_name = savePanel.get_node("OnlyForNewSave/LineEdit").text
 		if folder_name.is_empty():
-			savePanel.get_note("WarningLabel").text = "WARNING: Please set level name"
+			savePanel.get_node("WarningLabel").text = "WARNING: Please set level name"
 			return
 		
 		var dir_path = "res://Charts/" + folder_name
@@ -675,7 +683,13 @@ func select_chart(path: String):
 			break
 	
 	var stream = AudioStreamMP3.new()
+	var data = FileAccess.get_file_as_bytes(music_path)
+	if (data.is_empty()):
+		loadPanel.get_node("MusicLabel").text = "Please set music file with chart file"
+		loadPanel.get_node("LoadButton").visible = false
+		return
 	stream.data = FileAccess.get_file_as_bytes(music_path)
+
 	musicPlayer.stream = stream
 	
 	levelData = LevelData.new()
@@ -696,11 +710,13 @@ func select_chart(path: String):
 			
 	if (save_difficulty == -1):
 		loadPanel.get_node("MusicLabel").text = "Please load chart file with valid name"
+		loadPanel.get_node("LoadButton").visible = false
 		return
 			
 	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
 	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.music_path
 	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.length / 1000)
+	loadPanel.get_node("LoadButton").visible = true
 	
 
 func finish_load_chart():
