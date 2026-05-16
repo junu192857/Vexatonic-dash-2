@@ -28,9 +28,23 @@ func _ready():
 # ================== 에디터 시작하기 ==========================
 
 func _on_start_editor():
-	initiate_editor()
+	if (!check_everything_done()):
+		return
 	set_initial_value()
+	initiate_editor()
 	place_bar_lines()
+
+func check_everything_done() -> bool:
+	if music_path == "":
+		initialPanel.get_node("WarningLabel").text = "WARNING: Please set music"
+		return false
+	if initialPanel.get_node("BPMBox").value == 0:
+		initialPanel.get_node("WarningLabel").text = "WARNING: Please set initial bpm"
+		return false
+	if initialPanel.get_node("MusicTimeBox").value == 0:
+		initialPanel.get_node("WarningLabel").text = "WARNING: Please set song's length"
+		return false
+	return true
 
 func initiate_editor():
 	editor_ready = true
@@ -46,8 +60,6 @@ func initiate_editor():
 func set_initial_value():
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
-	if music_time == 0:
-		music_time = 180
 	levelData.bpm.append(Vector2(0, bpm))
 	levelData.bpm.append(Vector2(INF, 60))
 	levelData.length = music_time * 1000
@@ -567,7 +579,7 @@ func print_lane_info():
 # ======================== Save Chart ================================
 
 var save_difficulty = -1
-var music_path
+var music_path = ""
 
 func open_save_panel():
 	editor_ready = false

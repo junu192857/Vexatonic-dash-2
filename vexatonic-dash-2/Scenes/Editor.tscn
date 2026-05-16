@@ -265,10 +265,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -35.0
-offset_top = -15.5
-offset_right = 51.5
-offset_bottom = 15.5
+offset_left = 12.0
+offset_top = -15.0
+offset_right = 98.5
+offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
 max_value = 1000.0
@@ -290,10 +290,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -34.0
-offset_top = 34.0
-offset_right = 52.5
-offset_bottom = 65.0
+offset_left = 11.0
+offset_top = 30.0
+offset_right = 97.5
+offset_bottom = 61.0
 grow_horizontal = 2
 grow_vertical = 2
 max_value = 1000.0
@@ -318,19 +318,27 @@ text = "LoadTest"
 
 [node name="Button3" type="Button" parent="CanvasLayer/InitialPanel" unique_id=357968154]
 layout_mode = 0
-offset_left = 406.0
-offset_top = 165.0
-offset_right = 524.0
-offset_bottom = 214.0
+offset_left = 447.0
+offset_top = 164.0
+offset_right = 565.0
+offset_bottom = 213.0
 text = "Select Music"
 
 [node name="MusicText" type="Label" parent="CanvasLayer/InitialPanel" unique_id=1884758539]
 layout_mode = 0
-offset_left = 276.0
+offset_left = 321.0
 offset_top = 225.0
-offset_right = 670.0
+offset_right = 715.0
 offset_bottom = 254.0
 text = "Please select music using upper button"
+horizontal_alignment = 1
+
+[node name="WarningLabel" type="Label" parent="CanvasLayer/InitialPanel" unique_id=135071618]
+layout_mode = 0
+offset_left = 302.0
+offset_top = 388.0
+offset_right = 636.0
+offset_bottom = 424.0
 horizontal_alignment = 1
 
 [node name="SettingPanel" type="Panel" parent="CanvasLayer" unique_id=955210483]
