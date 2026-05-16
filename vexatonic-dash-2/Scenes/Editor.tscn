@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
 [ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/EditorInputHandler.gd" id="5_dfuwn"]
 
+[sub_resource type="ButtonGroup" id="ButtonGroup_brgpd"]
+
 [sub_resource type="ButtonGroup" id="ButtonGroup_dfuwn"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_5v8xv"]
@@ -81,6 +83,8 @@ offset_left = 235.0
 offset_top = 106.0
 offset_right = 278.0
 offset_bottom = 150.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_brgpd")
 text = "Vex"
 
 [node name="Button2" type="Button" parent="CanvasLayer/SavePanel" unique_id=1253078000]
@@ -89,6 +93,8 @@ offset_left = 178.0
 offset_top = 107.0
 offset_right = 225.0
 offset_bottom = 151.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_brgpd")
 text = "Hard"
 
 [node name="Button" type="Button" parent="CanvasLayer/SavePanel" unique_id=272347291]
@@ -97,6 +103,8 @@ offset_left = 126.0
 offset_top = 106.0
 offset_right = 169.0
 offset_bottom = 150.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_brgpd")
 text = "Easy"
 
 [node name="NoteSelectorPanel" type="Panel" parent="CanvasLayer" unique_id=1195473622]
@@ -452,6 +460,9 @@ access = 2
 
 [connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
+[connection signal="pressed" from="CanvasLayer/SavePanel/Button3" to="." method="set_difficulty" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/Button2" to="." method="set_difficulty" binds= [1]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/Button" to="." method="set_difficulty" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [13]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_mode" binds= [12]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_mode" binds= [11]]

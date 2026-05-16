@@ -38,7 +38,7 @@ func initiate_editor():
 	#변수들을 levelData와 연결
 	levelData = LevelData.new()
 	levelData.length = levelData.length
-	
+	levelData.music_path = music_path.get_file()
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
@@ -60,8 +60,9 @@ func select_music(path: String):
 	var audioStreamPlayer = $AudioStreamPlayer
 	stream.data = FileAccess.get_file_as_bytes(path)
 	audioStreamPlayer.stream = stream
-	music_path = path.get_file()
+	music_path = path
 	initialPanel.get_node("MusicTimeBox").value = audioStreamPlayer.stream.get_length()
+	initialPanel.get_node("MusicText").text = path.get_file()
 
 # ================== 에디터 내 카메라 조작 =====================
 var dragging = false
@@ -565,7 +566,7 @@ func print_lane_info():
 
 # ======================== Save Chart ================================
 
-var save_difficulty
+var save_difficulty = -1
 var music_path
 
 func open_save_panel():
@@ -576,7 +577,10 @@ func quit_save_panel():
 	savePanel.visible = false
 	editor_ready = false
 
-func save_chart(difficulty: int):
+func save_chart():
+	if save_difficulty == -1:
+		push_error("Please select difficulty")
+		return
 	var folder_name = savePanel.get_node("LineEdit").text
 	if folder_name.is_empty():
 		push_error("파일 이름을 입력해주세요!")
@@ -592,11 +596,14 @@ func save_chart(difficulty: int):
 		return
 	meta_file.store_line("NAME " + folder_name)
 	meta_file.store_line("MUSIC " + levelData.music_path)
-	meta_file.store_line("LEVEL %d %d %d" % [levelData.difficulty[0], levelData.difficulty[1], levelData.difficulty[2]])
+	meta_file.store_line("LEVEL 1 2 3")
 	meta_file.store_line("LENGTH %d" % levelData.length)
 	
+	# 음악 파일 저장
+	DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.music_path)
+	
 	# 채보 파일 저장
-	var difficulty_name = Setting.DIFFICULTY_NAMES[difficulty]
+	var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
 	var file = FileAccess.open(dir_path + "/" + difficulty_name + ".txt", FileAccess.WRITE)
 	if file == null:
 		push_error("ERROR: 채보 파일을 열 수 없습니다.")
