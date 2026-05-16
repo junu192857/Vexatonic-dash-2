@@ -52,6 +52,17 @@ func set_initial_value():
 	levelData.bpm.append(Vector2(INF, 60))
 	levelData.length = music_time * 1000
 
+func start_find_music():
+	$FileDialog.popup()
+	
+func select_music(path: String):
+	var stream = AudioStreamMP3.new()
+	var audioStreamPlayer = $AudioStreamPlayer
+	stream.data = FileAccess.get_file_as_bytes(path)
+	audioStreamPlayer.stream = stream
+	music_path = path.get_file()
+	initialPanel.get_node("MusicTimeBox").value = audioStreamPlayer.stream.get_length()
+
 # ================== 에디터 내 카메라 조작 =====================
 var dragging = false
 var drag_start: Vector2
@@ -555,6 +566,7 @@ func print_lane_info():
 # ======================== Save Chart ================================
 
 var save_difficulty
+var music_path
 
 func open_save_panel():
 	editor_ready = false
@@ -564,7 +576,7 @@ func quit_save_panel():
 	savePanel.visible = false
 	editor_ready = false
 
-func save_chart():
+func save_chart(difficulty: int):
 	var folder_name = savePanel.get_node("LineEdit").text
 	if folder_name.is_empty():
 		push_error("파일 이름을 입력해주세요!")
@@ -573,8 +585,18 @@ func save_chart():
 	var dir_path = "res://Charts/" + folder_name
 	DirAccess.make_dir_recursive_absolute(dir_path)
 	
+	# METADATA.txt 저장
+	var meta_file = FileAccess.open(dir_path + "/METADATA.txt", FileAccess.WRITE)
+	if meta_file == null:
+		push_error("ERROR: METADATA.txt를 열 수 없습니다.")
+		return
+	meta_file.store_line("NAME " + folder_name)
+	meta_file.store_line("MUSIC " + levelData.music_path)
+	meta_file.store_line("LEVEL %d %d %d" % [levelData.difficulty[0], levelData.difficulty[1], levelData.difficulty[2]])
+	meta_file.store_line("LENGTH %d" % levelData.length)
+	
 	# 채보 파일 저장
-	var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
+	var difficulty_name = Setting.DIFFICULTY_NAMES[difficulty]
 	var file = FileAccess.open(dir_path + "/" + difficulty_name + ".txt", FileAccess.WRITE)
 	if file == null:
 		push_error("ERROR: 채보 파일을 열 수 없습니다.")

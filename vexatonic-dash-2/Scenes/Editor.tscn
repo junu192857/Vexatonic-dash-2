@@ -308,6 +308,23 @@ offset_right = 973.0
 offset_bottom = 93.0
 text = "LoadTest"
 
+[node name="Button3" type="Button" parent="CanvasLayer/InitialPanel" unique_id=357968154]
+layout_mode = 0
+offset_left = 406.0
+offset_top = 165.0
+offset_right = 524.0
+offset_bottom = 214.0
+text = "Select Music"
+
+[node name="MusicText" type="Label" parent="CanvasLayer/InitialPanel" unique_id=1884758539]
+layout_mode = 0
+offset_left = 276.0
+offset_top = 225.0
+offset_right = 670.0
+offset_bottom = 254.0
+text = "Please select music using upper button"
+horizontal_alignment = 1
+
 [node name="SettingPanel" type="Panel" parent="CanvasLayer" unique_id=955210483]
 anchors_preset = -1
 anchor_left = 0.85
@@ -424,11 +441,17 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_5v8xv")
 text = "8bit"
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=787913441]
+
+[node name="FileDialog" type="FileDialog" parent="." unique_id=923584041]
+oversampling_override = 1.0
+title = "Open a File"
+position = Vector2i(0, 36)
+file_mode = 0
+access = 2
+
 [connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
-[connection signal="pressed" from="CanvasLayer/SavePanel/Button3" to="." method="set_difficulty" binds= [2]]
-[connection signal="pressed" from="CanvasLayer/SavePanel/Button2" to="." method="set_difficulty" binds= [1]]
-[connection signal="pressed" from="CanvasLayer/SavePanel/Button" to="." method="set_difficulty" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_mode" binds= [13]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_mode" binds= [12]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_mode" binds= [11]]
@@ -438,6 +461,7 @@ text = "8bit"
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_mode" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="load_chart"]
+[connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton2" to="." method="print_lane_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton" to="." method="open_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button4" to="." method="set_bit" binds= [32]]
@@ -449,3 +473,4 @@ text = "8bit"
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button2" to="." method="set_bit" binds= [4]]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button3" to="." method="set_bit" binds= [16]]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button" to="." method="set_bit" binds= [8]]
+[connection signal="file_selected" from="FileDialog" to="." method="select_music"]
