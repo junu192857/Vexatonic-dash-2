@@ -187,8 +187,8 @@ func realign_lines_by_move():
 const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
-enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, YellowLong = 13, Nothing = 100}
-enum EditorState { Ready, Placing, Modifying }
+enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, YellowLong = 13, Modify = 21, Nothing = 100}
+enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
 #Case 2: lane 분기
 #Case 3: lane 이어 찍기
@@ -213,7 +213,8 @@ func _on_select_note(selected: int):
 		return
 	if selected in NoteSelection.values():
 		selected_note = selected as NoteSelection
-		selected_color = selected % 10 - 1
+		if (selected < 20):
+			selected_color = selected % 10 - 1
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
@@ -222,11 +223,6 @@ func _on_select_note(selected: int):
 		print("Note Changed: %d" % selected_note)
 	else:
 		push_error("Invalid EditMode: %d" % selected)
-
-func _on_select_modifying(selected: int):
-	if (!editor_ready):
-		return
-	current_state = EditorState.Modifying
 	
 
 func _on_move_preview():
@@ -346,8 +342,10 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 		return null
 	
 	var my_preview = null
-	
-	if (selected == NoteSelection.Lane):
+	if (selected == NoteSelection.Modify):
+		if (current_state == EditorState.Ready):
+			pass
+	else: if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
 			if lane_case == LanePlacingCase.None:
@@ -840,4 +838,28 @@ func find_target_keyframe():
 			if abs(mouse_pos.x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				return kf
+	return null
+
+func find_target_note() -> Variant:
+	for noteData in levelData.noteDatas:
+		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
+		var note_x = Setting.get_posx_from_time(noteData.time)
+		var note_y = lane.get_height(noteData.time)
+		
+		if noteData.type == 0:  # 단노트
+			if abs(mouse_pos.x - note_x) <= Setting.NOTE_WIDTH and \
+			   abs(mouse_pos.y - note_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				return find_enote_by_data(lane, noteData)
+		else:  # 롱노트
+			var end_x = Setting.get_posx_from_time(noteData.end_time)
+			if mouse_pos.x >= note_x and mouse_pos.x <= end_x and \
+			   abs(mouse_pos.y - note_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				return find_enote_by_data(lane, noteData)
+	
+	return null
+
+func find_enote_by_data(lane: Lane, target_data: NoteData) -> Variant:
+	for note in lane.notes:
+		if note.data == target_data:
+			return note
 	return null

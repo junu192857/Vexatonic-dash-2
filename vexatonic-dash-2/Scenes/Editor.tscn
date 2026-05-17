@@ -218,6 +218,8 @@ offset_right = 726.0
 offset_bottom = 132.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
+text = "Delete
+Modify"
 
 [node name="Button8" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1578699209]
 layout_mode = 0
@@ -559,6 +561,7 @@ offset_bottom = 146.0
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_note" binds= [12]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_note" binds= [11]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button10" to="." method="_on_select_note" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button9" to="." method="_on_select_note" binds= [21]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button8" to="." method="_on_select_note" binds= [3]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_note" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_note" binds= [0]]
