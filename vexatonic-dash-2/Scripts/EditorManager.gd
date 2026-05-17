@@ -263,8 +263,8 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 				preview.queue_free()
 				preview = null
 			else:
-				var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2
-				var connector_end_x = snapped_x - Setting.NOTE_WIDTH / 2
+				var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2.0
+				var connector_end_x = snapped_x - Setting.NOTE_WIDTH / 2.0
 				var existing_marker = null
 				var existing_connector = null
 				for child in preview.get_children():
@@ -375,8 +375,8 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			my_preview.position = long_start_pos
 			my_preview.set_color(selected_color)
 			
-			var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2
-			var connector_end_x = snapped_x - Setting.NOTE_WIDTH / 2
+			var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2.0
+			var connector_end_x = snapped_x - Setting.NOTE_WIDTH / 2.0
 			if connector_end_x > connector_start_x:
 				var points = [connector_start_x]
 				for kf in target_lane.keyframes:
@@ -435,7 +435,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
-				target_lane = lane
+				set_target_lane(lane)
 				return LanePlacingCase.Case2
 
 	# Case 3 체크
@@ -454,7 +454,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 						closest_lane = lane
 
 	if closest_lane != null:
-		target_lane = closest_lane
+		set_target_lane(closest_lane)
 		return LanePlacingCase.Case3
 
 	# Case 1 체크
@@ -473,7 +473,7 @@ func find_note_placing_available(mouse_pos: Vector2) -> bool:
 		if snapped_x >= lane_x_start and mouse_pos.x >= lane_x_start and snapped_x <= lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
-				target_lane = lane
+				set_target_lane(lane)
 				return true
 	
 	return false
@@ -759,8 +759,8 @@ func parse(chart_path: String):
 		lane.add_note(note)
 
 		if (noteData.type == 1):
-			var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2
-			var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2
+			var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
+			var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
 			if connector_start_x < connector_end_x:
 				var points = [connector_start_x]
 				for kf in lane.keyframes:
@@ -826,3 +826,15 @@ func _process(delta:float):
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
 	
+func find_target_lanes() -> Array:
+	var lanes: Array
+	
+	for lane in levelData.lanes:
+		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
+			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
+			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				lanes.append(lane)
+	
+	return lanes
