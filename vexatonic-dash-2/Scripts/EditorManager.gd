@@ -188,7 +188,7 @@ const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, YellowLong = 13, Nothing = 100}
-enum EditorState { Ready, Placing }
+enum EditorState { Ready, Placing, Modifying }
 #Case 1: Initial lane 제작
 #Case 2: lane 분기
 #Case 3: lane 이어 찍기
@@ -208,7 +208,7 @@ var preview: Node2D
 var mouse_pos: Vector2
 var snapped_x: float
 
-func _on_select_mode(selected: int):
+func _on_select_note(selected: int):
 	if (!editor_ready):
 		return
 	if selected in NoteSelection.values():
@@ -222,7 +222,13 @@ func _on_select_mode(selected: int):
 		print("Note Changed: %d" % selected_note)
 	else:
 		push_error("Invalid EditMode: %d" % selected)
-		
+
+func _on_select_modifying(selected: int):
+	if (!editor_ready):
+		return
+	current_state = EditorState.Modifying
+	
+
 func _on_move_preview():
 	if (!editor_ready):
 		return
@@ -605,7 +611,7 @@ func open_save_panel():
 
 func quit_save_panel():
 	savePanel.visible = false
-	editor_ready = false
+	editor_ready = true
 
 func save_chart():
 	if (!chart_loaded):
@@ -826,15 +832,12 @@ func _process(delta:float):
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
 	
-func find_target_lanes() -> Array:
-	var lanes: Array
-	
+func find_target_keyframe():
 	for lane in levelData.lanes:
-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
-		if mouse_pos.x >= lane_x_start and mouse_pos.x <= lane_x_end:
-			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
-			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
-				lanes.append(lane)
-	
-	return lanes
+		for kf in lane.keyframes:
+			var kf_x = Setting.get_posx_from_time(kf.x)
+			var kf_y = kf.y
+			if abs(mouse_pos.x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
+			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				return kf
+	return null

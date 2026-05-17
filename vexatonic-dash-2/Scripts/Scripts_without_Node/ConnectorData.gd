@@ -3,8 +3,6 @@ class_name ConnectorData
 var color: int
 var length: float
 var delta_y: float
-var start_pos: Vector2
-var end_pos: Vector2
 
 func _init(p_color: int, p_length: float, p_delta_y: float):
 	color = p_color
