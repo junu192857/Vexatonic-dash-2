@@ -14,12 +14,22 @@ func _init(p_index: int, p_is_init: bool):
 	is_init = p_is_init
 	note_index = 0
 
+func adjust_keyframe(note_time: float, note_height: float):
+	insert_keyframe(note_time, note_height)
+	insert_keyframe(note_time + Setting.time_per_note_width, note_height)
+	var deleted = delete_middle_keyframe(note_time, note_time + Setting.time_per_note_width)
+	if (deleted != null):
+		var deleted2 = delete_middle_keyframe(note_time + Setting.time_per_note_width, note_time + Setting.time_per_note_width + Setting.EPSILON)
+		if (deleted2 != null):
+			insert_keyframe(note_time + Setting.time_per_note_width + Setting.EPSILON, deleted2.y)
+		else: insert_keyframe(note_time + Setting.time_per_note_width + Setting.EPSILON, deleted.y)
+
 func add_keyframe(time: float, height: float):
-	delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
+	#delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
 	keyframes.append(Vector2(time,height))
 
 func insert_keyframe(time: float, height: float):
-	delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
+	#delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
 	var new_kf = Vector2(time, height)
 	for i in range(keyframes.size()):
 		if keyframes[i].x > time:

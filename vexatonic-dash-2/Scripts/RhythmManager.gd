@@ -100,11 +100,11 @@ func render_chart():
 	var previous_lane = -1
 	for noteData in levelData.noteDatas:
 		pos_x = Setting.get_posx_from_time(noteData.time)
+		var cur_note = place_note(noteData, pos_x, false, self)
+		assign_note(cur_note)
 		if (previous_time >= 0):
 			var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
 							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2, 0))
-		var cur_note = place_note(noteData, pos_x, false, self)
-		assign_note(cur_note)
 	
 		previous_time = noteData.time
 		previous_lane = noteData.lane
@@ -112,9 +112,9 @@ func render_chart():
 	
 		if (noteData.type == 1): #LongNote
 			var length = Setting.get_posx_from_time(noteData.end_time-noteData.time)
+			var marker = place_note(noteData, length, true, cur_note)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
 							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2, 0))
-			var marker = place_note(noteData, length, true, cur_note)
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
@@ -134,8 +134,8 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 		note.position = Vector2(pos_x, lane.get_height(data.time))
 	else:
 		note.position = Vector2(pos_x, lane.get_height(data.end_time) - lane.get_height(data.time))
+	lane.adjust_keyframe(data.time, note.position.y)
 	#print("Place Note at %f"% pos_x)
-	
 	return note
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false

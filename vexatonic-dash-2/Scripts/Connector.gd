@@ -20,12 +20,12 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 					   p_lane.get_height(start_time)
 					
 # 단노트 또는 marker에서 캐릭터가 수평으로 이동하도록 keyframe 조절
-		if (first):
-			p_lane.insert_keyframe(start_time - Setting.time_per_note_width, start_height)
-			p_lane.insert_keyframe(start_time, start_height)
-			var deleted = p_lane.delete_middle_keyframe(start_time - Setting.time_per_note_width, start_time)
-			if (deleted != null):
-				p_lane.insert_keyframe(start_time + 2 * Setting.EPSILON, deleted.y)
+		#if (first):
+		#	p_lane.insert_keyframe(start_time - Setting.time_per_note_width, start_height)
+		#	p_lane.insert_keyframe(start_time, start_height)
+		#	var deleted = p_lane.delete_middle_keyframe(start_time - Setting.time_per_note_width, start_time)
+		#	if (deleted != null):
+		#		p_lane.insert_keyframe(start_time + 2 * Setting.EPSILON, deleted.y)
 				
 # 다음 keyframe이 나오기 전까지만 찍도록 end_time 조정
 		print("Start height: %f" % start_height)
