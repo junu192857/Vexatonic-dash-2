@@ -32,6 +32,12 @@ func _ready() -> void:
 	# 채보 찍기
 	render_chart()
 	
+	var stream = AudioStreamMP3.new()
+	print("MUSIC_PATH: " + levelData.music_path)
+	stream.data = FileAccess.get_file_as_bytes("res://Charts/Test" + "/" +  levelData.music_path)
+	musicPlayer.stream = stream
+	
+	
 	#print(levelData.noteDatas.size())
 	for lane:Lane in levelData.lanes:
 		lane.print_data()

@@ -8,6 +8,7 @@ var levelData: LevelData
 
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
+@onready var musicPlayer = $AudioStreamPlayer
 
 @onready var initialPanel = $CanvasLayer/InitialPanel
 @onready var noteSelectorPanel = $CanvasLayer/NoteSelectorPanel
@@ -59,7 +60,7 @@ func set_initial_value():
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
 	levelData.bpm.append(Vector2(0, bpm))
-	levelData.bpm.append(Vector2(INF, 60))
+	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
 	levelData.music_path = music_path.get_file()
 	levelData.length = music_time * 1000
 	chart_loaded = false
@@ -69,12 +70,19 @@ func start_find_music():
 	
 func select_music(path: String):
 	var stream = AudioStreamMP3.new()
-	var audioStreamPlayer = $AudioStreamPlayer
+	var data = FileAccess.get_file_as_bytes(path)
+	if (data.is_empty()):
+		initialPanel.get_node("MusicText").text = "Please load valid music file"
+		initialPanel.get_node("StartButton").visible = false
+		return
 	stream.data = FileAccess.get_file_as_bytes(path)
-	audioStreamPlayer.stream = stream
+
+	musicPlayer.stream = stream
 	music_path = path
-	initialPanel.get_node("MusicTimeBox").value = audioStreamPlayer.stream.get_length()
+	initialPanel.get_node("MusicTimeBox").value = musicPlayer.stream.get_length()
 	initialPanel.get_node("MusicText").text = path.get_file()
+	
+	initialPanel.get_node("StartButton").visible = true
 
 # ================== 에디터 내 카메라 조작 =====================
 var dragging = false
@@ -120,6 +128,9 @@ func place_bar_lines():
 	var effective_bit = bit if bit != 0 else 4
 	
 	for i in range(levelData.bpm.size() - 1):
+		print("bpm time: %f" % levelData.bpm[i].x)
+	
+	for i in range(levelData.bpm.size() - 1):
 		if levelData.bpm[i].x > levelData.bpm[i+1].x:
 			push_error("Please sort by time ascending")
 			return
@@ -156,6 +167,7 @@ func put_line(pos_x: float, major: bool):
 	line_holder.add_child(line)
 	line.position = Vector2(pos_x, camera.global_position.y)
 	line.scale = Vector2(pow(1.2, 1 if major else -3), 3)
+	return line
 
 func realign_lines_by_zoom(zoom: bool):
 	var lines = line_holder.get_children()
@@ -426,7 +438,7 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 
 	# Case 3 체크
 	var closest_lane: Lane = null
-	var closest_dist: float = INF
+	var closest_dist: float = Setting.INFINITE
 
 	for lane in levelData.lanes:
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
@@ -600,7 +612,7 @@ func save_chart():
 			return
 		var folder_name = savePanel.get_node("OnlyForNewSave/LineEdit").text
 		if folder_name.is_empty():
-			savePanel.get_note("WarningLabel").text = "WARNING: Please set level name"
+			savePanel.get_node("WarningLabel").text = "WARNING: Please set level name"
 			return
 		
 		var dir_path = "res://Charts/" + folder_name
@@ -671,9 +683,14 @@ func select_chart(path: String):
 			break
 	
 	var stream = AudioStreamMP3.new()
-	var audioStreamPlayer = $AudioStreamPlayer
+	var data = FileAccess.get_file_as_bytes(music_path)
+	if (data.is_empty()):
+		loadPanel.get_node("MusicLabel").text = "Please set music file with chart file"
+		loadPanel.get_node("LoadButton").visible = false
+		return
 	stream.data = FileAccess.get_file_as_bytes(music_path)
-	audioStreamPlayer.stream = stream
+
+	musicPlayer.stream = stream
 	
 	levelData = LevelData.new()
 	levelData.name = path.get_base_dir().get_file()
@@ -691,14 +708,20 @@ func select_chart(path: String):
 		_:
 			save_difficulty = -1
 			
+	if (save_difficulty == -1):
+		loadPanel.get_node("MusicLabel").text = "Please load chart file with valid name"
+		loadPanel.get_node("LoadButton").visible = false
+		return
+			
 	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
 	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.music_path
 	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.length / 1000)
+	loadPanel.get_node("LoadButton").visible = true
 	
 
 func finish_load_chart():
 	parse(chart_path)
-	levelData.bpm.append(Vector2(INF, 60))
+	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
 	for bpm in levelData.bpm:
 		print("time: %f bpm:%f" % [bpm.x, bpm.y])
 	chart_loaded = true
@@ -769,6 +792,34 @@ func parse(chart_path: String):
 			
 
 # ================================ 편의 기능 ============================
+
+var music_playing: bool = false
+var music_bar
+
+func toggle_music():
+	if (!music_playing):
+		noteSelectorPanel.get_node("PlayMusicButton").text = "Stop Music"
+		music_playing = true
+		var initial_pos_x = get_music_start_pos()
+		var music_start_time = Setting.get_time_from_posx(initial_pos_x) / 1000
+		musicPlayer.play(music_start_time)
+		music_bar = put_line(initial_pos_x, true)
+		music_bar.get_child(0).modulate = Color(120,120,0)
+		music_bar.scale.x = pow(1.2, 2-camera_zoom_level)
+	else:
+		noteSelectorPanel.get_node("PlayMusicButton").text = "Play Music"
+		music_playing = false
+		music_bar.queue_free()
+		music_bar = null
+		musicPlayer.stop()
+
+func get_music_start_pos() -> float:
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
+	return max(0.0, camera_left)
+
+func _process(delta:float):
+	if (music_bar != null):
+		music_bar.global_position.x = Setting.get_posx_from_time(musicPlayer.get_playback_position() * 1000)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane

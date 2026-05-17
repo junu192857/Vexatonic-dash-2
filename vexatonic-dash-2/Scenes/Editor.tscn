@@ -259,6 +259,14 @@ pivot_offset = Vector2(0, 120)
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 
+[node name="PlayMusicButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1614325007]
+layout_mode = 0
+offset_left = 1614.0
+offset_top = 31.0
+offset_right = 1708.0
+offset_bottom = 127.0
+text = "Play Music"
+
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
 anchor_left = 0.25
@@ -268,7 +276,8 @@ anchor_bottom = 0.75
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Button" type="Button" parent="CanvasLayer/InitialPanel" unique_id=1698511291]
+[node name="StartButton" type="Button" parent="CanvasLayer/InitialPanel" unique_id=1698511291]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -372,6 +381,7 @@ title = "Open a File"
 position = Vector2i(0, 36)
 file_mode = 0
 access = 2
+filters = PackedStringArray("*.mp3")
 
 [node name="SettingPanel" type="Panel" parent="CanvasLayer" unique_id=955210483]
 anchors_preset = -1
@@ -496,7 +506,8 @@ offset_top = 345.0
 offset_right = 1223.0
 offset_bottom = 686.0
 
-[node name="Button" type="Button" parent="CanvasLayer/LoadPanel" unique_id=1619523593]
+[node name="LoadButton" type="Button" parent="CanvasLayer/LoadPanel" unique_id=1619523593]
+visible = false
 layout_mode = 0
 offset_left = 202.0
 offset_top = 270.0
@@ -551,7 +562,8 @@ offset_bottom = 146.0
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button8" to="." method="_on_select_mode" binds= [3]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_mode" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_mode" binds= [0]]
-[connection signal="pressed" from="CanvasLayer/InitialPanel/Button" to="." method="_on_start_editor"]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/PlayMusicButton" to="." method="toggle_music"]
+[connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
 [connection signal="file_selected" from="CanvasLayer/InitialPanel/FileDialog" to="." method="select_music"]
@@ -566,6 +578,6 @@ offset_bottom = 146.0
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button2" to="." method="set_bit" binds= [4]]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button3" to="." method="set_bit" binds= [16]]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button" to="." method="set_bit" binds= [8]]
-[connection signal="pressed" from="CanvasLayer/LoadPanel/Button" to="." method="finish_load_chart"]
+[connection signal="pressed" from="CanvasLayer/LoadPanel/LoadButton" to="." method="finish_load_chart"]
 [connection signal="pressed" from="CanvasLayer/LoadPanel/Button2" to="." method="find_chart"]
 [connection signal="file_selected" from="CanvasLayer/LoadPanel/FileDialog" to="." method="select_chart"]
