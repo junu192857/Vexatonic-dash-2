@@ -100,21 +100,21 @@ func render_chart():
 	var previous_lane = -1
 	for noteData in levelData.noteDatas:
 		pos_x = Setting.get_posx_from_time(noteData.time)
-		if (previous_time >= 0):
-			var connector = place_connector(-1, previous_time + Setting.time_per_note_width, noteData.time, \
-							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH, 0))
 		var cur_note = place_note(noteData, pos_x, false, self)
 		assign_note(cur_note)
+		if (previous_time >= 0):
+			var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
+							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2, 0))
 	
 		previous_time = noteData.time
 		previous_lane = noteData.lane
 		previous_note = cur_note;
 	
 		if (noteData.type == 1): #LongNote
-			var length = Setting.get_posx_from_time(noteData.end_time-noteData.time)
-			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width, \
-							noteData.end_time, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH, 0))
-			var marker = place_note(noteData, length, true, cur_note)
+			var end_pos_x = Setting.get_posx_from_time(noteData.end_time)
+			var marker = place_note(noteData, end_pos_x, true, cur_note)
+			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
+							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2, 0))
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
@@ -131,11 +131,13 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 	var lane = Lane.find_lane(levelData.lanes, data.lane)
 	parent.add_child(note)
 	if !is_marker:
-		note.position = Vector2(pos_x, lane.get_height(data.time))
+		note.global_position = Vector2(pos_x, lane.get_height(data.time))
+		lane.adjust_keyframe(data.time, note.global_position.y)
 	else:
-		note.position = Vector2(pos_x, lane.get_height(data.end_time) - lane.get_height(data.time))
-	#print("Place Note at %f"% pos_x)
+		note.global_position = Vector2(pos_x, lane.get_height(data.end_time))
+		lane.adjust_keyframe(data.end_time, note.global_position.y)
 	
+	print("Place Note at x: %f y: %f"% [pos_x, note.global_position.y])
 	return note
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false
@@ -160,22 +162,12 @@ func place_initial_connector(lane: Lane):
 		if (lane.is_init):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
-			var initial_connector = place_connector(-1, -3000, lane.notes[0].get_time(), lane.lane_index, false,\
+			var initial_connector = place_connector(-1, -3000, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-3000),0))
-			
-			#var connector = CONNECTOR_SCENE.instantiate() as Node2D
-			#connector.position = Vector2(Setting.get_posx_from_time(-3000),0)
-			#connector.set_connector_data(-1, -3000, lane.notes[0].get_time(), lane, false)
-			#add_child(connector)
 		else:
 			if (lane.keyframes[0].x < lane.notes[0].get_time()):
-				var initial_connector = place_connector(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane.lane_index,\
+				var initial_connector = place_connector(-1, lane.keyframes[0].x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), lane.keyframes[0].y))
-				
-				#var connector = CONNECTOR_SCENE.instantiate() as Node2D
-				#connector.position = Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), -lane.keyframes[0].y)
-				#connector.set_connector_data(-1, lane.keyframes[0].x, lane.notes[0].get_time(), lane, false)
-				#add_child(connector)
 	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
 # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
@@ -183,8 +175,8 @@ func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
 		var last_note_time = lane.notes[-1].get_end_time() #find last note or marker
-		if lane.keyframes[-1].x - last_note_time > Setting.time_per_note_width:
-			var connector_time = last_note_time + Setting.time_per_note_width
+		if lane.keyframes[-1].x  > last_note_time + Setting.time_per_note_width / 2:
+			var connector_time = last_note_time + Setting.time_per_note_width / 2
 			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].x, lane.lane_index, true,\
 								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
 	else:

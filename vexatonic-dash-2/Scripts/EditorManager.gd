@@ -263,7 +263,8 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 				preview.queue_free()
 				preview = null
 			else:
-				var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH
+				var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2
+				var connector_end_x = snapped_x - Setting.NOTE_WIDTH / 2
 				var existing_marker = null
 				var existing_connector = null
 				for child in preview.get_children():
@@ -272,16 +273,16 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 						continue
 					if child is ENote:
 						existing_marker = child
-				if snapped_x > connector_start_x:
+				if connector_end_x > connector_start_x:
 					# 구간 포인트 수집
 					var points = [connector_start_x]
 					for kf in target_lane.keyframes:
 						var kf_x = Setting.get_posx_from_time(kf.x)
-						if kf_x > connector_start_x and kf_x < snapped_x:
+						if kf_x > connector_start_x and kf_x < connector_end_x:
 							points.append(kf_x)
-						if kf_x >= snapped_x:
+						if kf_x >= connector_end_x:
 							break
-					points.append(snapped_x)
+					points.append(connector_end_x)
 					
 					# existing_connector 없으면 생성
 					if existing_connector == null:
@@ -374,16 +375,17 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			my_preview.position = long_start_pos
 			my_preview.set_color(selected_color)
 			
-			var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH
-			if snapped_x > connector_start_x:
+			var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2
+			var connector_end_x = snapped_x - Setting.NOTE_WIDTH / 2
+			if connector_end_x > connector_start_x:
 				var points = [connector_start_x]
 				for kf in target_lane.keyframes:
 					var kf_x = Setting.get_posx_from_time(kf.x)
-					if kf_x > connector_start_x and kf_x < snapped_x:
+					if kf_x > connector_start_x and kf_x < connector_end_x:
 						points.append(kf_x)
-					if kf_x > snapped_x:
+					if kf_x >= connector_end_x:
 						break
-				points.append(snapped_x)
+				points.append(connector_end_x)
 				
 				var parent_node = my_preview
 				for i in range(points.size() - 1):
@@ -755,10 +757,10 @@ func parse(chart_path: String):
 		note.position = Vector2(Setting.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
 		note.set_color(noteData.color)
 		lane.add_note(note)
-		
-		var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH
-		var connector_end_x = Setting.get_posx_from_time(noteData.end_time)
+
 		if (noteData.type == 1):
+			var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2
+			var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2
 			if connector_start_x < connector_end_x:
 				var points = [connector_start_x]
 				for kf in lane.keyframes:
@@ -788,7 +790,7 @@ func parse(chart_path: String):
 			var marker = NOTE_SCENE.instantiate()
 			note.add_child(marker)
 			marker.set_color(noteData.color)
-			marker.global_position = Vector2(connector_end_x, lane.get_height(noteData.end_time))
+			marker.global_position = Vector2(Setting.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
 			
 
 # ================================ 편의 기능 ============================
