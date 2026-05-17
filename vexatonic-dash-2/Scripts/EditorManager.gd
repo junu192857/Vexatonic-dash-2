@@ -757,10 +757,10 @@ func parse(chart_path: String):
 		note.position = Vector2(Setting.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
 		note.set_color(noteData.color)
 		lane.add_note(note)
-		
-		var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH
-		var connector_end_x = Setting.get_posx_from_time(noteData.end_time)
+
 		if (noteData.type == 1):
+			var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2
+			var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2
 			if connector_start_x < connector_end_x:
 				var points = [connector_start_x]
 				for kf in lane.keyframes:
@@ -790,7 +790,7 @@ func parse(chart_path: String):
 			var marker = NOTE_SCENE.instantiate()
 			note.add_child(marker)
 			marker.set_color(noteData.color)
-			marker.global_position = Vector2(connector_end_x, lane.get_height(noteData.end_time))
+			marker.global_position = Vector2(Setting.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
 			
 
 # ================================ 편의 기능 ============================
