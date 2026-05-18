@@ -218,13 +218,22 @@ func _on_select_note(selected: int):
 		return
 	if selected in NoteSelection.values():
 		selected_note = selected as NoteSelection
+		if inputHandler.put_note.is_connected(_on_put_note):
+			inputHandler.put_note.disconnect(_on_put_note)
+		if inputHandler.put_note.is_connected(_on_modify):
+			inputHandler.put_note.disconnect(_on_modify)
+		
+		# selected < 20이면 레인/노트, selected > 20이면 modify
 		if (selected < 20):
 			selected_color = selected % 10 - 1
+			inputHandler.put_note.connect(_on_put_note)
+		else:
+			inputHandler.put_note.connect(_on_modify)
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
 			preview = null
-			#preview = generate_preview(selected_note)
+		cleanup_modify_values()
 		print("Note Changed: %d" % selected_note)
 	else:
 		push_error("Invalid EditMode: %d" % selected)
@@ -238,9 +247,13 @@ func _on_move_preview():
 	
 	if (selected_note == NoteSelection.ModifyLane or selected_note == NoteSelection.ModifyNote):
 		if (check_mouse_in_available_area()):
-			find_modify_target()
+			generate_modify_preview()
 		else:
-			cleanup_values()
+			if (keyframe_indicator != null):
+				keyframe_indicator.queue_free()
+				keyframe_indicator = null
+			if (target_note != null):
+				target_note.process_color()
 	else:
 		if (preview == null):
 			if (check_mouse_in_available_area()):
@@ -252,7 +265,7 @@ func _on_move_preview():
 			else: update_preview(selected_note, mouse_pos, snapped_x)
 
 # Modify 과정에서 설정된 값들 전부 초기화.
-func cleanup_values():
+func cleanup_modify_values():
 	target_keyframe = null
 	if (keyframe_indicator != null):
 		keyframe_indicator.queue_free()
@@ -437,7 +450,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			long_end_time = Setting.get_time_from_posx(my_marker.global_position.x)
 	return my_preview
 
-func find_modify_target():
+func generate_modify_preview():
 	if (!editor_ready):
 		return
 	if (current_state == EditorState.Ready):
@@ -445,7 +458,7 @@ func find_modify_target():
 			NoteSelection.ModifyLane:
 				var new_target_keyframe = find_target_keyframe()
 				if (new_target_keyframe == null):
-					cleanup_values()
+					cleanup_modify_values()
 					return
 				if (target_keyframe != new_target_keyframe):
 					target_keyframe = new_target_keyframe
@@ -456,6 +469,15 @@ func find_modify_target():
 				var new_target_note = find_target_note()
 			_:
 				push_error("INVALID NOTE SELECTION")
+	else:
+		match selected_note:
+			NoteSelection.ModifyLane:
+				#1. target_keyframe의 전후 키프레임을 구한다.
+				#2. target_lane의 Connector 중 end_pos == target_keyframe인 connector, start_pos == target_keyframe인 connector를 찾는다.
+				#3. 만약 현재 snapped_x가 전후 키프레임의 사이에 있다면, target_keyframe을 현재 마우스 위치에 해당하도록 바꾼다.
+				#4. target_keyframe을 바꾸면서, #2에서 구한 connector들도 keyframe 변경에 맞게 end_pos와 start_pos를 각각 바꾼다. (set_data 활용)
+			NoteSelection.ModifyNote:
+				pass
 
 func put_keyframe_indicator(keyframe: Vector2):
 	var indicator = NOTE_SCENE.instantiate()
@@ -544,9 +566,9 @@ func find_longNote_placing_available(mouse_pos: Vector2, snapped_x : float) -> b
 func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
-	else: if (case == LanePlacingCase.Case2):
+	elif (case == LanePlacingCase.Case2):
 		return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
-	else: if (case == LanePlacingCase.Case3):
+	elif (case == LanePlacingCase.Case3):
 		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].x),target_lane.keyframes[-1].y)
 	return Vector2.ZERO
 	
@@ -554,64 +576,104 @@ func get_preview_pos_for_note(mouse_pos: Vector2) -> Vector2:
 	return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 
 func _on_put_note():
-	if (!editor_ready):
+	if !editor_ready or preview == null or !check_mouse_in_available_area():
 		return
-	if (preview == null):
-		return
-	if (current_state == EditorState.Ready):
-		if (selected_note == NoteSelection.Lane):
-			lane_start_pos = preview.global_position
-		else: if (selected_note / 10 == 0): # 단노트
-			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
-			levelData.noteDatas.append(data)
-			preview.set_data(data)
-			target_lane.add_note(preview)
-			print("New Note added")
-			preview = null
-			return
-		else: if (selected_note / 10 == 1): #롱노트
-			long_start_pos = preview.global_position
-			print("New LongNote init added")
-			pass
+	if current_state == EditorState.Ready:
+		_on_put_note_ready()
+	else:
+		_on_put_note_placing()
+
+func _on_put_note_ready():
+	if selected_note == NoteSelection.Lane:
+		lane_start_pos = preview.global_position
 		current_state = EditorState.Placing
-	else: if (current_state == EditorState.Placing):
-		if (selected_note == NoteSelection.Lane):
-			if (lane_case == LanePlacingCase.Case1):
-				print("CASE 1 ACTIVATED")
-				var new_index = Lane.find_free_index(levelData.lanes)
-				var new_lane = Lane.new(new_index, true)
-				new_lane.add_keyframe(0, lane_start_pos.y)
-				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
-				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
-				levelData.lanes.append(new_lane)
-				new_lane.add_editor_connector(preview)
-				preview.set_lane_index(new_index)
-			else: if (lane_case == LanePlacingCase.Case2):
-				print("CASE 2 ACTIVATED")
-				var new_index = Lane.find_free_index(levelData.lanes)
-				var new_lane = Lane.new(new_index, false)
-				new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
-				new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
-				print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
-				levelData.lanes.append(new_lane)
-				target_lane.add_editor_connector(preview)
-				preview.set_lane_index(new_index)
-			else: if (lane_case == LanePlacingCase.Case3):
-				print("CASE 3 ACTIVATED")
-				target_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
-				print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
-				target_lane.add_editor_connector(preview)
-				preview.set_lane_index(target_lane.lane_index)
-			preview = null
-			lane_case = LanePlacingCase.None
-		else:
-			var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
-			print("New LongNote added: start time %f and end time %f and lane index %d" % [Setting.get_time_from_posx(preview.global_position.x), long_end_time, target_lane.lane_index])
-			levelData.noteDatas.append(data)
-			preview.set_data(data)
-			target_lane.add_note(preview)
-			preview = null
-		current_state = EditorState.Ready
+	elif selected_note / 10 == 0:  # 단노트
+		_place_single_note()
+	elif selected_note / 10 == 1:  # 롱노트
+		long_start_pos = preview.global_position
+		current_state = EditorState.Placing
+
+func _on_put_note_placing():
+	if selected_note == NoteSelection.Lane:
+		_place_lane()
+	else:
+		_place_long_note()
+	current_state = EditorState.Ready
+
+func _place_single_note():
+	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
+	levelData.noteDatas.append(data)
+	preview.set_data(data)
+	target_lane.add_note(preview)
+	preview = null
+
+func _place_long_note():
+	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
+	levelData.noteDatas.append(data)
+	preview.set_data(data)
+	target_lane.add_note(preview)
+	preview = null
+
+func _place_lane():
+	match lane_case:
+		LanePlacingCase.Case1: _place_lane_case1()
+		LanePlacingCase.Case2: _place_lane_case2()
+		LanePlacingCase.Case3: _place_lane_case3()
+	preview = null
+	lane_case = LanePlacingCase.None
+	
+func _place_lane_case1():
+	print("CASE 1 ACTIVATED")
+	var new_index = Lane.find_free_index(levelData.lanes)
+	var new_lane = Lane.new(new_index, true)
+	new_lane.add_keyframe(0, lane_start_pos.y)
+	new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
+	levelData.lanes.append(new_lane)
+	new_lane.add_editor_connector(preview)
+	preview.set_lane_index(new_index)
+func _place_lane_case2():
+	print("CASE 2 ACTIVATED")
+	var new_index = Lane.find_free_index(levelData.lanes)
+	var new_lane = Lane.new(new_index, false)
+	new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
+	new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
+	levelData.lanes.append(new_lane)
+	target_lane.add_editor_connector(preview)
+	preview.set_lane_index(new_index)
+func _place_lane_case3():
+	print("CASE 3 ACTIVATED")
+	target_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
+	target_lane.add_editor_connector(preview)
+	preview.set_lane_index(target_lane.lane_index)
+
+func _on_modify():
+	print("Hello from modify")
+	if !editor_ready or !check_mouse_in_available_area():
+		return
+	match current_state:
+		EditorState.Ready:
+			_on_modify_ready()
+		EditorState.Placing:
+			_on_modify_placing()
+
+func _on_modify_ready():
+	if (selected_note == NoteSelection.ModifyLane):
+		current_state = EditorState.Placing
+	elif (selected_note == NoteSelection.ModifyNote):
+		pass
+	else:
+		push_error("Please select Modify button")
+
+func _on_modify_placing():
+	if (selected_note == NoteSelection.ModifyLane):
+		pass
+	elif (selected_note == NoteSelection.ModifyNote):
+		pass
+	else:
+		push_error("Please select Modify button")
 
 func get_snapped_x(mouse_x: float) -> float:
 	if bit == 0:
@@ -886,6 +948,7 @@ func find_target_keyframe():
 			var kf_y = kf.y
 			if abs(mouse_pos.x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				set_target_lane(lane)
 				return kf
 	return null
 
