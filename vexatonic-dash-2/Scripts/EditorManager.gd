@@ -206,6 +206,10 @@ var note_case: bool
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
 
+var target_keyframe
+var keyframe_indicator: ENote
+var target_note: ENote
+
 var mouse_pos: Vector2
 var snapped_x: float
 
@@ -231,15 +235,33 @@ func _on_move_preview():
 		return
 	mouse_pos = get_global_mouse_position()
 	snapped_x = get_snapped_x(mouse_pos.x)
-	if (preview == null):
+	
+	if (selected_note == NoteSelection.ModifyLane or selected_note == NoteSelection.ModifyNote):
 		if (check_mouse_in_available_area()):
-			preview = generate_preview(selected_note, mouse_pos, snapped_x)
+			find_modify_target()
+		else:
+			cleanup_values()
 	else:
-		if (!check_mouse_in_available_area()):
-			preview.queue_free()
-			preview = null
-		else: update_preview(selected_note, mouse_pos, snapped_x)
-		
+		if (preview == null):
+			if (check_mouse_in_available_area()):
+				preview = generate_preview(selected_note, mouse_pos, snapped_x)
+		else:
+			if (!check_mouse_in_available_area()):
+				preview.queue_free()
+				preview = null
+			else: update_preview(selected_note, mouse_pos, snapped_x)
+
+# Modify 과정에서 설정된 값들 전부 초기화.
+func cleanup_values():
+	target_keyframe = null
+	if (keyframe_indicator != null):
+		keyframe_indicator.queue_free()
+		keyframe_indicator = null
+	if (target_note != null):
+		target_note.process_color()
+		target_note = null
+
+#새로운 노트나 레인을 찍기 위한 preview를 이동시키는 함수.
 func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 	if (selected == NoteSelection.Nothing):
 		return
@@ -341,21 +363,13 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 				long_end_time = Setting.get_time_from_posx(existing_marker.global_position.x)
 				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 		
-				
+#새로운 노트나 레인을 찍기 위한 preview를 만드는 함수.
 func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> Node2D:
 	if (selected == NoteSelection.Nothing):
 		return null
 	
 	var my_preview = null
-	if (selected == NoteSelection.ModifyLane):
-		if (current_state == EditorState.Ready):
-			pass
-	else: if (selected == NoteSelection.ModifyNote):
-		if (current_state == EditorState.Ready):
-			my_preview = find_target_note()
-			if (my_preview != null):
-				my_preview.select_color()
-	else: if (selected == NoteSelection.Lane):
+	if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
 			if lane_case == LanePlacingCase.None:
@@ -423,6 +437,20 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			long_end_time = Setting.get_time_from_posx(my_marker.global_position.x)
 	return my_preview
 
+func find_modify_target():
+	if (!editor_ready):
+		return
+	if (current_state == EditorState.Ready):
+		match selected_note:
+			NoteSelection.ModifyLane:
+				var new_target_keyframe = find_target_keyframe()
+				if (keyframe_indicator != null and target_keyframe != new_target_keyframe):
+					pass
+			NoteSelection.ModifyNote:
+				var new_target_note = find_target_note()
+			_:
+				push_error("INVALID NOTE SELECTION")
+	
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
 func check_mouse_in_available_area() -> bool:
 	if (mouse_pos.x < 0):
