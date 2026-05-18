@@ -444,13 +444,25 @@ func find_modify_target():
 		match selected_note:
 			NoteSelection.ModifyLane:
 				var new_target_keyframe = find_target_keyframe()
-				if (keyframe_indicator != null and target_keyframe != new_target_keyframe):
-					pass
+				if (new_target_keyframe == null):
+					cleanup_values()
+					return
+				if (target_keyframe != new_target_keyframe):
+					target_keyframe = new_target_keyframe
+					if (keyframe_indicator != null):
+						keyframe_indicator.queue_free()
+					keyframe_indicator = put_keyframe_indicator(target_keyframe)
 			NoteSelection.ModifyNote:
 				var new_target_note = find_target_note()
 			_:
 				push_error("INVALID NOTE SELECTION")
-	
+
+func put_keyframe_indicator(keyframe: Vector2):
+	var indicator = NOTE_SCENE.instantiate()
+	add_child(indicator)
+	indicator.global_position = Vector2(Setting.get_posx_from_time(target_keyframe.x), target_keyframe.y)
+	indicator.sprite.modulate = Color(0,0,0)
+	return indicator
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
 func check_mouse_in_available_area() -> bool:
 	if (mouse_pos.x < 0):
