@@ -187,7 +187,8 @@ func realign_lines_by_move():
 const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
-enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, YellowLong = 13, Modify = 21, Nothing = 100}
+enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, \
+					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, Nothing = 100}
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
 #Case 2: lane 분기
@@ -231,9 +232,13 @@ func _on_move_preview():
 	mouse_pos = get_global_mouse_position()
 	snapped_x = get_snapped_x(mouse_pos.x)
 	if (preview == null):
-		preview = generate_preview(selected_note, mouse_pos, snapped_x)
+		if (check_mouse_in_available_area()):
+			preview = generate_preview(selected_note, mouse_pos, snapped_x)
 	else:
-		update_preview(selected_note, mouse_pos, snapped_x)
+		if (!check_mouse_in_available_area()):
+			preview.queue_free()
+			preview = null
+		else: update_preview(selected_note, mouse_pos, snapped_x)
 		
 func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 	if (selected == NoteSelection.Nothing):
@@ -247,7 +252,7 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 			else: 
 				preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
-			if (!check_mouse_in_available_area(mouse_pos) or lane_start_pos.x >= snapped_x):
+			if (lane_start_pos.x >= snapped_x):
 				preview.queue_free()
 				preview = null
 			else:
@@ -342,9 +347,14 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 		return null
 	
 	var my_preview = null
-	if (selected == NoteSelection.Modify):
+	if (selected == NoteSelection.ModifyLane):
 		if (current_state == EditorState.Ready):
 			pass
+	else: if (selected == NoteSelection.ModifyNote):
+		if (current_state == EditorState.Ready):
+			my_preview = find_target_note()
+			if (my_preview != null):
+				my_preview.select_color()
 	else: if (selected == NoteSelection.Lane):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
@@ -355,7 +365,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 				add_child(my_preview)
 				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
-			if (!check_mouse_in_available_area(mouse_pos) or lane_start_pos.x >= snapped_x):
+			if (lane_start_pos.x >= snapped_x):
 				return null
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
@@ -414,7 +424,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 	return my_preview
 
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
-func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
+func check_mouse_in_available_area() -> bool:
 	if (mouse_pos.x < 0):
 		return false
 	var viewport_size = get_viewport_rect().size / camera.zoom
@@ -428,8 +438,8 @@ func check_mouse_in_available_area(mouse_pos: Vector2) -> bool:
 	return mouse_pos.y <= threshold_y and mouse_pos.x <= threshold_x
 
 func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
-	if (!check_mouse_in_available_area(mouse_pos)):
-		return LanePlacingCase.None
+	#if (!check_mouse_in_available_area(mouse_pos)):
+	#	return LanePlacingCase.None
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
 
 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
@@ -468,8 +478,8 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	return LanePlacingCase.None
 
 func find_note_placing_available(mouse_pos: Vector2) -> bool:
-	if (!check_mouse_in_available_area(mouse_pos)):
-		return false
+	#if (!check_mouse_in_available_area(mouse_pos)):
+	#	return false
 
 	for lane in levelData.lanes:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
@@ -483,7 +493,7 @@ func find_note_placing_available(mouse_pos: Vector2) -> bool:
 	return false
 
 func find_longNote_placing_available(mouse_pos: Vector2, snapped_x : float) -> bool:
-	if (!check_mouse_in_available_area(mouse_pos) or long_start_pos.x >= snapped_x):
+	if (long_start_pos.x >= snapped_x):
 		return false
 	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].x)
 	print("Snapped_x: %f, land_x_end: %f" % [snapped_x, lane_x_end])
@@ -562,7 +572,6 @@ func _on_put_note():
 			target_lane.add_note(preview)
 			preview = null
 		current_state = EditorState.Ready
-
 
 func get_snapped_x(mouse_x: float) -> float:
 	if bit == 0:
@@ -841,9 +850,14 @@ func find_target_keyframe():
 	return null
 
 func find_target_note() -> Variant:
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
+	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
+	
 	for noteData in levelData.noteDatas:
-		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
 		var note_x = Setting.get_posx_from_time(noteData.time)
+		if note_x < camera_left or note_x > camera_right:
+			continue
+		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
 		var note_y = lane.get_height(noteData.time)
 		
 		if noteData.type == 0:  # 단노트

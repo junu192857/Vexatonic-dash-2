@@ -1,7 +1,7 @@
 extends Node2D
 class_name Note
 
-const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
+const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 const VEXATONIC_MS = 40
@@ -38,7 +38,7 @@ func set_data(p_data: NoteData):
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	sprite.modulate = UNPROCECSSED_COLORS[data.color]
+	sprite.modulate = UNPROCESSED_COLORS[data.color]
 
 			
 # 노트 처리하는 함수.
