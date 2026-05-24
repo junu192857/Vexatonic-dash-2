@@ -208,6 +208,8 @@ var preview: Node2D
 
 var target_keyframe
 var keyframe_indicator: ENote
+var previous_connector: EConnector
+var next_connector: EConnector
 var target_note: ENote
 
 var mouse_pos: Vector2
@@ -249,11 +251,14 @@ func _on_move_preview():
 		if (check_mouse_in_available_area()):
 			generate_modify_preview()
 		else:
+			if (previous_connector or next_connector):
+				cancel_moving_connector()
 			if (keyframe_indicator != null):
 				keyframe_indicator.queue_free()
 				keyframe_indicator = null
 			if (target_note != null):
 				target_note.process_color()
+				target_note = null
 	else:
 		if (preview == null):
 			if (check_mouse_in_available_area()):
@@ -273,6 +278,8 @@ func cleanup_modify_values():
 	if (target_note != null):
 		target_note.process_color()
 		target_note = null
+	previous_connector = null
+	next_connector = null
 
 #새로운 노트나 레인을 찍기 위한 preview를 이동시키는 함수.
 func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
@@ -467,17 +474,52 @@ func generate_modify_preview():
 					keyframe_indicator = put_keyframe_indicator(target_keyframe)
 			NoteSelection.ModifyNote:
 				var new_target_note = find_target_note()
+				if (new_target_note == null):
+					cleanup_modify_values()
+					return
+				if (target_note != new_target_note):
+					if (target_note != null):
+						target_note.process_color()
+					target_note = new_target_note
+					target_note.select_color()
 			_:
 				push_error("INVALID NOTE SELECTION")
 	else:
 		match selected_note:
 			NoteSelection.ModifyLane:
-				#1. target_keyframe의 전후 키프레임을 구한다.
-				#2. target_lane의 Connector 중 end_pos == target_keyframe인 connector, start_pos == target_keyframe인 connector를 찾는다.
-				#3. 만약 현재 snapped_x가 전후 키프레임의 사이에 있다면, target_keyframe을 현재 마우스 위치에 해당하도록 바꾼다.
-				#4. target_keyframe을 바꾸면서, #2에서 구한 connector들도 keyframe 변경에 맞게 end_pos와 start_pos를 각각 바꾼다. (set_data 활용)
+				var kf_index = target_lane.keyframes.find(target_keyframe)
+				var prev_kf = target_lane.keyframes[kf_index - 1] if kf_index > 0 else null
+				var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
+	
+				var prev_x = Setting.get_posx_from_time(prev_kf.x) if prev_kf else -INF
+				var next_x = Setting.get_posx_from_time(next_kf.x) if next_kf else INF
+				var new_keyframe = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+				if snapped_x > prev_x + Setting.EPSILON and snapped_x < next_x - Setting.EPSILON:
+					if previous_connector:
+						previous_connector.end_keyframe = new_keyframe
+						previous_connector.set_data_from_keyframes()
+					if next_connector:
+						next_connector.start_keyframe = new_keyframe
+						next_connector.set_data_from_keyframes()
+				else:
+					cancel_moving_connector()
+					return
+				if (keyframe_indicator == null):
+					keyframe_indicator = put_keyframe_indicator(new_keyframe)
+				keyframe_indicator.global_position = Vector2(snapped_x, mouse_pos.y)
 			NoteSelection.ModifyNote:
 				pass
+
+func cancel_moving_connector():
+	if previous_connector:
+		previous_connector.end_keyframe = target_keyframe
+		previous_connector.set_data_from_keyframes()
+	if next_connector:
+		next_connector.start_keyframe = target_keyframe
+		next_connector.set_data_from_keyframes()
+	if (keyframe_indicator != null):
+		keyframe_indicator.queue_free()
+		keyframe_indicator = null
 
 func put_keyframe_indicator(keyframe: Vector2):
 	var indicator = NOTE_SCENE.instantiate()
@@ -626,28 +668,34 @@ func _place_lane_case1():
 	print("CASE 1 ACTIVATED")
 	var new_index = Lane.find_free_index(levelData.lanes)
 	var new_lane = Lane.new(new_index, true)
-	new_lane.add_keyframe(0, lane_start_pos.y)
-	new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_start_keyframe = Vector2(0, lane_start_pos.y)
+	var new_end_keyframe = Vector2(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	new_lane.add_keyframe(new_start_keyframe)
+	new_lane.add_keyframe(new_end_keyframe)
 	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
 	levelData.lanes.append(new_lane)
 	new_lane.add_editor_connector(preview)
-	preview.set_lane_index(new_index)
+	preview.set_editor_values(new_index, new_start_keyframe, new_end_keyframe)
+
 func _place_lane_case2():
 	print("CASE 2 ACTIVATED")
 	var new_index = Lane.find_free_index(levelData.lanes)
 	var new_lane = Lane.new(new_index, false)
-	new_lane.add_keyframe(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
-	new_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_start_keyframe = Vector2(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
+	var new_end_keyframe = Vector2(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	new_lane.add_keyframe(new_start_keyframe)
+	new_lane.add_keyframe(new_end_keyframe)
 	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
 	levelData.lanes.append(new_lane)
 	target_lane.add_editor_connector(preview)
-	preview.set_lane_index(new_index)
+	preview.set_editor_values(new_index, new_start_keyframe, new_end_keyframe)
 func _place_lane_case3():
 	print("CASE 3 ACTIVATED")
-	target_lane.add_keyframe(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_end_keyframe = Vector2(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 	print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
 	target_lane.add_editor_connector(preview)
-	preview.set_lane_index(target_lane.lane_index)
+	preview.set_editor_values(target_lane.lane_index, target_lane.keyframes[-1], new_end_keyframe)
+	target_lane.add_keyframe(new_end_keyframe)
 
 func _on_modify():
 	print("Hello from modify")
@@ -661,16 +709,33 @@ func _on_modify():
 
 func _on_modify_ready():
 	if (selected_note == NoteSelection.ModifyLane):
+		for connector in target_lane.editor_connectors:
+			if connector.end_keyframe == target_keyframe:
+				previous_connector = connector
+				print("Set previous connector")
+			if connector.start_keyframe == target_keyframe:
+				next_connector = connector
+				print("Set end connector")
 		current_state = EditorState.Placing
+		
 	elif (selected_note == NoteSelection.ModifyNote):
 		pass
 	else:
 		push_error("Please select Modify button")
 
 func _on_modify_placing():
-	if (selected_note == NoteSelection.ModifyLane):
-		pass
-	elif (selected_note == NoteSelection.ModifyNote):
+	if selected_note == NoteSelection.ModifyLane:
+		# 1. target_keyframe을 현재 마우스 위치로 수정
+		var kf_index = target_lane.keyframes.find(target_keyframe)
+		target_lane.keyframes[kf_index] = Vector2(
+			Setting.get_time_from_posx(snapped_x),
+			mouse_pos.y
+		)
+		# 2. cleanup
+		cleanup_modify_values()
+		# 3. Ready로 복귀
+		current_state = EditorState.Ready
+	elif selected_note == NoteSelection.ModifyNote:
 		pass
 	else:
 		push_error("Please select Modify button")
@@ -859,10 +924,11 @@ func parse(chart_path: String):
 			var connector = CONNECTOR_SCENE.instantiate()
 			add_child(connector)
 			connector.set_editor_color(-1)
-			connector.set_data(start_pos, end_pos)
+			connector.set_editor_values(lane.lane_index, lane.keyframes[i], lane.keyframes[i+1])
+			connector.set_data_from_keyframes()
 			connector.global_position = start_pos
 			lane.add_editor_connector(connector)
-			connector.set_lane_index(lane.lane_index)
+			
 	
 	for noteData in levelData.noteDatas:
 		var note: ENote = NOTE_SCENE.instantiate()
