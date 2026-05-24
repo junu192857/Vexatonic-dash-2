@@ -32,9 +32,7 @@ func set_data_from_keyframes():
 	var start_pos = Vector2(Setting.get_posx_from_time(start_keyframe.x), start_keyframe.y)
 	var end_pos = Vector2(Setting.get_posx_from_time(end_keyframe.x), end_keyframe.y)
 	global_position = start_pos
-	data.set_length(end_pos.x - start_pos.x)
-	data.set_delta_y(end_pos.y - start_pos.y)
-	set_polygon_dynamically()
+	set_data(start_pos, end_pos)
 	
 func set_data(start_pos: Vector2, end_pos: Vector2):
 	data.set_length(end_pos.x - start_pos.x)
