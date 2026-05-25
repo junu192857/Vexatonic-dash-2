@@ -58,7 +58,9 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 			continue
 		
 		if current_lane and parts.size() == 2:
-			current_lane.add_keyframe(Vector2(float(parts[0]), float(parts[1])))
+			var new_keyframe = Keyframe.new(float(parts[0]), float(parts[1]))
+			new_keyframe.set_lane(current_lane.lane_index)
+			current_lane.add_keyframe(new_keyframe)
 			continue
 		
 		if current_lane == null and parts.size() >= 5:

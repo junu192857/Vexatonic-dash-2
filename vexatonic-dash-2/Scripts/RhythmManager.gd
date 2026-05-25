@@ -165,9 +165,9 @@ func place_initial_connector(lane: Lane):
 			var initial_connector = place_connector(-1, -3000, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-3000),0))
 		else:
-			if (lane.keyframes[0].x < lane.notes[0].get_time()):
-				var initial_connector = place_connector(-1, lane.keyframes[0].x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
-										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), lane.keyframes[0].y))
+			if (lane.keyframes[0].kf.x < lane.notes[0].get_time()):
+				var initial_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
 # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
@@ -175,13 +175,13 @@ func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
 		var last_note_time = lane.notes[-1].get_end_time() #find last note or marker
-		if lane.keyframes[-1].x  > last_note_time + Setting.time_per_note_width / 2:
+		if lane.keyframes[-1].kf.x  > last_note_time + Setting.time_per_note_width / 2:
 			var connector_time = last_note_time + Setting.time_per_note_width / 2
-			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].x, lane.lane_index, true,\
+			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
 								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
 	else:
-		var final_connector = place_connector(-1, lane.keyframes[0].x, lane.keyframes[-1].x, lane.lane_index, false,\
-							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].x), lane.keyframes[0].y))
+		var final_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
+							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 
 # 생성된 노트를 레인의 노트 큐에 할당
 func assign_note(note: Note):
