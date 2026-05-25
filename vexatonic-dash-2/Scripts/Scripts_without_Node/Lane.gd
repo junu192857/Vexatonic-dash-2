@@ -27,9 +27,9 @@ func adjust_keyframe(note_time: float, note_height: float):
 				insert_keyframe(second_time + Setting.EPSILON, deleted2.y)
 			else: insert_keyframe(second_time + Setting.EPSILON, deleted.y)
 
-func add_keyframe(time: float, height: float):
-	delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
-	keyframes.append(Vector2(time,height))
+func add_keyframe(keyframe: Vector2):
+	delete_middle_keyframe(keyframe.x - Setting.EPSILON, keyframe.x + Setting.EPSILON)
+	keyframes.append(keyframe)
 
 func insert_keyframe(time: float, height: float):
 	delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
@@ -108,6 +108,10 @@ func get_end_time():
 
 func add_editor_connector(connector: EConnector):
 	editor_connectors.append(connector)
+
+func find_editor_connector(keyframe: Vector2):
+	for connector in editor_connectors:
+		pass
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane:Lane in lanes:

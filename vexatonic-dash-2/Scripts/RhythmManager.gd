@@ -104,7 +104,7 @@ func render_chart():
 		assign_note(cur_note)
 		if (previous_time >= 0):
 			var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
-							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2, 0))
+							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 	
 		previous_time = noteData.time
 		previous_lane = noteData.lane
@@ -114,7 +114,7 @@ func render_chart():
 			var end_pos_x = Setting.get_posx_from_time(noteData.end_time)
 			var marker = place_note(noteData, end_pos_x, true, cur_note)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
-							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2, 0))
+							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 			previous_time = noteData.end_time
 			previous_note = marker;
 			

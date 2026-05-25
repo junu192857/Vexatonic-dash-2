@@ -5,7 +5,8 @@ class_name EConnector
 
 #var data:ConnectorData
 var lane_index: int
-
+var start_keyframe: Vector2
+var end_keyframe: Vector2
 #const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 func _ready():
@@ -27,7 +28,13 @@ func set_polygon_dynamically():
 		Vector2(0,Setting.HALF_CONNECTOR_HEIGHT) #좌하
 	])
 
-func set_data(start_pos:Vector2, end_pos:Vector2):
+func set_data_from_keyframes():
+	var start_pos = Vector2(Setting.get_posx_from_time(start_keyframe.x), start_keyframe.y)
+	var end_pos = Vector2(Setting.get_posx_from_time(end_keyframe.x), end_keyframe.y)
+	global_position = start_pos
+	set_data(start_pos, end_pos)
+	
+func set_data(start_pos: Vector2, end_pos: Vector2):
 	data.set_length(end_pos.x - start_pos.x)
 	data.set_delta_y(end_pos.y - start_pos.y)
 	set_polygon_dynamically()
@@ -35,8 +42,10 @@ func set_data(start_pos:Vector2, end_pos:Vector2):
 func get_end_pos(start_pos:Vector2):
 	return start_pos + Vector2(data.length, data.delta_y)
 
-func set_lane_index(index:int):
+func set_editor_values(index:int, s_keyframe: Vector2, e_keyframe: Vector2):
 	lane_index = index
+	start_keyframe = s_keyframe
+	end_keyframe = e_keyframe
 	
 func set_editor_color(color: int):
 	polygon.modulate = Color(1,1,1) if color == -1 else PROCESSED_COLORS[color]
