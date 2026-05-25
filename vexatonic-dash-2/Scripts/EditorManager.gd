@@ -767,14 +767,24 @@ func _on_modify_ready():
 
 func _on_modify_placing():
 	if selected_note == NoteSelection.ModifyLane:
-		# 1. target_keyframe을 현재 마우스 위치로 수정 (in-place, to preserve connector references)
-		target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
-		if previous_connector:
+		if (target_keyframe.lane_index == -1):
+			# 1. target_keyframe을 현재 마우스 위치로 수정 (in-place, to preserve connector references)
+			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+			if previous_connector:
+				previous_connector.end_keyframe = target_keyframe
+				previous_connector.set_data_from_keyframes()
+			if next_connector:
+				next_connector.start_keyframe = target_keyframe
+				next_connector.set_data_from_keyframes()
+		else:
+			target_keyframe.lane_index = target_lane.lane_index
+			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
 			previous_connector.end_keyframe = target_keyframe
 			previous_connector.set_data_from_keyframes()
-		if next_connector:
 			next_connector.start_keyframe = target_keyframe
 			next_connector.set_data_from_keyframes()
+			target_lane.insert_keyframe(target_keyframe)
+			target_lane.add_editor_connector(next_connector)
 		# 2. cleanup
 		cleanup_modify_values()
 		# 3. Ready로 복귀
