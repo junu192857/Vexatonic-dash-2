@@ -4,6 +4,7 @@ signal move_camera(delta: Vector2)
 signal zoom_camera(zoom: int)
 signal move_preview(mouse_pos: Vector2)
 signal put_note()
+signal delete_something()
 
 var dragging = false
 var drag_start: Vector2
@@ -19,6 +20,10 @@ func _input(event):
 			zoom_camera.emit(false)
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			put_note.emit()
+	
+	if event is InputEventKey:
+		if event.keycode == KEY_DELETE and event.pressed:
+			delete_something.emit()
 			
 	if event is InputEventMouseMotion:
 		if dragging:

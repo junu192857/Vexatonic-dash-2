@@ -23,6 +23,7 @@ func _ready():
 	inputHandler.zoom_camera.connect(_on_zoom_camera)
 	inputHandler.move_preview.connect(_on_move_preview)
 	inputHandler.put_note.connect(_on_put_note)
+	inputHandler.delete_something.connect(_on_delete_something)
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
@@ -784,14 +785,55 @@ func _on_modify_placing():
 			if next_connector:
 				next_connector.start_keyframe = target_keyframe
 				next_connector.set_data_from_keyframes()
-		# 2. cleanup
-		cleanup_modify_values()
-		# 3. Ready로 복귀
-		current_state = EditorState.Ready
 	elif selected_note == NoteSelection.ModifyNote:
 		pass
 	else:
 		push_error("Please select Modify button")
+		return
+	cleanup_modify_values()
+	current_state = EditorState.Ready
+
+func _on_delete_something():
+	if (!editor_ready or current_state != EditorState.Placing):
+		return
+	match selected_note:
+		NoteSelection.ModifyLane:
+			if (target_keyframe.lane_index == -1):
+				cancel_modify()
+			else:  # 기존 keyframe 삭제
+				if previous_connector == null:
+		# 레인의 첫 번째 keyframe: next_connector 삭제, 레인 시작점을 next_connector의 end_keyframe으로
+					target_lane.keyframes.erase(target_keyframe)
+					target_lane.editor_connectors.erase(next_connector)
+					next_connector.queue_free()
+					next_connector = null
+				elif next_connector == null:
+					# 레인의 마지막 keyframe: previous_connector 삭제, 레인 끝점을 previous_connector의 start_keyframe으로
+					target_lane.keyframes.erase(target_keyframe)
+					target_lane.editor_connectors.erase(previous_connector)
+					previous_connector.queue_free()
+					previous_connector = null
+				else:
+					# 중간 keyframe: previous_connector의 end_keyframe을 next_connector의 end_keyframe으로
+					previous_connector.end_keyframe = next_connector.end_keyframe
+					previous_connector.set_data_from_keyframes()
+					target_lane.keyframes.erase(target_keyframe)
+					target_lane.editor_connectors.erase(next_connector)
+					next_connector.queue_free()
+					next_connector = null
+				if target_lane.keyframes.size() <= 1:
+					# lane에 속한 editor_connectors 모두 삭제
+					for connector in target_lane.editor_connectors:
+						connector.queue_free()
+					target_lane.editor_connectors.clear()
+					levelData.lanes.erase(target_lane)
+		NoteSelection.ModifyNote:
+			pass
+		_:
+			push_error("Please select modify button")
+			return
+	cleanup_modify_values()
+	current_state = EditorState.Ready
 
 func get_snapped_x(mouse_x: float) -> float:
 	if bit == 0:
