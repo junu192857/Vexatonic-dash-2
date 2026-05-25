@@ -30,12 +30,12 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 # 다음 keyframe이 나오기 전까지만 찍도록 end_time 조정
 		print("Start height: %f" % start_height)
 		for kf in p_lane.keyframes:
-			if kf.x > start_time:
-				if kf.x >= end_time:
+			if kf.kf.x > start_time:
+				if kf.kf.x >= end_time:
 					calculated_delta_y = p_lane.get_height(end_time) - start_height
 				else:
-					calculated_delta_y = kf.y - start_height
-					end_time = kf.x
+					calculated_delta_y = kf.kf.y - start_height
+					end_time = kf.kf.x
 				break
 				
 	print("Calculated_delta_y = %f" % calculated_delta_y)

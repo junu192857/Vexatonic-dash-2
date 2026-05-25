@@ -26,7 +26,7 @@ func _ready():
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
-	
+
 # ================== 에디터 시작하기 ==========================
 
 func _on_start_editor():
@@ -206,7 +206,7 @@ var note_case: bool
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
 
-var target_keyframe
+var target_keyframe: Keyframe
 var keyframe_indicator: ENote
 var previous_connector: EConnector
 var next_connector: EConnector
@@ -326,13 +326,13 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 					# 구간 포인트 수집
 					var points = [connector_start_x]
 					for kf in target_lane.keyframes:
-						var kf_x = Setting.get_posx_from_time(kf.x)
+						var kf_x = Setting.get_posx_from_time(kf.kf.x)
 						if kf_x > connector_start_x and kf_x < connector_end_x:
 							points.append(kf_x)
 						if kf_x >= connector_end_x:
 							break
 					points.append(connector_end_x)
-					
+
 					# existing_connector 없으면 생성
 					if existing_connector == null:
 						existing_connector = CONNECTOR_SCENE.instantiate()
@@ -428,7 +428,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			if connector_end_x > connector_start_x:
 				var points = [connector_start_x]
 				for kf in target_lane.keyframes:
-					var kf_x = Setting.get_posx_from_time(kf.x)
+					var kf_x = Setting.get_posx_from_time(kf.kf.x)
 					if kf_x > connector_start_x and kf_x < connector_end_x:
 						points.append(kf_x)
 					if kf_x >= connector_end_x:
@@ -490,10 +490,10 @@ func generate_modify_preview():
 				var kf_index = target_lane.keyframes.find(target_keyframe)
 				var prev_kf = target_lane.keyframes[kf_index - 1] if kf_index > 0 else null
 				var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
-	
-				var prev_x = Setting.get_posx_from_time(prev_kf.x) if prev_kf else -INF
-				var next_x = Setting.get_posx_from_time(next_kf.x) if next_kf else INF
-				var new_keyframe = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+				var prev_x = Setting.get_posx_from_time(prev_kf.kf.x) if prev_kf else -INF
+				var next_x = Setting.get_posx_from_time(next_kf.kf.x) if next_kf else INF
+				var new_keyframe = Keyframe.new(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+				new_keyframe.set_lane(target_lane.lane_index)
 				if snapped_x > prev_x + Setting.EPSILON and snapped_x < next_x - Setting.EPSILON:
 					if previous_connector:
 						previous_connector.end_keyframe = new_keyframe
@@ -521,12 +521,13 @@ func cancel_moving_connector():
 		keyframe_indicator.queue_free()
 		keyframe_indicator = null
 
-func put_keyframe_indicator(keyframe: Vector2):
+func put_keyframe_indicator(keyframe: Keyframe):
 	var indicator = NOTE_SCENE.instantiate()
 	add_child(indicator)
-	indicator.global_position = Vector2(Setting.get_posx_from_time(target_keyframe.x), target_keyframe.y)
+	indicator.global_position = Vector2(Setting.get_posx_from_time(target_keyframe.kf.x), target_keyframe.kf.y)
 	indicator.sprite.modulate = Color(0,0,0)
 	return indicator
+
 # 마우스가 정상 위치에 있는지 확인. 해당 위치에 있어야 preview를 볼 수 있다.
 func check_mouse_in_available_area() -> bool:
 	if (mouse_pos.x < 0):
@@ -548,8 +549,8 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 
 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
 	for lane in levelData.lanes:
-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
 		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
@@ -561,10 +562,10 @@ func find_lane_placing_case(mouse_pos: Vector2) -> LanePlacingCase:
 	var closest_dist: float = Setting.INFINITE
 
 	for lane in levelData.lanes:
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
 		if mouse_pos.x > lane_x_end:
 			if camera_left < lane_x_end:
-				var lane_y_end = lane.keyframes[-1].y
+				var lane_y_end = lane.keyframes[-1].kf.y
 				if abs(lane_y_end - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 					var dist = mouse_pos.x - lane_x_end
 					if dist < closest_dist:
@@ -586,8 +587,8 @@ func find_note_placing_available(mouse_pos: Vector2) -> bool:
 	#	return false
 
 	for lane in levelData.lanes:
-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].x)
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].x)
+		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
 		if snapped_x >= lane_x_start and mouse_pos.x >= lane_x_start and snapped_x <= lane_x_end and mouse_pos.x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
@@ -599,11 +600,12 @@ func find_note_placing_available(mouse_pos: Vector2) -> bool:
 func find_longNote_placing_available(mouse_pos: Vector2, snapped_x : float) -> bool:
 	if (long_start_pos.x >= snapped_x):
 		return false
-	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].x)
+	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
 	print("Snapped_x: %f, land_x_end: %f" % [snapped_x, lane_x_end])
 	if (snapped_x > lane_x_end):
 		return false
 	return true
+
 # Ready 단계에서 Lane의 preview의 위치 구하기.
 func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
@@ -611,7 +613,7 @@ func get_preview_pos_for_lane(mouse_pos: Vector2, case: LanePlacingCase) -> Vect
 	elif (case == LanePlacingCase.Case2):
 		return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 	elif (case == LanePlacingCase.Case3):
-		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].x),target_lane.keyframes[-1].y)
+		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x),target_lane.keyframes[-1].kf.y)
 	return Vector2.ZERO
 	
 func get_preview_pos_for_note(mouse_pos: Vector2) -> Vector2:
@@ -668,8 +670,10 @@ func _place_lane_case1():
 	print("CASE 1 ACTIVATED")
 	var new_index = Lane.find_free_index(levelData.lanes)
 	var new_lane = Lane.new(new_index, true)
-	var new_start_keyframe = Vector2(0, lane_start_pos.y)
-	var new_end_keyframe = Vector2(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_start_keyframe = Keyframe.new(0, lane_start_pos.y)
+	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	new_start_keyframe.set_lane(new_index)
+	new_end_keyframe.set_lane(new_index)
 	new_lane.add_keyframe(new_start_keyframe)
 	new_lane.add_keyframe(new_end_keyframe)
 	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
@@ -681,17 +685,21 @@ func _place_lane_case2():
 	print("CASE 2 ACTIVATED")
 	var new_index = Lane.find_free_index(levelData.lanes)
 	var new_lane = Lane.new(new_index, false)
-	var new_start_keyframe = Vector2(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
-	var new_end_keyframe = Vector2(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_start_keyframe = Keyframe.new(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
+	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	new_start_keyframe.set_lane(new_index)
+	new_end_keyframe.set_lane(new_index)
 	new_lane.add_keyframe(new_start_keyframe)
 	new_lane.add_keyframe(new_end_keyframe)
 	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
 	levelData.lanes.append(new_lane)
 	target_lane.add_editor_connector(preview)
 	preview.set_editor_values(new_index, new_start_keyframe, new_end_keyframe)
+
 func _place_lane_case3():
 	print("CASE 3 ACTIVATED")
-	var new_end_keyframe = Vector2(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	new_end_keyframe.set_lane(target_lane.lane_index)
 	print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
 	target_lane.add_editor_connector(preview)
 	preview.set_editor_values(target_lane.lane_index, target_lane.keyframes[-1], new_end_keyframe)
@@ -725,12 +733,14 @@ func _on_modify_ready():
 
 func _on_modify_placing():
 	if selected_note == NoteSelection.ModifyLane:
-		# 1. target_keyframe을 현재 마우스 위치로 수정
-		var kf_index = target_lane.keyframes.find(target_keyframe)
-		target_lane.keyframes[kf_index] = Vector2(
-			Setting.get_time_from_posx(snapped_x),
-			mouse_pos.y
-		)
+		# 1. target_keyframe을 현재 마우스 위치로 수정 (in-place, to preserve connector references)
+		target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+		if previous_connector:
+			previous_connector.end_keyframe = target_keyframe
+			previous_connector.set_data_from_keyframes()
+		if next_connector:
+			next_connector.start_keyframe = target_keyframe
+			next_connector.set_data_from_keyframes()
 		# 2. cleanup
 		cleanup_modify_values()
 		# 3. Ready로 복귀
@@ -768,7 +778,7 @@ func print_lane_info():
 	for lane in levelData.lanes:
 		print("LANE INDEX %d" % lane.lane_index)
 		for keyframe in lane.keyframes:
-			print("my lane's keyframe: time %f and height %f" % [keyframe.x, keyframe.y])
+			print("my lane's keyframe: time %f and height %f" % [keyframe.kf.x, keyframe.kf.y])
 
 # ======================== Save Chart ================================
 
@@ -831,7 +841,7 @@ func save_chart():
 	for lane in levelData.lanes:
 		file.store_line("LANE %d %d" % [lane.lane_index, 1 if lane.is_init else 0])
 		for kf in lane.keyframes:
-			file.store_line("%s %s" % [kf.x, kf.y])
+			file.store_line("%s %s" % [kf.kf.x, kf.kf.y])
 		file.store_line("END")
 	
 	# 노트 저장
@@ -843,6 +853,7 @@ func save_chart():
 
 func set_difficulty(difficulty:int):
 	save_difficulty = difficulty
+
 # =============================== Load Chart ==========================
 var chart_path
 var chart_loaded : bool
@@ -916,10 +927,10 @@ func parse(chart_path: String):
 	ChartParser.parse_chart(chart_path, levelData, true)
 	for lane in levelData.lanes:
 		for i in range(lane.keyframes.size() - 1):
-			var start_time = lane.keyframes[i].x
-			var end_time = lane.keyframes[i + 1].x
-			var start_pos = Vector2(Setting.get_posx_from_time(start_time), lane.keyframes[i].y)
-			var end_pos = Vector2(Setting.get_posx_from_time(end_time), lane.keyframes[i + 1].y)
+			var start_time = lane.keyframes[i].kf.x
+			var end_time = lane.keyframes[i + 1].kf.x
+			var start_pos = Vector2(Setting.get_posx_from_time(start_time), lane.keyframes[i].kf.y)
+			var end_pos = Vector2(Setting.get_posx_from_time(end_time), lane.keyframes[i + 1].kf.y)
 			
 			var connector = CONNECTOR_SCENE.instantiate()
 			add_child(connector)
@@ -945,9 +956,9 @@ func parse(chart_path: String):
 			if connector_start_x < connector_end_x:
 				var points = [connector_start_x]
 				for kf in lane.keyframes:
-					if kf.x > noteData.time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.x < noteData.end_time:
-						points.append(Setting.get_posx_from_time(kf.x))
-					if kf.x > noteData.end_time:
+					if kf.kf.x > noteData.time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < noteData.end_time:
+						points.append(Setting.get_posx_from_time(kf.kf.x))
+					if kf.kf.x > noteData.end_time:
 						break
 				points.append(connector_end_x)
 				var parent_node = note
@@ -1010,8 +1021,8 @@ func set_target_lane(p_target_lane: Lane):
 func find_target_keyframe():
 	for lane in levelData.lanes:
 		for kf in lane.keyframes:
-			var kf_x = Setting.get_posx_from_time(kf.x)
-			var kf_y = kf.y
+			var kf_x = Setting.get_posx_from_time(kf.kf.x)
+			var kf_y = kf.kf.y
 			if abs(mouse_pos.x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				set_target_lane(lane)
