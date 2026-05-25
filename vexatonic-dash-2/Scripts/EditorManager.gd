@@ -487,11 +487,11 @@ func generate_modify_preview():
 	else:
 		match selected_note:
 			NoteSelection.ModifyLane:
-				var kf_index = target_lane.keyframes.find(target_keyframe)
-				var prev_kf = target_lane.keyframes[kf_index - 1] if kf_index > 0 else null
-				var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
-				var prev_x = Setting.get_posx_from_time(prev_kf.kf.x) if prev_kf else -INF
-				var next_x = Setting.get_posx_from_time(next_kf.kf.x) if next_kf else INF
+				#var kf_index = target_lane.keyframes.find(target_keyframe)
+				#var prev_kf = target_lane.keyframes[kf_index - 1] if kf_index > 0 else null
+				#var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
+				var prev_x = Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x) if previous_connector else -INF
+				var next_x = Setting.get_posx_from_time(next_connector.end_keyframe.kf.x) if next_connector else INF
 				var new_keyframe = Keyframe.new(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
 				new_keyframe.set_lane(target_lane.lane_index)
 				if snapped_x > prev_x + Setting.EPSILON and snapped_x < next_x - Setting.EPSILON:
@@ -499,6 +499,8 @@ func generate_modify_preview():
 						previous_connector.end_keyframe = new_keyframe
 						previous_connector.set_data_from_keyframes()
 					if next_connector:
+						if (next_connector.visible == false):
+							next_connector.visible = true
 						next_connector.start_keyframe = new_keyframe
 						next_connector.set_data_from_keyframes()
 				else:
@@ -511,12 +513,19 @@ func generate_modify_preview():
 				pass
 
 func cancel_moving_connector():
-	if previous_connector:
-		previous_connector.end_keyframe = target_keyframe
-		previous_connector.set_data_from_keyframes()
-	if next_connector:
-		next_connector.start_keyframe = target_keyframe
-		next_connector.set_data_from_keyframes()
+	if (target_keyframe.lane_index != -1):
+		if previous_connector:
+			previous_connector.end_keyframe = target_keyframe
+			previous_connector.set_data_from_keyframes()
+		if next_connector:
+			next_connector.start_keyframe = target_keyframe
+			next_connector.set_data_from_keyframes()
+	else:
+		if previous_connector:
+			previous_connector.end_keyframe = next_connector.end_keyframe
+			previous_connector.set_data_from_keyframes()
+		if next_connector:
+			next_connector.visible = false
 	if (keyframe_indicator != null):
 		keyframe_indicator.queue_free()
 		keyframe_indicator = null
@@ -717,14 +726,39 @@ func _on_modify():
 
 func _on_modify_ready():
 	if (selected_note == NoteSelection.ModifyLane):
-		for connector in target_lane.editor_connectors:
-			if connector.end_keyframe == target_keyframe:
-				previous_connector = connector
-				print("Set previous connector")
-			if connector.start_keyframe == target_keyframe:
-				next_connector = connector
-				print("Set end connector")
-		current_state = EditorState.Placing
+		if target_keyframe.lane_index == -1:  # Adding new keyframe
+			# 1. previous_connector 찾기
+			for connector in target_lane.editor_connectors:
+				var conn_start_x = Setting.get_posx_from_time(connector.start_keyframe.kf.x)
+				var target_x = Setting.get_posx_from_time(target_keyframe.kf.x)
+				if conn_start_x < target_x:
+					if previous_connector == null or conn_start_x > Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x):
+						previous_connector = connector
+	
+			if previous_connector == null:
+				push_error("previous_connector를 찾을 수 없습니다.")
+				return
+	
+			# 2. previous_connector의 end_keyframe을 target_keyframe으로 바꾸기
+			var old_end_keyframe = previous_connector.end_keyframe
+			previous_connector.end_keyframe = target_keyframe
+			previous_connector.set_data_from_keyframes()
+			# 3. next_connector 새로 만들기
+			next_connector = CONNECTOR_SCENE.instantiate()
+			add_child(next_connector)
+			next_connector.set_editor_values(target_lane.lane_index, target_keyframe, old_end_keyframe)
+			next_connector.set_data_from_keyframes()
+			
+			current_state = EditorState.Placing
+		else:
+			for connector in target_lane.editor_connectors:
+				if connector.end_keyframe == target_keyframe:
+					previous_connector = connector
+					print("Set previous connector")
+				if connector.start_keyframe == target_keyframe:
+					next_connector = connector
+					print("Set end connector")
+			current_state = EditorState.Placing
 		
 	elif (selected_note == NoteSelection.ModifyNote):
 		pass
@@ -1019,6 +1053,7 @@ func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
 	
 func find_target_keyframe():
+	# 1. 기존 keyframe 근처에 있는지 먼저 체크
 	for lane in levelData.lanes:
 		for kf in lane.keyframes:
 			var kf_x = Setting.get_posx_from_time(kf.kf.x)
@@ -1027,6 +1062,18 @@ func find_target_keyframe():
 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				set_target_lane(lane)
 				return kf
+	
+	# 2. 레인 위에 있지만 keyframe 근처는 아닌 경우 -> 새로운 keyframe 생성
+	for lane in levelData.lanes:
+		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
+		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
+		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
+			var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
+			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				set_target_lane(lane)
+				var new_kf = Keyframe.new(Setting.get_time_from_posx(snapped_x), lane_y)
+				return new_kf
+	
 	return null
 
 func find_target_note() -> Variant:
