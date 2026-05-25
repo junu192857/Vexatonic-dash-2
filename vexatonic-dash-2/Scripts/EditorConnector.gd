@@ -4,7 +4,6 @@ class_name EConnector
 #@onready var polygon:Polygon2D = $Polygon2D
 
 #var data:ConnectorData
-var lane_index: int
 var start_keyframe: Keyframe
 var end_keyframe: Keyframe
 #const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
@@ -42,8 +41,8 @@ func set_data(start_pos: Vector2, end_pos: Vector2):
 func get_end_pos(start_pos:Vector2):
 	return start_pos + Vector2(data.length, data.delta_y)
 
-func set_editor_values(index:int, s_keyframe: Keyframe, e_keyframe: Keyframe):
-	lane_index = index
+func set_editor_values(p_lane: Lane, s_keyframe: Keyframe, e_keyframe: Keyframe):
+	lane = p_lane
 	start_keyframe = s_keyframe
 	end_keyframe = e_keyframe
 	

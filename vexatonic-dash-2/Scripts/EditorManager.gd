@@ -252,7 +252,7 @@ func _on_move_preview():
 			generate_modify_preview()
 		else:
 			if (previous_connector or next_connector):
-				cancel_moving_connector()
+				cancel_modify()
 			if (keyframe_indicator != null):
 				keyframe_indicator.queue_free()
 				keyframe_indicator = null
@@ -504,7 +504,7 @@ func generate_modify_preview():
 						next_connector.start_keyframe = new_keyframe
 						next_connector.set_data_from_keyframes()
 				else:
-					cancel_moving_connector()
+					cancel_modify()
 					return
 				if (keyframe_indicator == null):
 					keyframe_indicator = put_keyframe_indicator(new_keyframe)
@@ -512,7 +512,7 @@ func generate_modify_preview():
 			NoteSelection.ModifyNote:
 				pass
 
-func cancel_moving_connector():
+func cancel_modify():
 	if (target_keyframe.lane_index != -1):
 		if previous_connector:
 			previous_connector.end_keyframe = target_keyframe
@@ -688,7 +688,7 @@ func _place_lane_case1():
 	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y, preview.get_end_pos(lane_start_pos).y ])
 	levelData.lanes.append(new_lane)
 	new_lane.add_editor_connector(preview)
-	preview.set_editor_values(new_index, new_start_keyframe, new_end_keyframe)
+	preview.set_editor_values(new_lane, new_start_keyframe, new_end_keyframe)
 
 func _place_lane_case2():
 	print("CASE 2 ACTIVATED")
@@ -703,7 +703,7 @@ func _place_lane_case2():
 	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
 	levelData.lanes.append(new_lane)
 	target_lane.add_editor_connector(preview)
-	preview.set_editor_values(new_index, new_start_keyframe, new_end_keyframe)
+	preview.set_editor_values(new_lane, new_start_keyframe, new_end_keyframe)
 
 func _place_lane_case3():
 	print("CASE 3 ACTIVATED")
@@ -711,7 +711,7 @@ func _place_lane_case3():
 	new_end_keyframe.set_lane(target_lane.lane_index)
 	print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
 	target_lane.add_editor_connector(preview)
-	preview.set_editor_values(target_lane.lane_index, target_lane.keyframes[-1], new_end_keyframe)
+	preview.set_editor_values(target_lane, target_lane.keyframes[-1], new_end_keyframe)
 	target_lane.add_keyframe(new_end_keyframe)
 
 func _on_modify():
@@ -746,7 +746,7 @@ func _on_modify_ready():
 			# 3. next_connector 새로 만들기
 			next_connector = CONNECTOR_SCENE.instantiate()
 			add_child(next_connector)
-			next_connector.set_editor_values(target_lane.lane_index, target_keyframe, old_end_keyframe)
+			next_connector.set_editor_values(target_lane, target_keyframe, old_end_keyframe)
 			next_connector.set_data_from_keyframes()
 			
 			current_state = EditorState.Placing
@@ -770,21 +770,20 @@ func _on_modify_placing():
 		if (target_keyframe.lane_index == -1):
 			# 1. target_keyframe을 현재 마우스 위치로 수정 (in-place, to preserve connector references)
 			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+			previous_connector.end_keyframe = target_keyframe
+			previous_connector.set_data_from_keyframes()
+			next_connector.start_keyframe = target_keyframe
+			next_connector.set_data_from_keyframes()
+			target_lane.insert_editor_connector(next_connector)
+			target_lane.insert_keyframe(target_keyframe)
+		else:
+			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
 			if previous_connector:
 				previous_connector.end_keyframe = target_keyframe
 				previous_connector.set_data_from_keyframes()
 			if next_connector:
 				next_connector.start_keyframe = target_keyframe
 				next_connector.set_data_from_keyframes()
-		else:
-			target_keyframe.lane_index = target_lane.lane_index
-			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
-			previous_connector.end_keyframe = target_keyframe
-			previous_connector.set_data_from_keyframes()
-			next_connector.start_keyframe = target_keyframe
-			next_connector.set_data_from_keyframes()
-			target_lane.insert_keyframe(target_keyframe)
-			target_lane.add_editor_connector(next_connector)
 		# 2. cleanup
 		cleanup_modify_values()
 		# 3. Ready로 복귀
@@ -979,7 +978,7 @@ func parse(chart_path: String):
 			var connector = CONNECTOR_SCENE.instantiate()
 			add_child(connector)
 			connector.set_editor_color(-1)
-			connector.set_editor_values(lane.lane_index, lane.keyframes[i], lane.keyframes[i+1])
+			connector.set_editor_values(lane, lane.keyframes[i], lane.keyframes[i+1])
 			connector.set_data_from_keyframes()
 			connector.global_position = start_pos
 			lane.add_editor_connector(connector)
