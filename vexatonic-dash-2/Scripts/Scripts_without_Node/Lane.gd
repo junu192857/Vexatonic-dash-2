@@ -1,7 +1,7 @@
 class_name Lane
 
 var lane_index: int
-var keyframes: Array[Vector2]
+var keyframes: Array[Keyframe]
 var notes: Array[Note]
 
 var note_index: int
@@ -52,7 +52,7 @@ func delete_middle_keyframe(time1: float, time2: float):
 	
 func print_data():
 	print("INDEX: %d" % lane_index)
-	for kf:Vector2 in keyframes:
+	for kf: Vector2 in keyframes:
 		print("time: %f and height: %f" % [kf[0],kf[1]])
 	print("Note Count:%d" % notes.size())
 	for note:Note in notes:
