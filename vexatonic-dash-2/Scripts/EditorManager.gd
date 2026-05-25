@@ -785,6 +785,7 @@ func _on_modify_placing():
 			if next_connector:
 				next_connector.start_keyframe = target_keyframe
 				next_connector.set_data_from_keyframes()
+		adjust_note_position()
 	elif selected_note == NoteSelection.ModifyNote:
 		pass
 	else:
@@ -827,6 +828,7 @@ func _on_delete_something():
 						connector.queue_free()
 					target_lane.editor_connectors.clear()
 					levelData.lanes.erase(target_lane)
+			adjust_note_position()
 		NoteSelection.ModifyNote:
 			pass
 		_:
@@ -834,6 +836,80 @@ func _on_delete_something():
 			return
 	cleanup_modify_values()
 	current_state = EditorState.Ready
+
+func adjust_note_position():
+	var lane_start_time = target_lane.keyframes[0].kf.x
+	var lane_end_time = target_lane.keyframes[-1].kf.x
+	
+	# 1. keyframe이 하나 남은 경우 모든 노트 삭제
+	if target_lane.keyframes.size() <= 1:
+		for note in target_lane.notes:
+			levelData.noteDatas.erase(note.data)
+			note.queue_free()
+		target_lane.notes.clear()
+		return
+	
+	var notes_to_remove = []
+	for note in target_lane.notes:
+		var noteData = note.data
+		var should_remove = false
+		
+		if noteData.type == 0:  # 단노트
+			if noteData.time < lane_start_time or noteData.time > lane_end_time:
+				should_remove = true
+			else:
+				note.position.y = target_lane.get_height(noteData.time)
+		else:  # 롱노트
+			if noteData.time < lane_start_time or noteData.time > lane_end_time or \
+			   noteData.end_time < lane_start_time or noteData.end_time > lane_end_time:
+				should_remove = true
+			else:
+				# 시작점 y좌표 조정
+				note.position.y = target_lane.get_height(noteData.time)
+				
+				var marker
+				# 기존 connector 체인 삭제
+				for child in note.get_children():
+					if child is EConnector:
+						child.queue_free()
+					elif child is ENote:
+						marker = child
+				
+				# connector 새로 찍기
+				var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
+				var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
+				if connector_start_x < connector_end_x:
+					var points = [connector_start_x]
+					for kf in target_lane.keyframes:
+						if kf.kf.x > noteData.time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < noteData.end_time:
+							points.append(Setting.get_posx_from_time(kf.kf.x))
+						if kf.kf.x > noteData.end_time:
+							break
+					points.append(connector_end_x)
+					var parent_node = note
+					for i in range(points.size() - 1):
+						var start_x = points[i]
+						var end_x = points[i + 1]
+						var start_pos = Vector2(start_x, target_lane.get_height(Setting.get_time_from_posx(start_x)))
+						var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
+						var longNote_connector = CONNECTOR_SCENE.instantiate()
+						parent_node.add_child(longNote_connector)
+						longNote_connector.set_editor_color(noteData.color)
+						longNote_connector.set_data(start_pos, end_pos)
+						longNote_connector.global_position = start_pos
+						parent_node = longNote_connector
+				
+				#marker y좌표 조정
+				marker.global_position.y = target_lane.get_height(noteData.end_time)
+		
+		if should_remove:
+			notes_to_remove.append(note)
+	
+	for note in notes_to_remove:
+		levelData.noteDatas.erase(note.data)
+		target_lane.notes.erase(note)
+		note.queue_free()
+		
 
 func get_snapped_x(mouse_x: float) -> float:
 	if bit == 0:
