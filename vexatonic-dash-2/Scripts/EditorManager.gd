@@ -507,6 +507,7 @@ func generate_modify_preview():
 					keyframe_indicator = put_keyframe_indicator(new_keyframe)
 				keyframe_indicator.global_position = Vector2(snapped_x, mouse_pos.y)
 			NoteSelection.ModifyNote:
+				target_note.select_color()
 				var lane_start_x = Setting.get_posx_from_time(target_lane.keyframes[0].kf.x)
 				var lane_end_x = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
 				
