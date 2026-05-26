@@ -1,7 +1,6 @@
 extends Note
 class_name ENote
 
-var is_marker: bool
 
 func _ready():
 	return
@@ -12,4 +11,4 @@ func set_color(color: int):
 	sprite.modulate = PROCESSED_COLORS[color]
 
 func select_color():
-	sprite.modulate = SELECTED_COLORS[data.color]
+	sprite.modulate = SELECTED_COLORS[get_data().color]

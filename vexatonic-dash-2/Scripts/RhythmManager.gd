@@ -185,7 +185,7 @@ func place_final_connector(lane: Lane):
 
 # 생성된 노트를 레인의 노트 큐에 할당
 func assign_note(note: Note):
-	var lane = Lane.find_lane(levelData.lanes, note.data.lane)
+	var lane = Lane.find_lane(levelData.lanes, note.get_data().lane)
 	lane.add_note(note)
 
 #==================================================================================
