@@ -1,6 +1,8 @@
 extends Note
 class_name ENote
 
+var is_marker: bool
+
 func _ready():
 	return
 
