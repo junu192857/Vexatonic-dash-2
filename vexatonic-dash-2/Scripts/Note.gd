@@ -35,7 +35,10 @@ func get_lane() -> int:
 
 # 스포너에서 노트 생성 후 가장 먼저 호출되어 색상을 정함.
 func set_data(p_data: NoteData):
-	data = p_data
+	if (is_marker):
+		get_parent().data = p_data
+	else: 
+		data = p_data
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
