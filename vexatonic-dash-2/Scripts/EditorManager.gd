@@ -872,7 +872,18 @@ func _on_delete_something():
 					levelData.lanes.erase(target_lane)
 			adjust_note_position()
 		NoteSelection.ModifyNote:
-			pass
+			var noteData = target_note.get_data()
+			
+			if target_note.is_marker:
+				# 롱노트 뒷부분인 경우 앞부분을 구해서 삭제
+				var front_note = target_note.get_parent()
+				levelData.noteDatas.erase(noteData)
+				target_lane.notes.erase(front_note)
+				front_note.queue_free()  # 앞부분 삭제 시 자식(connector, marker)도 같이 삭제됨
+			else:
+				levelData.noteDatas.erase(noteData)
+				target_lane.notes.erase(target_note)
+				target_note.queue_free()  # 단노트 또는 롱노트 앞부분 삭제 시 자식도 같이 삭제됨
 		_:
 			push_error("Please select modify button")
 			return
