@@ -17,29 +17,33 @@ func _init(p_index: int, p_is_init: bool):
 func adjust_keyframe(note_time: float, note_height: float):
 	var first_time = note_time - Setting.time_per_note_width / 2
 	var second_time = note_time + Setting.time_per_note_width / 2
-	insert_keyframe(first_time, note_height)
-	insert_keyframe(second_time, note_height)
+	var first_keyframe = Keyframe.new(first_time, note_height)
+	var second_keyframe = Keyframe.new(second_time, note_height)
+	insert_keyframe(first_keyframe)
+	insert_keyframe(second_keyframe)
 	var deleted = delete_middle_keyframe(first_time, second_time)
 	if (deleted != null):
 		if (deleted.kf.y != note_height):
 			var deleted2 = delete_middle_keyframe(second_time, second_time + Setting.EPSILON)
-			if (deleted2 != null):
-				insert_keyframe(second_time + Setting.EPSILON, deleted2.kf.y)
-			else: insert_keyframe(second_time + Setting.EPSILON, deleted.kf.y)
+			if deleted2 != null:
+				insert_keyframe(Keyframe.new(second_time + Setting.EPSILON, deleted2.kf.y))
+			else:
+				insert_keyframe(Keyframe.new(second_time + Setting.EPSILON, deleted.kf.y))
 
 func add_keyframe(keyframe: Keyframe):
 	delete_middle_keyframe(keyframe.kf.x - Setting.EPSILON, keyframe.kf.x + Setting.EPSILON)
+	keyframe.set_lane(lane_index)
 	keyframes.append(keyframe)
 
-func insert_keyframe(time: float, height: float):
+func insert_keyframe(keyframe: Keyframe):
+	var time = keyframe.kf.x
 	delete_middle_keyframe(time - Setting.EPSILON, time + Setting.EPSILON)
-	var new_kf = Keyframe.new(time, height)
-	new_kf.set_lane(lane_index)
+	keyframe.set_lane(lane_index)
 	for i in range(keyframes.size()):
 		if keyframes[i].kf.x > time:
-			keyframes.insert(i, new_kf)
+			keyframes.insert(i, keyframe)
 			return
-	keyframes.append(new_kf)
+	keyframes.append(keyframe)
 
 func delete_middle_keyframe(time1: float, time2: float):
 	var deleted = keyframes.filter(func(kf: Keyframe): return kf.kf.x > time1 and kf.kf.x < time2)
@@ -107,6 +111,13 @@ func get_end_time():
 	return keyframes[-1].kf.x
 
 func add_editor_connector(connector: EConnector):
+	editor_connectors.append(connector)
+
+func insert_editor_connector(connector: EConnector):
+	for i in range(editor_connectors.size()):
+		if editor_connectors[i].start_keyframe.kf.x > connector.start_keyframe.kf.x:
+			editor_connectors.insert(i, connector)
+			return
 	editor_connectors.append(connector)
 
 func find_editor_connector(keyframe: Keyframe):
