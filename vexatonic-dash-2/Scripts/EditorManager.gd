@@ -525,6 +525,7 @@ func generate_modify_preview():
 					print("Trying move only parent")
 					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x))))
+					adjust_longNote_connector(target_note, Setting.get_time_from_posx(snapped_x), target_note.get_data().end_time)
 				
 				else:  # 롱노트 뒷부분
 					var long_start_x = Setting.get_posx_from_time(target_note.get_data().time)
@@ -532,6 +533,7 @@ func generate_modify_preview():
 						cancel_modify_note()
 						return
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
 
 func cancel_modify_lane():
 	if (!target_keyframe):
@@ -556,13 +558,17 @@ func cancel_modify_lane():
 func cancel_modify_note():
 	if (target_note != null):
 		target_note.process_color()
-		var data = target_note.get_data()
-		if (data.type == 0):
-			target_note.global_position = Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time))
-		elif (target_note.is_marker):
-			target_note.global_position = Vector2(Setting.get_posx_from_time(data.end_time), target_lane.get_height(data.end_time))
-		else:
-			move_only_parent(target_note, Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time)))
+		if (current_state == EditorState.Placing):
+			var data = target_note.get_data()
+			if (data.type == 0):
+				target_note.global_position = Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time))
+			elif (target_note.is_marker):
+				target_note.global_position = Vector2(Setting.get_posx_from_time(data.end_time), target_lane.get_height(data.end_time))
+				adjust_longNote_connector(target_note.get_parent(), data.time, data.end_time)
+			else:
+				move_only_parent(target_note, Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time)))
+				adjust_longNote_connector(target_note, data.time, data.end_time)
+
 func put_keyframe_indicator(keyframe: Keyframe):
 	var indicator = NOTE_SCENE.instantiate()
 	add_child(indicator)
@@ -824,11 +830,11 @@ func _on_modify_placing():
 			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
 		elif target_note.get_data().type == 1 and not target_note.is_marker:
 			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
-			adjust_longNote_connector(target_note)
+			adjust_longNote_connector(target_note, target_note.get_data().time, target_note.get_data().end_time)
 		else:
 			var head = target_note.get_parent()
 			head.get_data().end_time = Setting.get_time_from_posx(snapped_x)
-			adjust_longNote_connector(head)
+			adjust_longNote_connector(head, target_note.get_data().time, target_note.get_data().end_time)
 		target_note.process_color()
 	else:
 		push_error("Please select Modify button")
@@ -917,7 +923,7 @@ func adjust_note_position():
 			   noteData.end_time < lane_start_time or noteData.end_time > lane_end_time:
 				should_remove = true
 			else:
-				adjust_longNote_connector(note)
+				adjust_longNote_connector(note, noteData.time, noteData.end_time)
 		
 		if should_remove:
 			notes_to_remove.append(note)
@@ -927,13 +933,12 @@ func adjust_note_position():
 		target_lane.notes.erase(note)
 		note.queue_free()
 		
-func adjust_longNote_connector(note: ENote):
+func adjust_longNote_connector(note: ENote, start_time: float, end_time: float):
 	if (note.get_data().type != 1):
 		push_error("Sorry, this is not a long note")
 		return
 	
-	var noteData = note.get_data()
-	note.position.y = target_lane.get_height(noteData.time)
+	note.position.y = target_lane.get_height(start_time)
 	
 	var marker
 	# 기존 connector 체인 삭제
@@ -944,14 +949,14 @@ func adjust_longNote_connector(note: ENote):
 			marker = child
 	
 	# connector 새로 찍기
-	var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
-	var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
+	var connector_start_x = Setting.get_posx_from_time(start_time) + Setting.NOTE_WIDTH / 2.0
+	var connector_end_x = Setting.get_posx_from_time(end_time) - Setting.NOTE_WIDTH / 2.0
 	if connector_start_x < connector_end_x:
 		var points = [connector_start_x]
 		for kf in target_lane.keyframes:
-			if kf.kf.x > noteData.time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < noteData.end_time:
+			if kf.kf.x > start_time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < end_time:
 				points.append(Setting.get_posx_from_time(kf.kf.x))
-			if kf.kf.x > noteData.end_time:
+			if kf.kf.x > end_time:
 				break
 		points.append(connector_end_x)
 		var parent_node = note
@@ -962,13 +967,13 @@ func adjust_longNote_connector(note: ENote):
 			var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
 			var longNote_connector = CONNECTOR_SCENE.instantiate()
 			parent_node.add_child(longNote_connector)
-			longNote_connector.set_editor_color(noteData.color)
+			longNote_connector.set_editor_color(note.get_data().color)
 			longNote_connector.set_data(start_pos, end_pos)
 			longNote_connector.global_position = start_pos
 			parent_node = longNote_connector
 	
 	#marker y좌표 조정
-	marker.global_position.y = target_lane.get_height(noteData.end_time)
+	marker.global_position.y = target_lane.get_height(end_time)
 
 func get_snapped_x(mouse_x: float) -> float:
 	if bit == 0:
