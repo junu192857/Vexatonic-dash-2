@@ -102,7 +102,7 @@ func add_note(note: Note):
 	notes.append(note)
 
 func sort_notes():
-	notes.sort_custom(func(a: Note, b: Note): return a.data.time < b.data.time)
+	notes.sort_custom(func(a: Note, b: Note): return a.get_data().time < b.get_data().time)
 
 func get_start_time():
 	return keyframes[0].kf.x

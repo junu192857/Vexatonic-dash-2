@@ -511,21 +511,23 @@ func generate_modify_preview():
 				var lane_start_x = Setting.get_posx_from_time(target_lane.keyframes[0].kf.x)
 				var lane_end_x = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
 				
-				if target_note.data.type == 0:  # 단노트
+				if target_note.get_data().type == 0:  # 단노트
 					if snapped_x < lane_start_x or snapped_x > lane_end_x:
 						cancel_modify_note()
 						return
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 				
-				elif target_note.data.type == 1 and not target_note.is_marker:  # 롱노트 앞부분
-					var long_end_x = Setting.get_posx_from_time(target_note.data.end_time)
+				elif target_note.get_data().type == 1 and not target_note.is_marker:  # 롱노트 앞부분
+					var long_end_x = Setting.get_posx_from_time(target_note.get_data().end_time)
 					if snapped_x < lane_start_x or snapped_x > long_end_x:
 						cancel_modify_note()
 						return
+					print("Trying move only parent")
+					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x))))
 				
 				else:  # 롱노트 뒷부분
-					var long_start_x = Setting.get_posx_from_time(target_note.data.time)
+					var long_start_x = Setting.get_posx_from_time(target_note.get_data().time)
 					if snapped_x < long_start_x or snapped_x > lane_end_x:
 						cancel_modify_note()
 						return
@@ -818,14 +820,14 @@ func _on_modify_placing():
 				next_connector.set_data_from_keyframes()
 		adjust_note_position()
 	elif selected_note == NoteSelection.ModifyNote:
-		if (target_note.data.type == 0):
-			target_note.data.time = Setting.get_time_from_posx(snapped_x)
-		elif target_note.data.type == 1 and not target_note.is_marker:
-			target_note.data.time = Setting.get_time_from_posx(snapped_x)
+		if (target_note.get_data().type == 0):
+			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
+		elif target_note.get_data().type == 1 and not target_note.is_marker:
+			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
 			adjust_longNote_connector(target_note)
 		else:
 			var head = target_note.get_parent()
-			head.data.end_time = Setting.get_time_from_posx(snapped_x)
+			head.get_data().end_time = Setting.get_time_from_posx(snapped_x)
 			adjust_longNote_connector(head)
 		target_note.process_color()
 	else:
@@ -884,14 +886,14 @@ func adjust_note_position():
 	# 1. keyframe이 하나 남은 경우 모든 노트 삭제
 	if target_lane.keyframes.size() <= 1:
 		for note in target_lane.notes:
-			levelData.noteDatas.erase(note.data)
+			levelData.noteDatas.erase(note.get_data())
 			note.queue_free()
 		target_lane.notes.clear()
 		return
 	
 	var notes_to_remove = []
 	for note in target_lane.notes:
-		var noteData = note.data
+		var noteData = note.get_data()
 		var should_remove = false
 		
 		if noteData.type == 0:  # 단노트
@@ -910,16 +912,16 @@ func adjust_note_position():
 			notes_to_remove.append(note)
 	
 	for note in notes_to_remove:
-		levelData.noteDatas.erase(note.data)
+		levelData.noteDatas.erase(note.get_data())
 		target_lane.notes.erase(note)
 		note.queue_free()
 		
 func adjust_longNote_connector(note: ENote):
-	if (note.data.type != 1):
+	if (note.get_data().type != 1):
 		push_error("Sorry, this is not a long note")
 		return
 	
-	var noteData = note.data
+	var noteData = note.get_data()
 	note.position.y = target_lane.get_height(noteData.time)
 	
 	var marker
@@ -1282,19 +1284,21 @@ func find_target_note() -> Variant:
 
 func find_enote_by_data(lane: Lane, target_data: NoteData) -> Variant:
 	for note in lane.notes:
-		if note.data == target_data:
+		if note.get_data() == target_data:
 			return note
 	return null
 	
 func move_only_parent(parent: Node2D, pos: Vector2):
-	var child_positions = []
+	var saved_positions = []
+	var fixed_children = []
+	
 	for child in parent.get_children():
-		child_positions.append(child.global_position)
-
-	# 부모 이동
+		if child is EConnector or child is ENote:
+			saved_positions.append(child.global_position)
+			fixed_children.append(child)
+	
 	parent.global_position = pos
-
-	# 자식들의 global_position 복원
-	for i in range(parent.get_children().size()):
-		parent.get_children()[i].global_position = child_positions[i]
+	
+	for i in range(fixed_children.size()):
+		fixed_children[i].global_position = saved_positions[i]
 	
