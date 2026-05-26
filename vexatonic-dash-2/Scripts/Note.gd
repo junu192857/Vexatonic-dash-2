@@ -65,3 +65,9 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	
 func process_color():
 	sprite.modulate = PROCESSED_COLORS[data.color]
+	
+func get_marker() -> Note:
+	for child in get_children():
+		if child is Note:
+			return child
+	return null

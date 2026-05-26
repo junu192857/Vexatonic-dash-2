@@ -252,14 +252,8 @@ func _on_move_preview():
 		if (check_mouse_in_available_area()):
 			generate_modify_preview()
 		else:
-			if (previous_connector or next_connector):
-				cancel_modify()
-			if (keyframe_indicator != null):
-				keyframe_indicator.queue_free()
-				keyframe_indicator = null
-			if (target_note != null):
-				target_note.process_color()
-				target_note = null
+			cancel_modify_lane()
+			cancel_modify_note()
 	else:
 		if (preview == null):
 			if (check_mouse_in_available_area()):
@@ -380,6 +374,7 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 				if (existing_marker == null):
 					existing_marker = NOTE_SCENE.instantiate()
 					preview.add_child(existing_marker)
+					existing_marker.is_marker = true
 					existing_marker.set_color(selected_color)
 				long_end_time = Setting.get_time_from_posx(existing_marker.global_position.x)
 				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
@@ -453,6 +448,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			
 			var my_marker = NOTE_SCENE.instantiate()
 			my_preview.add_child(my_marker)
+			my_marker.is_marker = true
 			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 			my_marker.set_color(selected_color)
 			long_end_time = Setting.get_time_from_posx(my_marker.global_position.x)
@@ -505,15 +501,39 @@ func generate_modify_preview():
 						next_connector.start_keyframe = new_keyframe
 						next_connector.set_data_from_keyframes()
 				else:
-					cancel_modify()
+					cancel_modify_lane()
 					return
 				if (keyframe_indicator == null):
 					keyframe_indicator = put_keyframe_indicator(new_keyframe)
 				keyframe_indicator.global_position = Vector2(snapped_x, mouse_pos.y)
 			NoteSelection.ModifyNote:
-				pass
+				target_note.select_color()
+				var lane_start_x = Setting.get_posx_from_time(target_lane.keyframes[0].kf.x)
+				var lane_end_x = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
+				
+				if target_note.data.type == 0:  # 단노트
+					if snapped_x < lane_start_x or snapped_x > lane_end_x:
+						cancel_modify_note()
+						return
+					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+				
+				elif target_note.data.type == 1 and not target_note.is_marker:  # 롱노트 앞부분
+					var long_end_x = Setting.get_posx_from_time(target_note.data.end_time)
+					if snapped_x < lane_start_x or snapped_x > long_end_x:
+						cancel_modify_note()
+						return
+					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+				
+				else:  # 롱노트 뒷부분
+					var long_start_x = Setting.get_posx_from_time(target_note.data.time)
+					if snapped_x < long_start_x or snapped_x > lane_end_x:
+						cancel_modify_note()
+						return
+					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 
-func cancel_modify():
+func cancel_modify_lane():
+	if (!target_keyframe):
+		return
 	if (target_keyframe.lane_index != -1):
 		if previous_connector:
 			previous_connector.end_keyframe = target_keyframe
@@ -530,6 +550,10 @@ func cancel_modify():
 	if (keyframe_indicator != null):
 		keyframe_indicator.queue_free()
 		keyframe_indicator = null
+
+func cancel_modify_note():
+	if (target_note != null):
+		target_note.process_color()
 
 func put_keyframe_indicator(keyframe: Keyframe):
 	var indicator = NOTE_SCENE.instantiate()
@@ -665,6 +689,7 @@ func _place_long_note():
 	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
 	levelData.noteDatas.append(data)
 	preview.set_data(data)
+	preview.get_marker().set_data(data)
 	target_lane.add_note(preview)
 	preview = null
 
@@ -762,7 +787,8 @@ func _on_modify_ready():
 			current_state = EditorState.Placing
 		
 	elif (selected_note == NoteSelection.ModifyNote):
-		pass
+		current_state = EditorState.Placing
+		#이 시점에서 target_lane, target_note 전부 결정 완료
 	else:
 		push_error("Please select Modify button")
 
@@ -800,7 +826,7 @@ func _on_delete_something():
 	match selected_note:
 		NoteSelection.ModifyLane:
 			if (target_keyframe.lane_index == -1):
-				cancel_modify()
+				cancel_modify_lane()
 			else:  # 기존 keyframe 삭제
 				if previous_connector == null:
 		# 레인의 첫 번째 keyframe: next_connector 삭제, 레인 시작점을 next_connector의 end_keyframe으로
@@ -1143,6 +1169,8 @@ func parse(chart_path: String):
 			var marker = NOTE_SCENE.instantiate()
 			note.add_child(marker)
 			marker.set_color(noteData.color)
+			marker.is_marker = true
+			marker.set_data(noteData)
 			marker.global_position = Vector2(Setting.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
 			
 
@@ -1217,12 +1245,19 @@ func find_target_note() -> Variant:
 		if noteData.type == 0:  # 단노트
 			if abs(mouse_pos.x - note_x) <= Setting.NOTE_WIDTH and \
 			   abs(mouse_pos.y - note_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				target_lane = lane
 				return find_enote_by_data(lane, noteData)
 		else:  # 롱노트
 			var end_x = Setting.get_posx_from_time(noteData.end_time)
-			if mouse_pos.x >= note_x and mouse_pos.x <= end_x and \
+			var end_y = lane.get_height(noteData.end_time)
+			if abs(mouse_pos.x - note_x) <= Setting.NOTE_WIDTH and \
 			   abs(mouse_pos.y - note_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				target_lane = lane
 				return find_enote_by_data(lane, noteData)
+			elif abs(mouse_pos.x - end_x) <= Setting.NOTE_WIDTH and \
+				 abs(mouse_pos.y - end_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+				target_lane = lane
+				return find_enote_by_data(lane, noteData).get_marker()
 	
 	return null
 
