@@ -15,6 +15,7 @@ enum Judgement { VEXATONIC = 0, SPARKLIC = 1, WILD = 2, MISS = 3, PASS = 4 }
 var data: NoteData
 
 var is_hit := false
+var is_marker
 
 #=============== NoteData 값 가져오기 =======================
 func get_time() -> float:
@@ -64,10 +65,18 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	return judgement
 	
 func process_color():
-	sprite.modulate = PROCESSED_COLORS[data.color]
+	sprite.modulate = PROCESSED_COLORS[get_data().color]
 	
 func get_marker() -> Note:
+	if is_marker:
+		return null
 	for child in get_children():
 		if child is Note:
 			return child
 	return null
+
+func get_data() -> NoteData:
+	if is_marker:
+		return get_parent().data
+	else:
+		return data
