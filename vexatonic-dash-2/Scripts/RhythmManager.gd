@@ -4,6 +4,7 @@ var levelData: LevelData
 
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
+@onready var camera = $CameraManager
 
 var characters: Array[Character]
 var time: float
@@ -77,8 +78,8 @@ func _process(delta):
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
-
-
+			
+	camera.move(time)
 #============================== Chart Rendering ===================================
 
 @export var NOTE_SCENE: PackedScene
