@@ -25,3 +25,5 @@ CONNECTOR_SCENE = ExtResource("4_wjq5j")
 script = ExtResource("6_4pq8y")
 
 [node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+
+[node name="InputReader" type="Node2D" parent="RhythmManager" unique_id=742858960]
