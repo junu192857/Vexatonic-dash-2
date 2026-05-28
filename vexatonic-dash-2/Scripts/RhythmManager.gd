@@ -31,10 +31,14 @@ func _ready() -> void:
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
-	
+	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
+		if a.lane != b.lane:
+			return a.lane < b.lane
+		return a.time < b.time
+	)
 	# 채보 찍기
 	render_chart()
-	sort_notes()
+	sort_note_holders()
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
 	stream.data = FileAccess.get_file_as_bytes("res://Charts/Test" + "/" +  levelData.music_path)
@@ -81,15 +85,14 @@ func _process(delta):
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
-			
+	
+	for holder in noteHolders:
+		holder.check_miss(time)
+	
 	camera.move(time)
 
-func sort_notes():
-	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
-		if a.lane != b.lane:
-			return a.lane < b.lane
-		return a.time < b.time
-	)
+func sort_note_holders():
+
 	for holder in noteHolders:
 		holder.sort_notes()
 		print("HELLO")
