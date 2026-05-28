@@ -9,6 +9,8 @@ var is_init: bool
 
 var editor_connectors: Array[EConnector]
 
+var ingame_character: Character
+
 func _init(p_index: int, p_is_init: bool):
 	lane_index = p_index
 	is_init = p_is_init

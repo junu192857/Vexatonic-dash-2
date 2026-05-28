@@ -66,10 +66,15 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	is_hit = true
 	print("Hello! Your Judgement is %d" % judgement)
 	return judgement
-	
+
 func process_color():
 	sprite.modulate = PROCESSED_COLORS[get_data().color]
-	
+
+func missed(time: float) -> bool:
+	if (get_data().time + WILD_MS < time):
+		return true
+	return false
+
 func get_marker() -> Note:
 	if is_marker:
 		return null

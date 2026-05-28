@@ -14,6 +14,8 @@ var music_start_tick: float
 #어느 레인까지 캐릭터가 생성되었는지 체크하는 용도
 var lane_index: int
 
+var noteHolders: Array[NoteHolder]
+
 const COUNTDOWN_TIME = 3000
 
 # Called when the node enters the scene tree for the first time.
@@ -21,18 +23,18 @@ func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
+	
+	for i in range(3):
+		noteHolders.append(NoteHolder.new(i))
+	
 	levelData = ChartParser.parse("res://Charts/Test", 0)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
-	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
-		if a.lane != b.lane:
-			return a.lane < b.lane
-		return a.time < b.time
-	)
+	
 	
 	# 채보 찍기
 	render_chart()
-	
+	sort_notes()
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
 	stream.data = FileAccess.get_file_as_bytes("res://Charts/Test" + "/" +  levelData.music_path)
@@ -41,7 +43,8 @@ func _ready() -> void:
 	
 	#print(levelData.noteDatas.size())
 	for lane:Lane in levelData.lanes:
-		lane.print_data()
+		#lane.print_data()
+		pass
 	
 	# 최초의 lane들에 캐릭터 생성
 	for lane in levelData.lanes:
@@ -80,6 +83,17 @@ func _process(delta):
 			characters.erase(character)
 			
 	camera.move(time)
+
+func sort_notes():
+	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
+		if a.lane != b.lane:
+			return a.lane < b.lane
+		return a.time < b.time
+	)
+	for holder in noteHolders:
+		holder.sort_notes()
+		print("HELLO")
+
 #============================== Chart Rendering ===================================
 
 @export var NOTE_SCENE: PackedScene
@@ -95,6 +109,8 @@ func _process(delta):
 
 
 func render_chart():
+
+	
 	var pos_x
 	var previous_time = -1
 	var previous_note
@@ -120,7 +136,7 @@ func render_chart():
 			previous_note = marker;
 			
 	for lane:Lane in levelData.lanes:
-		lane.print_data()
+		#lane.print_data()
 		lane.sort_notes()
 		place_initial_connector(lane)
 		place_final_connector(lane)
@@ -138,7 +154,7 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 		note.global_position = Vector2(pos_x, lane.get_height(data.end_time))
 		lane.adjust_keyframe(data.end_time, note.global_position.y)
 	
-	print("Place Note at x: %f y: %f"% [pos_x, note.global_position.y])
+	#print("Place Note at x: %f y: %f"% [pos_x, note.global_position.y])
 	return note
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false
@@ -188,6 +204,7 @@ func place_final_connector(lane: Lane):
 func assign_note(note: Note):
 	var lane = Lane.find_lane(levelData.lanes, note.get_data().lane)
 	lane.add_note(note)
+	noteHolders[note.get_data().color].notes.append(note)
 
 #==================================================================================
 
@@ -199,19 +216,13 @@ func assign_note(note: Note):
 
 #================================== Input Reading =================================
 
-var total_judgements:Array[int] = [0, 0, 0, 0]
-
 func _on_pressed(p_color:int):
 	var pressed_ms = time
-	#print("Hello! your color is: %d and pressed_ms: %f and time: %f and character_posx: %f" % [p_color, pressed_ms, time, character.position.x])
+	var target_holder = noteHolders[p_color]
+	target_holder.process_input(time)
 	
-	for lane:Lane in levelData.lanes:
-		if (lane.notes.size() <= lane.note_index):
-			continue
-		else:
-			var judgement = lane.notes[lane.note_index].process_input(p_color, pressed_ms)
-			if (judgement < 4): #not pass
-				lane.note_index += 1
-				break
+	
+	
+
 
 #===================================================================================
