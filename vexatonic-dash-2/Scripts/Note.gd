@@ -66,6 +66,7 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	process_color()
 	is_hit = true
 	print("Hello! Your Judgement is %d" % judgement)
+	spread_judgement(judgement, self)
 	return judgement
 
 # 롱노트 시작점 판정. 윈도우 밖이더라도 is_holding은 항상 true로 설정.
@@ -86,6 +87,7 @@ func process_long_press(p_color: int, pressed_ms: float) -> int:
 		Judgement.WILD
 	)
 	print("Long note start! Judgement: %d" % judgement)
+	spread_judgement(judgement, self)
 	return judgement
 
 # 롱노트 끝점 판정 (키 릴리즈). end_time - WILD_MS ~ end_time 사이 릴리즈 시 VEXATONIC.
@@ -98,6 +100,7 @@ func process_long_release(p_color: int, released_ms: float) -> int:
 		end_judged = true
 		print("Long note end! VEXATONIC from release")
 		get_marker().process_color()
+		spread_judgement(Judgement.VEXATONIC, get_marker())
 		return Judgement.VEXATONIC
 	return Judgement.PASS
 
@@ -112,9 +115,11 @@ func check_long_end(time: float) -> int:
 		if is_holding:
 			print("Long note end! VEXATONIC from hold")
 			get_marker().process_color()
+			spread_judgement(Judgement.VEXATONIC, get_marker())
 			return Judgement.VEXATONIC
 		else:
 			print("Long note end! MISS")
+			spread_judgement(Judgement.MISS, get_marker())
 			return Judgement.MISS
 	return Judgement.PASS
 
@@ -126,13 +131,18 @@ func missed(time: float) -> bool:
 		# 롱노트: 시작점 윈도우가 지났으면 시작점 Miss
 		if get_data().time + WILD_MS < time and !is_hit:
 			is_hit = true
+			spread_judgement(Judgement.MISS, self)
 			return true
 		return false
 	# 단노트
 	if get_data().time + WILD_MS < time and !is_hit:
 		is_hit = true
+		spread_judgement(Judgement.MISS, self)
 		return true
 	return false
+
+func spread_judgement(judgement: int, note: Note):
+	print("Detect judgement: %d" % judgement)
 
 func get_marker() -> Note:
 	if is_marker:
