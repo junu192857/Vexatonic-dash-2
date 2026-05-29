@@ -71,7 +71,8 @@ func process_color():
 	sprite.modulate = PROCESSED_COLORS[get_data().color]
 
 func missed(time: float) -> bool:
-	if (get_data().time + WILD_MS < time):
+	if (get_data().time + WILD_MS < time and !is_hit):
+		is_hit = true
 		return true
 	return false
 
