@@ -23,6 +23,7 @@ func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
 	InputHandler.note_pressed.connect(_on_pressed)
+	InputHandler.note_released.connect(_on_released)
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
@@ -220,12 +221,10 @@ func assign_note(note: Note):
 #================================== Input Reading =================================
 
 func _on_pressed(p_color:int):
-	var pressed_ms = time
-	var target_holder = noteHolders[p_color]
-	target_holder.process_input(time)
-	
-	
-	
+	noteHolders[p_color].process_input(time)
+
+func _on_released(p_color:int):
+	noteHolders[p_color].process_release(time)
 
 
 #===================================================================================
