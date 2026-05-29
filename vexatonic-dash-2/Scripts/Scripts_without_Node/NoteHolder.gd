@@ -26,7 +26,6 @@ func check_miss(time: float):
 	if active_long_note != null:
 		var end_j = active_long_note.check_long_end(time)
 		if end_j != Note.Judgement.PASS:
-			#TODO: Judgement 전파하기
 			active_long_note = null
 
 	if (notes.size() - 1 < current_index): #모든 노트 처리 완료
@@ -36,7 +35,6 @@ func check_miss(time: float):
 
 	while earliest_unprocessed_index < current_index:
 		if notes[earliest_unprocessed_index].missed(time):
-			#TODO: Judgement_Miss 처리
 			earliest_unprocessed_index += 1
 		elif notes[earliest_unprocessed_index].is_hit:
 			earliest_unprocessed_index += 1
@@ -46,7 +44,6 @@ func check_miss(time: float):
 	if (current_note.missed(time)):
 		if current_note.get_data().type == 1:
 			active_long_note = current_note
-		#TODO: Judgement_Miss 처리
 		move_to_next_note()
 
 
@@ -75,7 +72,6 @@ func process_input(time: float):
 			active_long_note = current_note
 			if earliest_unprocessed_index == current_index:
 				earliest_unprocessed_index += 1
-			#TODO: Judgement 전파하기
 			move_to_next_note()
 		# PASS: 윈도우 밖이지만 is_holding=true — current_note 유지, missed()가 처리
 	else:
@@ -83,7 +79,6 @@ func process_input(time: float):
 		if (0 <= judgement and judgement < 4):
 			if (earliest_unprocessed_index == current_index):
 				earliest_unprocessed_index += 1
-			#TODO: Judgement 전파하기
 			move_to_next_note()
 
 # 키 릴리즈 시 호출. 활성 롱노트 끝점 판정.
@@ -92,7 +87,6 @@ func process_release(time: float):
 		return
 	var judgement = active_long_note.process_long_release(color, time)
 	if judgement != Note.Judgement.PASS:
-		#TODO: Judgement 전파하기
 		active_long_note = null
 
 func move_to_next_note():
