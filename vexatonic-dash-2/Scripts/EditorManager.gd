@@ -760,7 +760,7 @@ func _place_lane_case2():
 	new_lane.add_keyframe(new_end_keyframe)
 	print("New initial line added with initial y %f and next y %f" % [lane_start_pos.y,preview.get_end_pos(lane_start_pos).y ])
 	levelData.lanes.append(new_lane)
-	target_lane.add_editor_connector(preview)
+	new_lane.add_editor_connector(preview)
 	preview.set_editor_values(new_lane, new_start_keyframe, new_end_keyframe)
 
 func _place_lane_case3():
@@ -784,8 +784,10 @@ func _on_modify():
 
 func _on_modify_ready():
 	if (selected_note == NoteSelection.ModifyLane):
+		print("Target lane index: %d" % target_lane.lane_index)
 		if target_keyframe.lane_index == -1:  # Adding new keyframe
 			# 1. previous_connector 찾기
+			print("Finding previous connector..")
 			for connector in target_lane.editor_connectors:
 				var conn_start_x = Setting.get_posx_from_time(connector.start_keyframe.kf.x)
 				var target_x = Setting.get_posx_from_time(target_keyframe.kf.x)
