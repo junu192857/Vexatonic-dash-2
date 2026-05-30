@@ -4,8 +4,8 @@
 [ext_resource type="Script" uid="uid://brm0k422e5mbt" path="res://Scripts/Note.gd" id="2_cp8im"]
 
 [node name="Note" type="Node2D" unique_id=1307802017]
+z_index = 1
 script = ExtResource("2_cp8im")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729566812]
-z_index = 1
 texture = ExtResource("1_6w4eq")
