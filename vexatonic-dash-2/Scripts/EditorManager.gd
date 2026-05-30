@@ -216,6 +216,8 @@ var target_note: ENote
 var mouse_pos: Vector2
 var snapped_x: float
 
+var can_do_something
+
 func _on_select_note(selected: int):
 	if (!editor_ready):
 		return
@@ -266,6 +268,7 @@ func _on_move_preview():
 
 # Modify 과정에서 설정된 값들 전부 초기화.
 func cleanup_modify_values():
+	can_do_something = false
 	target_keyframe = null
 	if (keyframe_indicator != null):
 		keyframe_indicator.queue_free()
@@ -284,28 +287,26 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
 			if lane_case == LanePlacingCase.None:
-				preview.queue_free()
-				preview = null
+				cancel_put_lane_or_note()
 			else: 
 				preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
+				can_do_something = true
 		else:
 			if (lane_start_pos.x >= snapped_x):
-				preview.queue_free()
-				preview = null
+				cancel_put_lane_or_note()
 			else:
 				preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
+				can_do_something = true
 	else:
 		if (current_state == EditorState.Ready):
 			note_case = find_note_placing_available(mouse_pos)
 			if (!note_case):
-				preview.queue_free()
-				preview = null
+				cancel_put_lane_or_note()
 			else:
 				preview.position = get_preview_pos_for_note(mouse_pos)
 		else:
 			if (!find_longNote_placing_available(mouse_pos, snapped_x)):
-				preview.queue_free()
-				preview = null
+				cancel_put_lane_or_note()
 			else:
 				var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2.0
 				var connector_end_x = snapped_x - Setting.NOTE_WIDTH / 2.0
@@ -378,7 +379,8 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 					existing_marker.set_color(selected_color)
 				long_end_time = Setting.get_time_from_posx(existing_marker.global_position.x)
 				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
-		
+				
+				can_do_something = true
 #새로운 노트나 레인을 찍기 위한 preview를 만드는 함수.
 func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> Node2D:
 	if (selected == NoteSelection.Nothing):
@@ -389,6 +391,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case(mouse_pos)
 			if lane_case == LanePlacingCase.None:
+				cancel_put_lane_or_note()
 				return null
 			else:
 				my_preview = CONNECTOR_SCENE.instantiate()
@@ -396,6 +399,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 				my_preview.position = get_preview_pos_for_lane(mouse_pos, lane_case)
 		else:
 			if (lane_start_pos.x >= snapped_x):
+				cancel_put_lane_or_note()
 				return null
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
@@ -406,6 +410,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 		if (current_state == EditorState.Ready):
 			note_case = find_note_placing_available(mouse_pos)
 			if (!note_case):
+				cancel_put_lane_or_note()
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
@@ -413,6 +418,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			my_preview.set_color(selected_color)
 		else: #Note이고 Placing인 경우: 무조건 LongNote
 			if (!find_longNote_placing_available(mouse_pos, snapped_x)):
+				cancel_put_lane_or_note()
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
@@ -452,6 +458,8 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 			my_marker.set_color(selected_color)
 			long_end_time = Setting.get_time_from_posx(my_marker.global_position.x)
+			
+	can_do_something = true
 	return my_preview
 
 func generate_modify_preview():
@@ -534,8 +542,15 @@ func generate_modify_preview():
 						return
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
+	can_do_something = true
+func cancel_put_lane_or_note():
+	if (preview):
+		preview.queue_free()
+		preview = null
+		can_do_something = false
 
 func cancel_modify_lane():
+	can_do_something = false
 	if (!target_keyframe):
 		return
 	if (target_keyframe.lane_index != -1):
@@ -555,7 +570,10 @@ func cancel_modify_lane():
 		keyframe_indicator.queue_free()
 		keyframe_indicator = null
 
+	
+
 func cancel_modify_note():
+	can_do_something = false
 	if (target_note != null):
 		target_note.process_color()
 		if (current_state == EditorState.Placing):
@@ -668,7 +686,7 @@ func get_preview_pos_for_note(mouse_pos: Vector2) -> Vector2:
 	return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 
 func _on_put_note():
-	if !editor_ready or preview == null or !check_mouse_in_available_area():
+	if !editor_ready or !can_do_something or !check_mouse_in_available_area():
 		return
 	if current_state == EditorState.Ready:
 		_on_put_note_ready()
@@ -755,7 +773,7 @@ func _place_lane_case3():
 
 func _on_modify():
 	print("Hello from modify")
-	if !editor_ready or !check_mouse_in_available_area():
+	if !editor_ready or !check_mouse_in_available_area() or !can_do_something:
 		return
 	match current_state:
 		EditorState.Ready:
