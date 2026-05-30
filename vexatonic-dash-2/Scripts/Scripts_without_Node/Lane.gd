@@ -21,9 +21,9 @@ func adjust_keyframe(note_time: float, note_height: float):
 	var second_time = note_time + Setting.time_per_note_width / 2
 	var first_keyframe = Keyframe.new(first_time, note_height)
 	var second_keyframe = Keyframe.new(second_time, note_height)
+	var deleted = delete_middle_keyframe(first_time, second_time)
 	insert_keyframe(first_keyframe)
 	insert_keyframe(second_keyframe)
-	var deleted = delete_middle_keyframe(first_time, second_time)
 	if (deleted != null):
 		if (deleted.kf.y != note_height):
 			var deleted2 = delete_middle_keyframe(second_time, second_time + Setting.EPSILON)
@@ -55,6 +55,7 @@ func delete_middle_keyframe(time1: float, time2: float):
 		return null
 
 	deleted.sort_custom(func(a: Keyframe, b: Keyframe): return a.kf.x < b.kf.x)
+	print("deleted %d keyframes" % deleted.size())
 	return deleted[-1]
 
 func print_data():
