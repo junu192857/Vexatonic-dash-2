@@ -124,7 +124,8 @@ func set_bit(p_bit: int):
 #현재 camera의 zoom과 position에 맞춰서 마디 구분선 출력
 func place_bar_lines():
 	for bar in line_holder.get_children():
-		bar.queue_free()
+		if (bar != music_bar):
+			bar.queue_free()
 	
 	var effective_bit = bit if bit != 0 else 4
 	
