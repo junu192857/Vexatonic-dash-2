@@ -673,7 +673,7 @@ func find_note_placing_available() -> bool:
 		elif (snapped_x - lane_x_end < Setting.EPSILON):
 			snapped_x -= Setting.EPSILON
 		if snapped_x >= lane_x_start and snapped_x <= lane_x_end:
-			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
+			var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				set_target_lane(lane)
 				return true
