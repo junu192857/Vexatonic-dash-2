@@ -28,7 +28,7 @@ func _ready() -> void:
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
 	
-	levelData = ChartParser.parse("res://Charts/Test", 0)
+	levelData = ChartParser.parse("res://Charts/ShortLongTest", 0)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
@@ -183,8 +183,8 @@ func place_initial_connector(lane: Lane):
 		if (lane.is_init):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
-			var initial_connector = place_connector(-1, -3000, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
-									self, Vector2(Setting.get_posx_from_time(-3000),0))
+			var initial_connector = place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 		else:
 			if (lane.keyframes[0].kf.x < lane.notes[0].get_time()):
 				var initial_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
