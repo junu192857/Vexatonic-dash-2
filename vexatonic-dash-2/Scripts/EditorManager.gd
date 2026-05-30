@@ -24,6 +24,7 @@ func _ready():
 	inputHandler.move_preview.connect(_on_move_preview)
 	inputHandler.put_note.connect(_on_put_note)
 	inputHandler.delete_something.connect(_on_delete_something)
+	inputHandler.toggle_shifting.connect(_on_toggle_shifting)
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
@@ -216,6 +217,8 @@ var target_note: ENote
 
 var mouse_pos: Vector2
 var snapped_x: float
+var adjusted_y: float
+var shifting: bool
 
 var can_do_something
 
@@ -296,7 +299,7 @@ func update_preview(selected: int, mouse_pos: Vector2, snapped_x: float):
 			if (lane_start_pos.x >= snapped_x):
 				cancel_put_lane_or_note()
 			else:
-				preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
+				preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
 				can_do_something = true
 	else:
 		if (current_state == EditorState.Ready):
@@ -405,7 +408,7 @@ func generate_preview(selected: int, mouse_pos: Vector2, snapped_x: float) -> No
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
 			add_child(my_preview)
-			my_preview.set_data(lane_start_pos, Vector2(snapped_x, mouse_pos.y))
+			my_preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
 			my_preview.position = lane_start_pos
 	else: #Note인 경우
 		if (current_state == EditorState.Ready):
@@ -498,7 +501,14 @@ func generate_modify_preview():
 				#var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
 				var prev_x = Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x) if previous_connector else -INF
 				var next_x = Setting.get_posx_from_time(next_connector.end_keyframe.kf.x) if next_connector else INF
-				var new_keyframe = Keyframe.new(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+				if not shifting:
+					adjusted_y = mouse_pos.y
+				else:
+					if previous_connector:
+						adjusted_y = previous_connector.start_keyframe.kf.y
+					elif next_connector:
+						adjusted_y = next_connector.end_keyframe.kf.y
+				var new_keyframe = Keyframe.new(Setting.get_time_from_posx(snapped_x), adjusted_y)
 				new_keyframe.set_lane(target_lane.lane_index)
 				if snapped_x > prev_x + Setting.EPSILON and snapped_x < next_x - Setting.EPSILON:
 					if previous_connector:
@@ -514,7 +524,7 @@ func generate_modify_preview():
 					return
 				if (keyframe_indicator == null):
 					keyframe_indicator = put_keyframe_indicator(new_keyframe)
-				keyframe_indicator.global_position = Vector2(snapped_x, mouse_pos.y)
+				keyframe_indicator.global_position = Vector2(snapped_x, adjusted_y)
 			NoteSelection.ModifyNote:
 				target_note.select_color()
 				var lane_start_x = Setting.get_posx_from_time(target_lane.keyframes[0].kf.x)
@@ -830,7 +840,7 @@ func _on_modify_placing():
 	if selected_note == NoteSelection.ModifyLane:
 		if (target_keyframe.lane_index == -1):
 			# 1. target_keyframe을 현재 마우스 위치로 수정 (in-place, to preserve connector references)
-			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), adjusted_y)
 			previous_connector.end_keyframe = target_keyframe
 			previous_connector.set_data_from_keyframes()
 			next_connector.start_keyframe = target_keyframe
@@ -838,7 +848,7 @@ func _on_modify_placing():
 			target_lane.insert_editor_connector(next_connector)
 			target_lane.insert_keyframe(target_keyframe)
 		else:
-			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), mouse_pos.y)
+			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), adjusted_y)
 			if previous_connector:
 				previous_connector.end_keyframe = target_keyframe
 				previous_connector.set_data_from_keyframes()
@@ -1338,4 +1348,7 @@ func move_only_parent(parent: Node2D, pos: Vector2):
 	
 	for i in range(fixed_children.size()):
 		fixed_children[i].global_position = saved_positions[i]
-	
+
+func _on_toggle_shifting(pressed: bool):
+	shifting = pressed
+	_on_move_preview()
