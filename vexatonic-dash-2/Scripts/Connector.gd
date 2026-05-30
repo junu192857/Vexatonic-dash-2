@@ -11,7 +11,6 @@ const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Colo
 
 
 func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: bool) -> float:
-	print("Calling set_connector_data with %d, %f, %f" % [p_color, start_time, end_time])
 	lane = p_lane
 	var calculated_delta_y: float = 0.0
 	var start_height
@@ -20,17 +19,14 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 					   p_lane.get_height(start_time)
 					
 # 다음 keyframe이 나오기 전까지만 찍도록 end_time 조정
-		print("Start height: %f" % start_height)
 		for kf in p_lane.keyframes:
 			if kf.kf.x > start_time:
-				if kf.kf.x >= end_time:
+				if kf.kf.x >= end_time: #이게 마지막 connector인 경우.
 					calculated_delta_y = p_lane.get_height(end_time) - start_height
-				else:
+				else: # 앞으로 connector가 더 나오는 경우.
 					calculated_delta_y = kf.kf.y - start_height
 					end_time = kf.kf.x
 				break
-				
-	print("Calculated_delta_y = %f" % calculated_delta_y)
 	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)
 	return end_time
 

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="2_vdcar"]
 
 [node name="Note" type="Node2D" unique_id=1307802017]
+z_index = 1
 script = ExtResource("1_1f3cg")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729566812]

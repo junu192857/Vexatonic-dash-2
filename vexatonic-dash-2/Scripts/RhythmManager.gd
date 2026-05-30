@@ -28,7 +28,7 @@ func _ready() -> void:
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
 	
-	levelData = ChartParser.parse("res://Charts/ShortLongTest", 0)
+	levelData = ChartParser.parse("res://Charts/YOUNITHM", 0)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
@@ -42,7 +42,7 @@ func _ready() -> void:
 	sort_note_holders()
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
-	stream.data = FileAccess.get_file_as_bytes("res://Charts/Test" + "/" +  levelData.music_path)
+	stream.data = FileAccess.get_file_as_bytes("res://Charts/YOUNITHM" + "/" +  levelData.music_path)
 	musicPlayer.stream = stream
 	
 	
@@ -157,6 +157,7 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 	else:
 		note.global_position = Vector2(pos_x, lane.get_height(data.end_time))
 		lane.adjust_keyframe(data.end_time, note.global_position.y)
+		
 	
 	#print("Place Note at x: %f y: %f"% [pos_x, note.global_position.y])
 	return note
