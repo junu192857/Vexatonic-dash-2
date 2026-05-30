@@ -112,6 +112,7 @@ func check_long_end(time: float) -> int:
 		end_judged = true
 		if not is_hit:
 			is_hit = true
+			spread_judgement(Judgement.MISS, self)
 		if is_holding:
 			print("Long note end! VEXATONIC from hold")
 			get_marker().process_color()
