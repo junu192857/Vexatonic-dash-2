@@ -113,8 +113,6 @@ func sort_note_holders():
 
 
 func render_chart():
-
-	
 	var pos_x
 	var previous_time = -1
 	var previous_note
@@ -123,7 +121,7 @@ func render_chart():
 		pos_x = Setting.get_posx_from_time(noteData.time)
 		var cur_note = place_note(noteData, pos_x, false, self)
 		assign_note(cur_note)
-		if (previous_time >= 0):
+		if (previous_time >= 0 and previous_lane == noteData.lane):
 			var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
 							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 	
@@ -136,6 +134,8 @@ func render_chart():
 			var marker = place_note(noteData, end_pos_x, true, cur_note)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
 							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
+			if (connector):
+				connector.z_index = 1
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
@@ -176,7 +176,7 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 
 	parent.add_child(connector)
 	connector.position = p_pos
-	
+	return connector
 	
 # 레인의 첫 번째 노트 이전의 Connector 생성. 첫 번째 노트가 없으면 패스
 func place_initial_connector(lane: Lane):

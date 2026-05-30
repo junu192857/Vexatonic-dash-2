@@ -5,6 +5,7 @@
 
 [node name="Note" type="Node2D" unique_id=1307802017]
 z_index = 1
+z_as_relative = false
 script = ExtResource("1_1f3cg")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729566812]
