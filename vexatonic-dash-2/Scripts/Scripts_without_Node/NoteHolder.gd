@@ -43,14 +43,14 @@ func check_miss(time: float):
 		_advance_earliest_unprocessed()
 		return
 
-	# 2-2: 다음 노트가 현재 노트보다 가까우면 강제 Miss 후 이동
-	if current_index + 1 < notes.size():
-		var next_note = notes[current_index + 1]
-		if next_note.get_data().time - time < time - current_note.get_data().time:
-			#_force_start_miss(current_note)
-			move_to_next_note()
-			_advance_earliest_unprocessed()
-			return
+	# 2-2: 다음 노트가 현재 노트보다 가까우면 이동
+	#if current_index + 1 < notes.size():
+	#	var next_note = notes[current_index + 1]
+	#	if next_note.get_data().time - time < time - current_note.get_data().time:
+	#		#_force_start_miss(current_note)
+	#		move_to_next_note()
+	#		_advance_earliest_unprocessed()
+	#		return
 
 	# 시작점 윈도우 경과 → Miss
 	if not current_note.is_hit and time > current_note.get_data().time + Note.WILD_MS:
@@ -92,6 +92,7 @@ func _judge_long_end(note: Note):
 
 # 키 누름: [eu, ci) 범위 롱노트 재홀드 + current_note 시작점 판정
 func process_input(time: float):
+	print("Trying process_input: color: %d, time: %f" % [color, time])
 	for i in range(earliest_unprocessed_index, current_index):
 		if i >= notes.size():
 			break
@@ -101,8 +102,9 @@ func process_input(time: float):
 
 	if notes.size() - 1 < current_index:
 		return
-
+	
 	var judgement = current_note.process_input(color, time)
+	
 	if judgement != Note.Judgement.PASS:
 		if current_note.get_data().type == 1:
 			current_note.is_holding = true
@@ -112,6 +114,7 @@ func process_input(time: float):
 		# 시작점 윈도우 밖이지만 노트 지속 구간 내: 홀드 추적 시작
 		if time >= current_note.get_data().time and time <= current_note.get_data().end_time:
 			current_note.is_holding = true
+	print("end process input: color: %d, time: %f" % [color, time])
 
 # 키 뗌: [eu, ci] 범위 롱노트 is_holding 해제 + 끝점 윈도우 내 릴리즈 시 최고 판정
 func process_release(time: float):

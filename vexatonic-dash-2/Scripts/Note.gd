@@ -48,6 +48,7 @@ func _ready() -> void:
 
 
 func process_input(p_color: int, pressed_ms: float) -> int:
+	print("Processing input: pressed time: %f, note time: %f" % [pressed_ms, data.time])
 	if is_hit: return Judgement.PASS
 	if data.color != p_color: return Judgement.PASS
 	var deltaTime = absf(pressed_ms - data.time)

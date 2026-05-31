@@ -668,9 +668,11 @@ func find_note_placing_available() -> bool:
 	for lane in levelData.lanes:
 		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
 		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
-		if (lane_x_start - snapped_x < Setting.EPSILON):
+		var delta_start = lane_x_start - snapped_x
+		var delta_end = snapped_x - lane_x_end
+		if (0 < delta_start and delta_start < snapped_x):
 			snapped_x += Setting.EPSILON
-		elif (snapped_x - lane_x_end < Setting.EPSILON):
+		elif (0 < delta_end and delta_end < Setting.EPSILON):
 			snapped_x -= Setting.EPSILON
 		if snapped_x >= lane_x_start and snapped_x <= lane_x_end:
 			var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
@@ -685,7 +687,8 @@ func find_longNote_placing_available() -> bool:
 	if (long_start_pos.x >= snapped_x):
 		return false
 	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
-	if (snapped_x - lane_x_end < Setting.EPSILON):
+	var delta = snapped_x - lane_x_end
+	if (0 < delta and delta < Setting.EPSILON):
 		snapped_x -= Setting.EPSILON
 		print("Adjusted snapped_x. new x is %f and new time is %f" % [snapped_x, Setting.get_time_from_posx(snapped_x)])
 	if (snapped_x > lane_x_end):

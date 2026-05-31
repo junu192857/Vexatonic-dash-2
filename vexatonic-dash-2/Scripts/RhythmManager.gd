@@ -17,6 +17,7 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
+const level_path = "res://Charts/YOUNITHM"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -28,7 +29,7 @@ func _ready() -> void:
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
 	
-	levelData = ChartParser.parse("res://Charts/YOUNITHM", 0)
+	levelData = ChartParser.parse(level_path, 0)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
@@ -42,7 +43,7 @@ func _ready() -> void:
 	sort_note_holders()
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
-	stream.data = FileAccess.get_file_as_bytes("res://Charts/YOUNITHM" + "/" +  levelData.music_path)
+	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.music_path)
 	musicPlayer.stream = stream
 	
 	
@@ -89,11 +90,10 @@ func _process(delta):
 	
 	for holder in noteHolders:
 		holder.check_miss(time)
-	
+
 	camera.move(time)
 
 func sort_note_holders():
-
 	for holder in noteHolders:
 		holder.sort_notes()
 		print("HELLO")
