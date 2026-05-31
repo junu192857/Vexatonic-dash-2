@@ -25,6 +25,7 @@ func _ready():
 	inputHandler.put_note.connect(_on_put_note)
 	inputHandler.delete_something.connect(_on_delete_something)
 	inputHandler.toggle_shifting.connect(_on_toggle_shifting)
+	inputHandler.move_to_last_note.connect(_on_move_to_last_note)
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
@@ -711,6 +712,8 @@ func get_preview_pos_for_note() -> Vector2:
 func _on_put_note():
 	if !editor_ready or !can_do_something or !check_mouse_in_available_area():
 		return
+	if (preview == null):
+		return
 	if current_state == EditorState.Ready:
 		_on_put_note_ready()
 	else:
@@ -1362,5 +1365,13 @@ func move_only_parent(parent: Node2D, pos: Vector2):
 		fixed_children[i].global_position = saved_positions[i]
 
 func _on_toggle_shifting(pressed: bool):
+	if (!editor_ready):
+		return
 	shifting = pressed
 	_on_move_preview()
+	
+func _on_move_to_last_note():
+	if (!editor_ready):
+		return
+	var last_note = levelData.noteDatas.reduce(func(a, b): return a if a.time > b.time else b)
+	camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
