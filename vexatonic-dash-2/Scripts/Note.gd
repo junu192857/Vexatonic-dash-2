@@ -16,7 +16,8 @@ var data: NoteData
 
 var is_hit := false
 var is_marker
-var is_holding := false  # 롱노트: 현재 키가 눌려 있는지
+var is_holding_left := false
+var is_holding_right := false  # 롱노트: 현재 키가 눌려 있는지
 var end_judged := false  # 롱노트: 끝점 판정 완료 여부
 
 #=============== NoteData 값 가져오기 =======================
@@ -48,6 +49,7 @@ func _ready() -> void:
 
 
 func process_input(p_color: int, pressed_ms: float) -> int:
+	print("Processing input: pressed time: %f, note time: %f" % [pressed_ms, data.time])
 	if is_hit: return Judgement.PASS
 	if data.color != p_color: return Judgement.PASS
 	var deltaTime = absf(pressed_ms - data.time)
@@ -75,6 +77,27 @@ func get_marker() -> Note:
 		if child is Note:
 			return child
 	return null
+
+func start_hold(is_left: bool):
+	if is_left:
+		is_holding_left = true
+	else:
+		is_holding_right = true
+
+func release_hold(is_left: bool):
+	if is_left:
+		is_holding_left = false
+	else:
+		is_holding_right = false
+
+func get_is_holding(is_left: bool):
+	if is_left:
+		return is_holding_left
+	else:
+		return is_holding_right
+
+func is_holding_anyway():
+	return is_holding_left or is_holding_right
 
 func get_data() -> NoteData:
 	if is_marker:

@@ -24,6 +24,6 @@ static func get_time_from_posx(posx_float: float) -> float:
 	
 static var time_per_note_width = NOTE_WIDTH / (PX_PER_MS * speed)
 
-static var EPSILON = 0.001
+static var EPSILON = 0.1
 
 static var INFINITE = 99999999
