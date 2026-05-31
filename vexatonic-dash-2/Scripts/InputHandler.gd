@@ -1,28 +1,27 @@
 extends Node
 
-signal note_pressed(note_color: int)
-signal note_released(note_color: int)
+signal note_pressed(note_color: int, is_left: bool)
+signal note_released(note_color: int, is_left: bool)
 signal right_pressed(released: bool)
 
 enum NoteColor { RED = 0, BLUE = 1, YELLOW = 2 }
 
+const KEY_MAP = [
+	["a", NoteColor.RED, true],
+	["l", NoteColor.RED, false],
+	["s", NoteColor.BLUE, true],
+	["k", NoteColor.BLUE, false],
+	["d", NoteColor.YELLOW, true],
+	["j", NoteColor.YELLOW, false],
+]
+
 		
 func _input(event):
-	if event.is_action_pressed("a") or \
-	   event.is_action_pressed("l"):
-		note_pressed.emit(NoteColor.RED)
-	if event.is_action_pressed("s") or \
-	   event.is_action_pressed("k"):
-		note_pressed.emit(NoteColor.BLUE)
-	if event.is_action_pressed("d") or \
-	   event.is_action_pressed("j"):
-		note_pressed.emit(NoteColor.YELLOW)
-	if event.is_action_released("a") or \
-	   event.is_action_released("l"):
-		note_released.emit(NoteColor.RED)
-	if event.is_action_released("s") or \
-	   event.is_action_released("k"):
-		note_released.emit(NoteColor.BLUE)
-	if event.is_action_released("d") or \
-	   event.is_action_released("j"):
-		note_released.emit(NoteColor.YELLOW)
+	for entry in KEY_MAP:
+		var action = entry[0]
+		var color = entry[1]
+		var is_left = entry[2]
+		if event.is_action_pressed(action):
+			note_pressed.emit(color, is_left)
+		elif event.is_action_released(action):
+			note_released.emit(color, is_left)

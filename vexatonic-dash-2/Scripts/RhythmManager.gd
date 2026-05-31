@@ -17,7 +17,7 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
-const level_path = "res://Charts/YOUNITHM"
+const level_path = "res://Charts/ShortLongTest"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -221,11 +221,11 @@ func assign_note(note: Note):
 
 #================================== Input Reading =================================
 
-func _on_pressed(p_color:int):
-	noteHolders[p_color].process_input(time)
+func _on_pressed(p_color:int, is_left: bool):
+	noteHolders[p_color].process_input(time, is_left)
 
-func _on_released(p_color:int):
-	noteHolders[p_color].process_release(time)
+func _on_released(p_color:int, is_left: bool):
+	noteHolders[p_color].process_release(time, is_left)
 
 
 #===================================================================================

@@ -30,14 +30,16 @@ func check_miss(time: float):
 		if note.get_data().type == 0 and not note.is_hit and time >= note.get_data().time + Note.WILD_MS:
 			_force_start_miss(note)
 		elif note.get_data().type == 1 and not note.end_judged and time >= note.get_data().end_time:
+			print("Trying judge long end: note %d at time %f" % [i, time])
 			_judge_long_end(note)
-	_advance_earliest_unprocessed()
+	_advance_earliest_unprocessed(time)
 
 	if notes.size() - 1 < current_index:
 		return
 
 	# current_note가 롱노트이고 end_time 경과
 	if current_note.get_data().type == 1 and not current_note.end_judged and time >= current_note.get_data().end_time:
+		print("Trying judge long end: current note %d" % current_index)
 		_judge_long_end(current_note)
 		move_to_next_note()
 		_advance_earliest_unprocessed()
@@ -60,12 +62,13 @@ func check_miss(time: float):
 
 # 완전히 처리된 노트를 earliest_unprocessed_index에서 건너뜀
 # 단노트: is_hit 시 완료 / 롱노트: end_judged 시 완료
-func _advance_earliest_unprocessed():
+func _advance_earliest_unprocessed(time: float = 0):
 	while earliest_unprocessed_index < notes.size():
 		var note = notes[earliest_unprocessed_index]
 		var done = (note.get_data().type == 1 and note.end_judged) or \
 				   (note.get_data().type != 1 and note.is_hit)
 		if done:
+			print("Note index %d: done. time: %f" % [earliest_unprocessed_index, time])
 			earliest_unprocessed_index += 1
 		else:
 			break
@@ -84,21 +87,20 @@ func _judge_long_end(note: Note):
 	if not note.is_hit:
 		note.is_hit = true
 		note.spread_judgement(Note.Judgement.MISS, note)
-	if note.is_holding:
+	if note.is_holding_anyway():
 		note.get_marker().process_color()
 		note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
 	else:
 		note.spread_judgement(Note.Judgement.MISS, note.get_marker())
 
 # 키 누름: [eu, ci) 범위 롱노트 재홀드 + current_note 시작점 판정
-func process_input(time: float):
-	print("Trying process_input: color: %d, time: %f" % [color, time])
+func process_input(time: float, is_left: bool):
 	for i in range(earliest_unprocessed_index, current_index):
 		if i >= notes.size():
 			break
 		var note = notes[i]
 		if note.get_data().type == 1 and not note.end_judged and time <= note.get_data().end_time:
-			note.is_holding = true
+			note.start_hold(is_left)
 
 	if notes.size() - 1 < current_index:
 		return
@@ -107,24 +109,25 @@ func process_input(time: float):
 	
 	if judgement != Note.Judgement.PASS:
 		if current_note.get_data().type == 1:
-			current_note.is_holding = true
+			current_note.start_hold(is_left)
 		move_to_next_note()
 		_advance_earliest_unprocessed()
 	elif current_note.get_data().type == 1:
 		# 시작점 윈도우 밖이지만 노트 지속 구간 내: 홀드 추적 시작
 		if time >= current_note.get_data().time and time <= current_note.get_data().end_time:
-			current_note.is_holding = true
-	print("end process input: color: %d, time: %f" % [color, time])
+			current_note.start_hold(is_left)
 
 # 키 뗌: [eu, ci] 범위 롱노트 is_holding 해제 + 끝점 윈도우 내 릴리즈 시 최고 판정
-func process_release(time: float):
+func process_release(time: float, is_left: bool):
+	print("Trying release input: color: %d, time: %f" % [color, time])
 	var upper = min(current_index, notes.size() - 1)
 	for i in range(earliest_unprocessed_index, upper + 1):
 		var note = notes[i]
 		if note.get_data().type != 1 or note.end_judged:
 			continue
-		if note.is_holding:
-			note.is_holding = false
+		if note.get_is_holding(is_left):
+			note.release_hold(is_left)
+			print("Trying end long: time: %f, end_time: %f" % [time, note.get_data().end_time])
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time:
 				note.end_judged = true
 				if not note.is_hit:
