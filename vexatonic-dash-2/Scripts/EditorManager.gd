@@ -208,7 +208,6 @@ var long_end_time: float
 
 var selected_note: NoteSelection = NoteSelection.Nothing
 var selected_color
-var note_case: bool
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
 
@@ -306,8 +305,7 @@ func update_preview(selected: int):
 				can_do_something = true
 	else:
 		if (current_state == EditorState.Ready):
-			note_case = find_note_placing_available()
-			if (!note_case):
+			if (!find_note_placing_available()):
 				cancel_put_lane_or_note()
 			else:
 				preview.position = get_preview_pos_for_note()
@@ -417,8 +415,7 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.position = lane_start_pos
 	else: #Note인 경우
 		if (current_state == EditorState.Ready):
-			note_case = find_note_placing_available()
-			if (!note_case):
+			if (!find_note_placing_available()):
 				cancel_put_lane_or_note()
 				return null
 			my_preview = NOTE_SCENE.instantiate()
@@ -534,15 +531,13 @@ func generate_modify_preview():
 				target_note.select_color()
 				
 				if target_note.get_data().type == 0:  # 단노트
-					note_case = find_note_placing_available()
 					if (!find_note_placing_available()):
 						cancel_modify_note()
 						return
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 				
 				elif target_note.get_data().type == 1 and not target_note.is_marker:  # 롱노트 앞부분
-					var long_end_x = Setting.get_posx_from_time(target_note.get_data().end_time)
-					if (snapped_x >= long_end_x):
+					if (snapped_x >= Setting.get_posx_from_time(target_note.get_data().end_time)):
 						cancel_modify_note()
 						return
 					if (!find_note_placing_available()):
@@ -666,9 +661,26 @@ func find_lane_placing_case() -> LanePlacingCase:
 	return LanePlacingCase.None
 
 func find_note_placing_available() -> bool:
-	for lane in levelData.lanes:
-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
+	#Ready 단계: 모든 레인에서 노드 위치의 후보를 찾음.
+	if (current_state == EditorState.Ready):
+		for lane in levelData.lanes:
+			var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
+			var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
+			var delta_start = lane_x_start - snapped_x
+			var delta_end = snapped_x - lane_x_end
+			if (0 < delta_start and delta_start < snapped_x):
+				snapped_x += Setting.EPSILON
+			elif (0 < delta_end and delta_end < Setting.EPSILON):
+				snapped_x -= Setting.EPSILON
+			if snapped_x >= lane_x_start and snapped_x <= lane_x_end:
+				var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
+				if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+					set_target_lane(lane)
+					return true
+	#Placing 단계: 오직 target_lane 안에서만 판정함
+	elif (current_state == EditorState.Placing):
+		var lane_x_start = Setting.get_posx_from_time(target_lane.keyframes[0].kf.x)
+		var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
 		var delta_start = lane_x_start - snapped_x
 		var delta_end = snapped_x - lane_x_end
 		if (0 < delta_start and delta_start < snapped_x):
@@ -676,16 +688,13 @@ func find_note_placing_available() -> bool:
 		elif (0 < delta_end and delta_end < Setting.EPSILON):
 			snapped_x -= Setting.EPSILON
 		if snapped_x >= lane_x_start and snapped_x <= lane_x_end:
-			var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
-			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
-				set_target_lane(lane)
-				return true
-	
+			return true
 	return false
+
 
 func find_longNote_placing_available() -> bool:
 	print("Finding..")
-	if (long_start_pos.x >= snapped_x):
+	if (long_start_pos.x >= snapped_x - Setting.EPSILON):
 		return false
 	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
 	var delta = snapped_x - lane_x_end
@@ -695,6 +704,8 @@ func find_longNote_placing_available() -> bool:
 	if (snapped_x > lane_x_end):
 		return false
 	return true
+
+
 
 # Ready 단계에서 Lane의 preview의 위치 구하기.
 func get_preview_pos_for_lane(case: LanePlacingCase) -> Vector2:
@@ -846,6 +857,8 @@ func _on_modify_ready():
 			current_state = EditorState.Placing
 		
 	elif (selected_note == NoteSelection.ModifyNote):
+		if (target_note.get_data().type == 1):
+			long_start_pos = target_note.get_parent().global_position if target_note.is_marker else target_note.global_position
 		current_state = EditorState.Placing
 		#이 시점에서 target_lane, target_note 전부 결정 완료
 	else:
