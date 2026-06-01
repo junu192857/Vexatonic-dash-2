@@ -6,6 +6,7 @@ signal move_preview(mouse_pos: Vector2)
 signal put_note()
 signal delete_something()
 signal toggle_shifting(pressed: bool)
+signal move_to_last_note()
 
 var dragging = false
 var drag_start: Vector2
@@ -27,6 +28,8 @@ func _input(event):
 			delete_something.emit()
 		if event.keycode == KEY_SHIFT:
 			toggle_shifting.emit(event.pressed)
+		if event.keycode == KEY_F:
+			move_to_last_note.emit()
 			
 	if event is InputEventMouseMotion:
 		if dragging:

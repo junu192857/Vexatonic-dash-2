@@ -81,15 +81,23 @@ func check_note_error() -> bool:
 
 func get_height(time_ms: float) -> float:
 	if time_ms < keyframes[0].kf.x:
+		var delta = keyframes[0].kf.x - time_ms
 		if (!is_init):
-			push_error("ERROR: 레인 %d 시작 전에는 높이를 찾을 수 없습니다. (time: %sms)" % [lane_index, time_ms])
-			return 0.0
+			if 0 < delta and delta < Setting.EPSILON:
+				time_ms += Setting.EPSILON
+			else:
+				push_error("ERROR: 레인 %d 시작 전에는 높이를 찾을 수 없습니다. (time: %sms)" % [lane_index, time_ms])
+				return 0.0
 		else:
 			return keyframes[0].kf.y
 
 	if time_ms > keyframes[-1].kf.x:
-		push_error("ERROR: 레인 %d 종료 후에는 높이를 찾을 수 없습니다. (time: %sms)" % [lane_index, time_ms])
-		return 0.0
+		var delta = time_ms - keyframes[-1].kf.x
+		if 0 < delta and delta < Setting.EPSILON:
+			time_ms -= Setting.EPSILON
+		else:
+			push_error("ERROR: 레인 %d 종료 후에는 높이를 찾을 수 없습니다. (last_lane_time: %s) (time: %sms)" % [lane_index, keyframes[-1].kf.x, time_ms])
+			return 0.0
 
 	for i in range(keyframes.size() - 1):
 		var kf_curr = keyframes[i]

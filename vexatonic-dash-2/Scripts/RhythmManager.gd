@@ -17,7 +17,7 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
-const level_path = "res://Charts/ShortLongTest"
+const level_path = "res://Charts/YOUNITHM"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -134,8 +134,6 @@ func render_chart():
 			var marker = place_note(noteData, end_pos_x, true, cur_note)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
 							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
-			if (connector):
-				connector.z_index = 1
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
@@ -176,6 +174,8 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 
 	parent.add_child(connector)
 	connector.position = p_pos
+	if (p_color > -1):
+		connector.z_index = 1
 	return connector
 	
 # 레인의 첫 번째 노트 이전의 Connector 생성. 첫 번째 노트가 없으면 패스
