@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://b6da4bo2wovn0" path="res://Textures/Connector.jpg" id="2_svias"]
 
 [node name="Connector" type="Node2D" unique_id=691671917]
-z_as_relative = false
 script = ExtResource("1_bpkow")
 
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=1789340535]

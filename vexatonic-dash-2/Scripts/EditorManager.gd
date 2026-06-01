@@ -1336,7 +1336,8 @@ func find_target_note() -> Variant:
 	
 	for noteData in levelData.noteDatas:
 		var note_x = Setting.get_posx_from_time(noteData.time)
-		if note_x < camera_left or note_x > camera_right:
+		var note_end_x = Setting.get_posx_from_time(noteData.end_time)
+		if (note_x < camera_left or note_x > camera_right) and (note_end_x < camera_left or note_end_x > camera_right):
 			continue
 		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
 		var note_y = lane.get_height(noteData.time)

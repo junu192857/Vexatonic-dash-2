@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://be2tj6sethhja" path="res://Scripts/Connector.gd" id="1_peggv"]
 
 [node name="Connector" type="Node2D" unique_id=691671917]
-z_as_relative = false
 script = ExtResource("1_peggv")
 
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=1789340535]
