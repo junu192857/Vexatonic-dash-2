@@ -16,9 +16,7 @@ var data: NoteData
 
 var is_hit := false
 var is_marker
-var is_holding_left := false
-var is_holding_right := false  # 롱노트: 현재 키가 눌려 있는지
-var end_judged := false  # 롱노트: 끝점 판정 완료 여부
+var end_judged := false
 
 #=============== NoteData 값 가져오기 =======================
 func get_time() -> float:
@@ -36,17 +34,14 @@ func get_end_time() -> float:
 func get_lane() -> int:
 	return data.lane
 
-# 스포너에서 노트 생성 후 가장 먼저 호출되어 색상을 정함.
 func set_data(p_data: NoteData):
 	if (is_marker):
 		get_parent().data = p_data
 	else:
 		data = p_data
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	sprite.modulate = UNPROCESSED_COLORS[data.color]
-
 
 func process_input(p_color: int, pressed_ms: float) -> int:
 	print("Processing input: pressed time: %f, note time: %f" % [pressed_ms, data.time])
@@ -59,48 +54,26 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 		Judgement.SPARKLIC if deltaTime <= SPARKLIC_MS else
 		Judgement.WILD
 	)
-	process_color(); is_hit = true
+	process_color()
+	is_hit = true
 	spread_judgement(judgement, self)
 	return judgement
 
 func process_color():
 	sprite.modulate = PROCESSED_COLORS[get_data().color]
 
-
 func spread_judgement(judgement: int, note: Note):
 	print("Detect judgement: %d" % judgement)
-
-func get_marker() -> Note:
-	if is_marker:
-		return null
-	for child in get_children():
-		if child is Note:
-			return child
-	return null
-
-func start_hold(is_left: bool):
-	if is_left:
-		is_holding_left = true
-	else:
-		is_holding_right = true
-
-func release_hold(is_left: bool):
-	if is_left:
-		is_holding_left = false
-	else:
-		is_holding_right = false
-
-func get_is_holding(is_left: bool):
-	if is_left:
-		return is_holding_left
-	else:
-		return is_holding_right
-
-func is_holding_anyway():
-	return is_holding_left or is_holding_right
 
 func get_data() -> NoteData:
 	if is_marker:
 		return get_parent().data
 	else:
 		return data
+
+# 롱노트 전용 메서드 스텁 — LongNote에서 오버라이드
+func get_marker() -> Note: return null
+func start_hold(_is_left: bool) -> void: pass
+func release_hold(_is_left: bool) -> void: pass
+func get_is_holding(_is_left: bool) -> bool: return false
+func is_holding_anyway() -> bool: return false
