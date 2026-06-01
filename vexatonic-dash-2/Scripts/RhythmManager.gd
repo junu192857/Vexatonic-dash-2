@@ -174,6 +174,8 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 
 	parent.add_child(connector)
 	connector.position = p_pos
+	if (p_color > -1):
+		connector.z_index = 1
 	return connector
 	
 # 레인의 첫 번째 노트 이전의 Connector 생성. 첫 번째 노트가 없으면 패스

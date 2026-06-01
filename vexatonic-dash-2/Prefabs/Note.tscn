@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://brm0k422e5mbt" path="res://Scripts/Note.gd" id="2_cp8im"]
 
 [node name="Note" type="Node2D" unique_id=1307802017]
-z_index = 1
+z_index = 2
 z_as_relative = false
 script = ExtResource("2_cp8im")
 

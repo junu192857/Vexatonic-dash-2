@@ -364,6 +364,7 @@ func update_preview(selected: int):
 							if child_connector == null:
 								child_connector = CONNECTOR_SCENE.instantiate()
 								current.add_child(child_connector)
+								child_connector.z_index = 1
 								child_connector.set_editor_color(selected_color)
 							current = child_connector
 						else:
@@ -1025,14 +1026,12 @@ func adjust_longNote_connector(note: ENote, start_time: float, end_time: float):
 			var start_pos = Vector2(start_x, target_lane.get_height(Setting.get_time_from_posx(start_x)))
 			var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
 			var longNote_connector = CONNECTOR_SCENE.instantiate()
+			longNote_connector.z_index = 1
 			parent_node.add_child(longNote_connector)
 			longNote_connector.set_editor_color(note.get_data().color)
 			longNote_connector.set_data(start_pos, end_pos)
 			longNote_connector.global_position = start_pos
 			parent_node = longNote_connector
-		for child in note.get_children():
-			if child is EConnector:
-				child.z_index = 1
 	#marker y좌표 조정
 	marker.global_position.y = target_lane.get_height(end_time)
 
