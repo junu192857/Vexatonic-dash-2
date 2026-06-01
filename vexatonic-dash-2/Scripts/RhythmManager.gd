@@ -101,6 +101,7 @@ func sort_note_holders():
 #============================== Chart Rendering ===================================
 
 @export var NOTE_SCENE: PackedScene
+@export var LONG_NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
 
 # render_chart() 후 생성된 Note, Connector, Marker의 관계
@@ -145,7 +146,7 @@ func render_chart():
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
 func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Node2D:
-	var note = NOTE_SCENE.instantiate() as Node2D
+	var note = (LONG_NOTE_SCENE if not is_marker and data.type == 1 else NOTE_SCENE).instantiate() as Node2D
 	note.set_data(data)
 	var lane = Lane.find_lane(levelData.lanes, data.lane)
 	parent.add_child(note)
