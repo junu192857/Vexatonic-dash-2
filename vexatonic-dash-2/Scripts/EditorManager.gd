@@ -1066,6 +1066,9 @@ func print_lane_info():
 		for keyframe in lane.keyframes:
 			print("my lane's keyframe: time %f and height %f" % [keyframe.kf.x, keyframe.kf.y])
 
+func print_note_info():
+	for note in levelData.noteDatas:
+		print("Note color: %d, start_time: %f, end_time: %f, at lane %d" % [note.color, note.time, note.end_time, note.lane])
 # ======================== Save Chart ================================
 
 var save_difficulty = -1

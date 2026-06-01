@@ -397,6 +397,14 @@ offset_top = 30.0
 offset_right = -30.0
 offset_bottom = -30.0
 
+[node name="SaveButton3" type="Button" parent="CanvasLayer/SettingPanel" unique_id=2131681375]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 599.0
+offset_right = 113.0
+offset_bottom = 686.0
+text = "Debug Note"
+
 [node name="SaveButton2" type="Button" parent="CanvasLayer/SettingPanel" unique_id=900100908]
 layout_mode = 0
 offset_left = 122.0
@@ -581,6 +589,7 @@ grow_vertical = 2
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
 [connection signal="file_selected" from="CanvasLayer/InitialPanel/FileDialog" to="." method="select_music"]
+[connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton3" to="." method="print_note_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton2" to="." method="print_lane_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton" to="." method="open_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button4" to="." method="set_bit" binds= [32]]
