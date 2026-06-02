@@ -73,7 +73,7 @@ func get_data() -> NoteData:
 
 # 롱노트 전용 메서드 스텁 — LongNote에서 오버라이드
 func get_marker() -> Note: return null
-func start_hold(_is_left: bool, _time: float) -> void: pass
+func start_hold(_is_left: bool, _time: float, _start_adjust: bool) -> void: pass
 func release_hold(_is_left: bool) -> void: pass
 func get_is_holding(_is_left: bool) -> bool: return false
 func is_holding_anyway() -> bool: return false

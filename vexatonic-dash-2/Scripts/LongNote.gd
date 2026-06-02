@@ -17,23 +17,26 @@ func get_marker() -> Note:
 func set_long_connector(c: Connector) -> void:
 	long_connector = c
 
-func start_hold(is_left: bool, time: float) -> void:
+func start_hold(is_left: bool, time: float, start_adjust: bool) -> void:
+	var before = is_holding_anyway()
 	if is_left:
 		is_holding_left = true
 	else:
 		is_holding_right = true
+	if (not before and is_holding_anyway()):
+		hold_paint_from = get_data().time if start_adjust else time
+		print("start hold at time %f" % time)
 
 func release_hold(is_left: bool) -> void:
-	#if (is_holding_anyway() and long_connector and not visual_finalized):
-	#	if end_judged:
-	#		long_connector.paint_range(hold_paint_from, long_connector.c_end_time, false)
-	
+	var before = is_holding_anyway()
 	if is_left:
 		is_holding_left = false
 	else:
 		is_holding_right = false
+	if (before and not is_holding_anyway() and long_connector):
+		long_connector.make_new_polygon()
+		print("Move to new polygon")
 		
-	
 
 func get_is_holding(is_left: bool) -> bool:
 	return is_holding_left if is_left else is_holding_right
@@ -41,14 +44,10 @@ func get_is_holding(is_left: bool) -> bool:
 func is_holding_anyway() -> bool:
 	return is_holding_left or is_holding_right
 
-func update_hold_visual(from_time: float, to_time: float) -> void:
+
+func update_hold_visual(to_time: float) -> void:
 	if long_connector == null or not is_holding_anyway() or visual_finalized:
 		return
-	hold_paint_until = time
-	var paint_end: float
 	if end_judged:
-		paint_end = long_connector.c_end_time
 		visual_finalized = true
-	else:
-		paint_end = hold_paint_until
-	long_connector.paint_range(from_time, to_time, false)
+	long_connector.paint_range(hold_paint_from, to_time)

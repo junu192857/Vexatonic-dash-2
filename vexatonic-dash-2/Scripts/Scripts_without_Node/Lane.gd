@@ -55,7 +55,6 @@ func delete_middle_keyframe(time1: float, time2: float):
 		return null
 
 	deleted.sort_custom(func(a: Keyframe, b: Keyframe): return a.kf.x < b.kf.x)
-	print("deleted %d keyframes" % deleted.size())
 	return deleted[-1]
 
 func print_data():

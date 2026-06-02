@@ -100,8 +100,7 @@ func process_input(time: float, is_left: bool):
 			break
 		var note = notes[i]
 		if note.get_data().type == 1 and not note.end_judged and time <= note.get_data().end_time:
-			note.start_hold(is_left, time)
-
+			note.start_hold(is_left, time, false)
 
 	if notes.size() - 1 < current_index:
 		return
@@ -110,14 +109,13 @@ func process_input(time: float, is_left: bool):
 	
 	if judgement != Note.Judgement.PASS:
 		if current_note.get_data().type == 1:
-			current_note.start_hold(is_left, time)
-			current_note.update_hold_visual(current_note.get_data().time, time)
+			current_note.start_hold(is_left, time, true)
 		move_to_next_note()
 		_advance_earliest_unprocessed()
 	elif current_note.get_data().type == 1:
 		# 시작점 윈도우 밖이지만 노트 지속 구간 내: 홀드 추적 시작
 		if time >= current_note.get_data().time and time <= current_note.get_data().end_time:
-			current_note.start_hold(is_left, time)
+			current_note.start_hold(is_left, time, false)
 
 # 키 뗌: [eu, ci] 범위 롱노트 is_holding 해제 + 끝점 윈도우 내 릴리즈 시 최고 판정
 func process_release(time: float, is_left: bool):
@@ -133,11 +131,12 @@ func process_release(time: float, is_left: bool):
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time:
 				note.end_judged = true
 				if not note.is_hit: # 짧은 롱노트 대응
+					print("이거 실행은 되나요..??")
 					note.is_hit = true
 					note.spread_judgement(Note.Judgement.MISS, note)
 				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
-			
+				note.update_hold_visual(current_note.get_data().end_time)
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():
@@ -147,8 +146,9 @@ func move_to_next_note():
 	current_note = notes[current_index]
 	
 func update_visuals(time: float) -> void:
+	#print("Update_visuals at time %f" % time)
 	var upper = min(current_index, notes.size() - 1)
 	for i in range(earliest_unprocessed_index, upper + 1):
 		var note = notes[i]
-		if note is LongNote:
+		if note.get_data().type == 1:
 			(note as LongNote).update_hold_visual(time)

@@ -49,11 +49,8 @@ func _ready():
 		Vector2(0,500)
 	])
 	set_color()
-	
-	#processed_polygon = Polygon2D.new()
-	#processed_polygon.z_index = 2
-	#add_child(processed_polygon)
-	#processed_polygon.visible = false
+	if (data.color != -1):
+		make_new_polygon()
 	
 func set_color():
 	if (data.color == -1):
@@ -61,15 +58,19 @@ func set_color():
 	else:
 		polygon.modulate = UNPROCESSED_COLORS[data.color]
 
-# from_time~to_time 구간을 PROCESSED_COLORS로 칠함. 자식 Connector에 재귀 적용.
 
-func paint_range(from_time: float, to_time: float, new: bool) -> void:
-	if new:
-		processed_polygon = Polygon2D.new()
-		processed_polygon.z_index = 2
-		add_child(processed_polygon)
-		processed_polygon.visible = false
-	elif processed_polygon == null:
+func make_new_polygon():
+	processed_polygon = Polygon2D.new()
+	processed_polygon.z_index = 2
+	add_child(processed_polygon)
+	processed_polygon.visible = false
+	print("Made new polygon")
+
+# from_time~to_time 구간을 PROCESSED_COLORS로 칠함. 자식 Connector에 재귀 적용.
+func paint_range(from_time: float, to_time: float) -> void:
+	if (data.color == -1):
+		return
+	if processed_polygon == null:
 		return
 	
 	var local_start_x = clamp(Setting.get_posx_from_time(from_time - c_start_time), 0.0, data.length)
@@ -91,4 +92,5 @@ func paint_range(from_time: float, to_time: float, new: bool) -> void:
 
 	for child in get_children():
 		if child is Connector:
-			child.paint_range(from_time, to_time, true)
+			make_new_polygon()
+			child.paint_range(from_time, to_time)

@@ -82,8 +82,8 @@ func _process(delta):
 	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 		place_character(levelData.lanes[lane_index])
 		lane_index += 1
-		
-	
+
+func _physics_process(delta):
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
