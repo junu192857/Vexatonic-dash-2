@@ -18,18 +18,15 @@ func set_long_connector(c: Connector) -> void:
 	long_connector = c
 
 func start_hold(is_left: bool, time: float) -> void:
-	if (!is_holding_anyway() and long_connector and not visual_finalized):
-		hold_paint_from = time if is_hit else long_connector.c_start_time
-		long_connector.paint_range(hold_paint_from, time, true)
 	if is_left:
 		is_holding_left = true
 	else:
 		is_holding_right = true
 
 func release_hold(is_left: bool) -> void:
-	if (is_holding_anyway() and long_connector and not visual_finalized):
-		if end_judged:
-			long_connector.paint_range(hold_paint_from, long_connector.c_end_time, false)
+	#if (is_holding_anyway() and long_connector and not visual_finalized):
+	#	if end_judged:
+	#		long_connector.paint_range(hold_paint_from, long_connector.c_end_time, false)
 	
 	if is_left:
 		is_holding_left = false
@@ -44,7 +41,7 @@ func get_is_holding(is_left: bool) -> bool:
 func is_holding_anyway() -> bool:
 	return is_holding_left or is_holding_right
 
-func update_hold_visual(time: float) -> void:
+func update_hold_visual(from_time: float, to_time: float) -> void:
 	if long_connector == null or not is_holding_anyway() or visual_finalized:
 		return
 	hold_paint_until = time
@@ -54,4 +51,4 @@ func update_hold_visual(time: float) -> void:
 		visual_finalized = true
 	else:
 		paint_end = hold_paint_until
-	long_connector.paint_range(hold_paint_from, paint_end, false)
+	long_connector.paint_range(from_time, to_time, false)

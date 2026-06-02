@@ -111,6 +111,7 @@ func process_input(time: float, is_left: bool):
 	if judgement != Note.Judgement.PASS:
 		if current_note.get_data().type == 1:
 			current_note.start_hold(is_left, time)
+			current_note.update_hold_visual(current_note.get_data().time, time)
 		move_to_next_note()
 		_advance_earliest_unprocessed()
 	elif current_note.get_data().type == 1:
@@ -127,15 +128,16 @@ func process_release(time: float, is_left: bool):
 		if note.get_data().type != 1 or note.end_judged:
 			continue
 		if note.get_is_holding(is_left):
+			note.release_hold(is_left)
 			print("Trying end long: time: %f, end_time: %f" % [time, note.get_data().end_time])
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time:
 				note.end_judged = true
-				if not note.is_hit:
+				if not note.is_hit: # 짧은 롱노트 대응
 					note.is_hit = true
 					note.spread_judgement(Note.Judgement.MISS, note)
 				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
-			note.release_hold(is_left)
+			
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():
