@@ -82,14 +82,15 @@ func _process(delta):
 	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 		place_character(levelData.lanes[lane_index])
 		lane_index += 1
-		
-	
+
+func _physics_process(delta):
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
 	
 	for holder in noteHolders:
 		holder.check_miss(time)
+		holder.update_visuals(time)
 
 	camera.move(time)
 
@@ -135,6 +136,7 @@ func render_chart():
 			var marker = place_note(noteData, end_pos_x, true, cur_note)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
 							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
+			(cur_note as LongNote).set_long_connector(connector as Connector)
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
