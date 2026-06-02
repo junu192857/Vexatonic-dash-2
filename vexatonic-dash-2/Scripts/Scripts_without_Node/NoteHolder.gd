@@ -100,7 +100,8 @@ func process_input(time: float, is_left: bool):
 			break
 		var note = notes[i]
 		if note.get_data().type == 1 and not note.end_judged and time <= note.get_data().end_time:
-			note.start_hold(is_left)
+			note.start_hold(is_left, time)
+
 
 	if notes.size() - 1 < current_index:
 		return
@@ -109,13 +110,13 @@ func process_input(time: float, is_left: bool):
 	
 	if judgement != Note.Judgement.PASS:
 		if current_note.get_data().type == 1:
-			current_note.start_hold(is_left)
+			current_note.start_hold(is_left, time)
 		move_to_next_note()
 		_advance_earliest_unprocessed()
 	elif current_note.get_data().type == 1:
 		# 시작점 윈도우 밖이지만 노트 지속 구간 내: 홀드 추적 시작
 		if time >= current_note.get_data().time and time <= current_note.get_data().end_time:
-			current_note.start_hold(is_left)
+			current_note.start_hold(is_left, time)
 
 # 키 뗌: [eu, ci] 범위 롱노트 is_holding 해제 + 끝점 윈도우 내 릴리즈 시 최고 판정
 func process_release(time: float, is_left: bool):
@@ -126,7 +127,6 @@ func process_release(time: float, is_left: bool):
 		if note.get_data().type != 1 or note.end_judged:
 			continue
 		if note.get_is_holding(is_left):
-			note.release_hold(is_left)
 			print("Trying end long: time: %f, end_time: %f" % [time, note.get_data().end_time])
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time:
 				note.end_judged = true
@@ -135,6 +135,7 @@ func process_release(time: float, is_left: bool):
 					note.spread_judgement(Note.Judgement.MISS, note)
 				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
+			note.release_hold(is_left)
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():
@@ -142,3 +143,10 @@ func move_to_next_note():
 	if notes.size() - 1 < current_index:
 		return
 	current_note = notes[current_index]
+	
+func update_visuals(time: float) -> void:
+	var upper = min(current_index, notes.size() - 1)
+	for i in range(earliest_unprocessed_index, upper + 1):
+		var note = notes[i]
+		if note is LongNote:
+			(note as LongNote).update_hold_visual(time)
