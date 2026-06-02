@@ -76,7 +76,7 @@ func paint_range(from_time: float, to_time: float) -> void:
 	var local_start_x = clamp(Setting.get_posx_from_time(from_time - c_start_time), 0.0, data.length)
 	var local_end_x   = clamp(Setting.get_posx_from_time(to_time   - c_start_time), 0.0, data.length)
 
-	if local_end_x <= local_start_x or data.length <= 0.0:
+	if local_end_x <= local_start_x or data.length <= Setting.EPSILON:
 		processed_polygon.visible = false
 	else:
 		var y_start = (local_start_x / data.length) * data.delta_y
@@ -92,5 +92,4 @@ func paint_range(from_time: float, to_time: float) -> void:
 
 	for child in get_children():
 		if child is Connector:
-			child.make_new_polygon()
 			child.paint_range(from_time, to_time)

@@ -7,6 +7,7 @@ var long_connector: Connector = null
 var hold_paint_from: float = 0.0
 var hold_paint_until: float = 0.0
 var visual_finalized: bool = false
+var target_visual_connector: Connector = null
 
 func get_marker() -> Note:
 	for child in get_children():
@@ -25,7 +26,6 @@ func start_hold(is_left: bool, time: float, start_adjust: bool) -> void:
 		is_holding_right = true
 	if (not before and is_holding_anyway()):
 		hold_paint_from = get_data().time if start_adjust else time
-		print("start hold at time %f" % time)
 
 func release_hold(is_left: bool) -> void:
 	var before = is_holding_anyway()
