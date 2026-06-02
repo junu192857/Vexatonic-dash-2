@@ -46,8 +46,12 @@ func is_holding_anyway() -> bool:
 
 
 func update_hold_visual(to_time: float) -> void:
-	if long_connector == null or not is_holding_anyway() or visual_finalized:
+	if long_connector == null or visual_finalized:
 		return
 	if end_judged:
+		long_connector.paint_range(hold_paint_from, to_time)
 		visual_finalized = true
+		return
+	if not is_holding_anyway():
+		return
 	long_connector.paint_range(hold_paint_from, to_time)

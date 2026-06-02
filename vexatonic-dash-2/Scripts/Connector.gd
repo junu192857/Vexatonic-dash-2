@@ -92,5 +92,5 @@ func paint_range(from_time: float, to_time: float) -> void:
 
 	for child in get_children():
 		if child is Connector:
-			make_new_polygon()
+			child.make_new_polygon()
 			child.paint_range(from_time, to_time)

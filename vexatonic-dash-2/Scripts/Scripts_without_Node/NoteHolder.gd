@@ -119,7 +119,6 @@ func process_input(time: float, is_left: bool):
 
 # 키 뗌: [eu, ci] 범위 롱노트 is_holding 해제 + 끝점 윈도우 내 릴리즈 시 최고 판정
 func process_release(time: float, is_left: bool):
-	print("Trying release input: color: %d, time: %f" % [color, time])
 	var upper = min(current_index, notes.size() - 1)
 	for i in range(earliest_unprocessed_index, upper + 1):
 		var note = notes[i]
@@ -127,7 +126,6 @@ func process_release(time: float, is_left: bool):
 			continue
 		if note.get_is_holding(is_left):
 			note.release_hold(is_left)
-			print("Trying end long: time: %f, end_time: %f" % [time, note.get_data().end_time])
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time:
 				note.end_judged = true
 				if not note.is_hit: # 짧은 롱노트 대응
@@ -136,7 +134,7 @@ func process_release(time: float, is_left: bool):
 					note.spread_judgement(Note.Judgement.MISS, note)
 				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
-				note.update_hold_visual(current_note.get_data().end_time)
+				note.update_hold_visual(note.get_data().end_time)
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():
