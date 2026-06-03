@@ -30,6 +30,7 @@ func _ready() -> void:
 		noteHolders.append(NoteHolder.new(i))
 	
 	levelData = ChartParser.parse(level_path, 0)
+	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
@@ -69,7 +70,7 @@ func place_character(lane: Lane):
 	add_child(character)
 	
 	
-func _process(delta):
+func _physics_process(delta: float) -> void:
 	if (not music_started):
 		time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
 		if time >= 0:
@@ -82,8 +83,6 @@ func _process(delta):
 	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 		place_character(levelData.lanes[lane_index])
 		lane_index += 1
-
-func _physics_process(delta):
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
@@ -93,6 +92,7 @@ func _physics_process(delta):
 		holder.update_visuals(time)
 
 	camera.move(time)
+	
 
 func sort_note_holders():
 	for holder in noteHolders:
@@ -136,7 +136,7 @@ func render_chart():
 			var marker = place_note(noteData, end_pos_x, true, cur_note)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
 							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
-			(cur_note as LongNote).set_long_connector(connector as Connector)
+			(cur_note as LongNote).set_target_connector(connector as Connector)
 			previous_time = noteData.end_time
 			previous_note = marker;
 			
@@ -169,7 +169,7 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 		return
 	var connector = CONNECTOR_SCENE.instantiate() as Node2D
 	var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
-	
+
 	# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
 	if (end_time - initial_end_time > Setting.EPSILON):
 		var following_connector = place_connector(p_color, initial_end_time, end_time, lane, false,\
