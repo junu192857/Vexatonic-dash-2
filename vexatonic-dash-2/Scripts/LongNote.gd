@@ -5,6 +5,8 @@ var is_holding_left := false
 var is_holding_right := false
 var hold_paint_from: float = 0.0
 var hold_paint_until: float = 0.0
+var last_press_start: float = 0.0
+var total_pressed_time: float = 0.0
 var visual_finalized: bool = false
 var target_visual_connector: Connector = null
 
@@ -25,13 +27,25 @@ func start_hold(is_left: bool, time: float, start_adjust: bool) -> void:
 		is_holding_right = true
 	if (not before and is_holding_anyway()):
 		hold_paint_from = get_data().time if start_adjust else time
+		last_press_start = hold_paint_from
 		update_visual_polygon(time)
 
-func release_hold(is_left: bool) -> void:
+func release_hold(is_left: bool, time: float) -> void:
+	var before = is_holding_anyway()
 	if is_left:
 		is_holding_left = false
 	else:
 		is_holding_right = false
+	if before and not is_holding_anyway() and not end_judged:
+		finalize_hold_time(time)
+
+func finalize_hold_time(end_time: float) -> void:
+	last_press_start = clamp(last_press_start, get_data().time, get_data().end_time)
+	end_time = clamp(end_time, get_data().time, get_data().end_time)
+	
+	var pressed_time = end_time - last_press_start
+	if (pressed_time > 0.0):
+		total_pressed_time += end_time - last_press_start
 		
 
 func get_is_holding(is_left: bool) -> bool:

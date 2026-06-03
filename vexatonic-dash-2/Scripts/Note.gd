@@ -9,6 +9,7 @@ const SPARKLIC_MS = 84
 const WILD_MS = 126
 
 enum Judgement { VEXATONIC = 0, SPARKLIC = 1, WILD = 2, MISS = 3, PASS = 4 }
+signal judgement_spread(judgement: int, note: Note, is_long_end: bool)
 
 @onready var sprite:Sprite2D = $Sprite2D
 
@@ -56,14 +57,14 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	)
 	process_color()
 	is_hit = true
-	spread_judgement(judgement, self)
+	spread_judgement(judgement, self, false)
 	return judgement
 
 func process_color(): 
 	sprite.modulate = PROCESSED_COLORS[get_data().color]
 
-func spread_judgement(judgement: int, note: Note):
-	print("Detect judgement: %d" % judgement)
+func spread_judgement(judgement: int, note: Note, is_long_end: bool):
+	judgement_spread.emit(judgement, note, is_long_end)
 
 func get_data() -> NoteData:
 	if is_marker:
@@ -74,6 +75,7 @@ func get_data() -> NoteData:
 # 롱노트 전용 메서드 스텁 — LongNote에서 오버라이드
 func get_marker() -> Note: return null
 func start_hold(_is_left: bool, _time: float, _start_adjust: bool) -> void: pass
-func release_hold(_is_left: bool) -> void: pass
+func release_hold(_is_left: bool, _time: float) -> void: pass
 func get_is_holding(_is_left: bool) -> bool: return false
 func is_holding_anyway() -> bool: return false
+func finalize_hold_time(_end_time: float) -> void: pass

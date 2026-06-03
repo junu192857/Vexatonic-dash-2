@@ -213,6 +213,7 @@ func assign_note(note: Note):
 	var lane = Lane.find_lane(levelData.lanes, note.get_data().lane)
 	lane.add_note(note)
 	noteHolders[note.get_data().color].notes.append(note)
+	note.judgement_spread.connect($IngameDataManager.catch_judgement)
 
 #==================================================================================
 

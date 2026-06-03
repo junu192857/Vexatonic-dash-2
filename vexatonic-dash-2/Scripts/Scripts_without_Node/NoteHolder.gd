@@ -77,7 +77,7 @@ func _force_start_miss(note: Note):
 	if note.is_hit:
 		return
 	note.is_hit = true
-	note.spread_judgement(Note.Judgement.MISS, note)
+	note.spread_judgement(Note.Judgement.MISS, note, false)
 
 # end_time 도달 시 끝점 판정. 시작점 미처리이면 강제 MISS 후 끝점 판정.
 func _judge_long_end(note: Note):
@@ -86,12 +86,13 @@ func _judge_long_end(note: Note):
 	note.end_judged = true
 	if not note.is_hit:
 		note.is_hit = true
-		note.spread_judgement(Note.Judgement.MISS, note)
+		note.spread_judgement(Note.Judgement.MISS, note, false)
 	if note.is_holding_anyway():
+		note.finalize_hold_time(note.get_data().end_time)
 		note.get_marker().process_color()
-		note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
+		note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker(), true)
 	else:
-		note.spread_judgement(Note.Judgement.MISS, note.get_marker())
+		note.spread_judgement(Note.Judgement.MISS, note.get_marker(), true)
 
 # 키 누름: [eu, ci) 범위 롱노트 재홀드 + current_note 시작점 판정
 func process_input(time: float, is_left: bool):
@@ -125,16 +126,15 @@ func process_release(time: float, is_left: bool):
 		if note.get_data().type != 1 or note.end_judged:
 			continue
 		if note.get_is_holding(is_left):
-			note.release_hold(is_left)
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time + Note.WILD_MS:
 				note.end_judged = true
-				#if not note.is_hit: # 짧은 롱노트 대응
-				#	print("이거 실행은 되나요..??")
-				#	note.is_hit = true
-				#	note.spread_judgement(Note.Judgement.MISS, note)
+				note.release_hold(is_left, time)
+				note.finalize_hold_time(note.get_data().end_time)
 				note.get_marker().process_color()
-				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
+				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker(), true)
 				note.update_last_hold_visual()
+			else:
+				note.release_hold(is_left, time)
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():
