@@ -134,7 +134,7 @@ func process_release(time: float, is_left: bool):
 					note.spread_judgement(Note.Judgement.MISS, note)
 				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
-				note.update_hold_visual(note.get_data().end_time)
+				#note.update_hold_visual(note.get_data().end_time)
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():

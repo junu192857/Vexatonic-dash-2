@@ -136,7 +136,7 @@ func render_chart():
 			var marker = place_note(noteData, end_pos_x, true, cur_note)
 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
 							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
-			(cur_note as LongNote).set_long_connector(connector as Connector)
+			(cur_note as LongNote).set_target_connector(connector as Connector)
 			previous_time = noteData.end_time
 			previous_note = marker;
 			

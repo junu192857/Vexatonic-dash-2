@@ -15,7 +15,6 @@ const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Colo
 
 func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: bool) -> float:
 	c_start_time = start_time
-	c_end_time = end_time
 	lane = p_lane
 	var calculated_delta_y: float = 0.0
 	var start_height
@@ -32,6 +31,7 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 					calculated_delta_y = kf.kf.y - start_height
 					end_time = kf.kf.x
 				break
+	c_end_time = end_time
 	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)
 	return end_time
 
@@ -49,8 +49,8 @@ func _ready():
 		Vector2(0,500)
 	])
 	set_color()
-	if (data.color != -1):
-		make_new_polygon()
+	#if (data.color != -1):
+	#	make_new_polygon()
 	
 func set_color():
 	if (data.color == -1):
@@ -75,7 +75,7 @@ func paint_range(from_time: float, to_time: float) -> void:
 	
 	var local_start_x = clamp(Setting.get_posx_from_time(from_time - c_start_time), 0.0, data.length)
 	var local_end_x   = clamp(Setting.get_posx_from_time(to_time   - c_start_time), 0.0, data.length)
-
+	print("Go paint: %f, %f" % [local_start_x, local_end_x])
 	if local_end_x <= local_start_x or data.length <= Setting.EPSILON:
 		processed_polygon.visible = false
 	else:
@@ -90,6 +90,6 @@ func paint_range(from_time: float, to_time: float) -> void:
 		processed_polygon.color = PROCESSED_COLORS[data.color]
 		processed_polygon.visible = true
 
-	for child in get_children():
-		if child is Connector:
-			child.paint_range(from_time, to_time)
+	#for child in get_children():
+	#	if child is Connector:
+	#		child.paint_range(from_time, to_time)
