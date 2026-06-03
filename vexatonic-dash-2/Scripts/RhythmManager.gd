@@ -30,6 +30,7 @@ func _ready() -> void:
 		noteHolders.append(NoteHolder.new(i))
 	
 	levelData = ChartParser.parse(level_path, 0)
+	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	

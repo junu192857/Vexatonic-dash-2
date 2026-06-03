@@ -59,7 +59,7 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	spread_judgement(judgement, self)
 	return judgement
 
-func process_color():
+func process_color(): 
 	sprite.modulate = PROCESSED_COLORS[get_data().color]
 
 func spread_judgement(judgement: int, note: Note):
