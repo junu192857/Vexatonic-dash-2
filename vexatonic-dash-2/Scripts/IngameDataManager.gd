@@ -2,15 +2,17 @@ extends Node
 
 const MAX_NOTE_SCORE = 1000000.0
 
-var score
-var score_per_note
+var score: float = 0
+var score_per_note: float = 0
 var combo: int
+var total_long_length: float = 0.0
+var pressed_long_length: float = 0.0
 
 var test_processed_count = 0
 
 signal status_updated(score: float, combo: int)
 
-func catch_judgement(judgement: int, note: Note):
+func catch_judgement(judgement: int, note: Note, is_long_end: bool):
 	match judgement:
 		0: #Vexatonic
 			score += score_per_note
@@ -24,6 +26,12 @@ func catch_judgement(judgement: int, note: Note):
 		_:
 			push_error("Invalid judgement")
 	test_processed_count += 1
+	
+	if (is_long_end):
+		total_long_length += (note.get_data().end_time - note.get_data().time)
+		pressed_long_length += note.get_parent().total_pressed_time
+		print("LongNote: currently %f / %f pressed" % [pressed_long_length, total_long_length])
+	
 	status_updated.emit(score, combo)
 
 func set_total_notes(noteDatas: Array[NoteData]):
