@@ -69,7 +69,7 @@ func place_character(lane: Lane):
 	add_child(character)
 	
 	
-func _process(delta):
+func _physics_process(delta: float) -> void:
 	if (not music_started):
 		time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
 		if time >= 0:

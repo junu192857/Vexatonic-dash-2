@@ -126,7 +126,7 @@ func process_release(time: float, is_left: bool):
 			continue
 		if note.get_is_holding(is_left):
 			note.release_hold(is_left)
-			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time:
+			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time + Note.WILD_MS:
 				note.end_judged = true
 				#if not note.is_hit: # 짧은 롱노트 대응
 				#	print("이거 실행은 되나요..??")
