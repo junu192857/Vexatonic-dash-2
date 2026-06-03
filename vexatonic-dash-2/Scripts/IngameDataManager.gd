@@ -1,6 +1,7 @@
 extends Node
 
-const MAX_NOTE_SCORE = 1000000.0
+const MAX_NOTE_SCORE = 990000.0
+const MAX_LONG_BONUS = 10000.0
 
 var score: float = 0
 var score_per_note: float = 0
@@ -16,8 +17,10 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool):
 	match judgement:
 		0: #Vexatonic
 			score += score_per_note
+			combo += 1
 		1: #Sparklic
 			score += 0.9 * score_per_note
+			combo += 1
 		2: #Wild
 			score += 0.5 * score_per_note
 			combo = 0
