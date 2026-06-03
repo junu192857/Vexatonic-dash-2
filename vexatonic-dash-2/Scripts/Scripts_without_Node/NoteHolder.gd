@@ -88,6 +88,7 @@ func _judge_long_end(note: Note):
 		note.is_hit = true
 		note.spread_judgement(Note.Judgement.MISS, note)
 	if note.is_holding_anyway():
+		note.finalize_hold_time(note.get_data().end_time)
 		note.get_marker().process_color()
 		note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
 	else:
@@ -125,16 +126,15 @@ func process_release(time: float, is_left: bool):
 		if note.get_data().type != 1 or note.end_judged:
 			continue
 		if note.get_is_holding(is_left):
-			note.release_hold(is_left)
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time + Note.WILD_MS:
 				note.end_judged = true
-				#if not note.is_hit: # 짧은 롱노트 대응
-				#	print("이거 실행은 되나요..??")
-				#	note.is_hit = true
-				#	note.spread_judgement(Note.Judgement.MISS, note)
+				note.release_hold(is_left, time)
+				note.finalize_hold_time(note.get_data().end_time)
 				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
 				note.update_last_hold_visual()
+			else:
+				note.release_hold(is_left, time)
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():

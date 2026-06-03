@@ -6,6 +6,8 @@ var score
 var score_per_note
 var combo: int
 
+var test_processed_count = 0
+
 signal status_updated(score: float, combo: int)
 
 func catch_judgement(judgement: int, note: Note):
@@ -21,6 +23,7 @@ func catch_judgement(judgement: int, note: Note):
 			combo = 0
 		_:
 			push_error("Invalid judgement")
+	test_processed_count += 1
 	status_updated.emit(score, combo)
 
 func set_total_notes(noteDatas: Array[NoteData]):
