@@ -8,7 +8,7 @@ var combo: int
 
 signal status_updated(score: float, combo: int)
 
-func catch_judgement(judgement: int):
+func catch_judgement(judgement: int, note: Note):
 	match judgement:
 		0: #Vexatonic
 			score += score_per_note
