@@ -64,7 +64,6 @@ func make_new_polygon():
 	processed_polygon.z_index = 2
 	add_child(processed_polygon)
 	processed_polygon.visible = false
-	print("Made new polygon")
 
 # from_time~to_time 구간을 PROCESSED_COLORS로 칠함. 자식 Connector에 재귀 적용.
 func paint_range(from_time: float, to_time: float) -> void:
@@ -75,7 +74,6 @@ func paint_range(from_time: float, to_time: float) -> void:
 	
 	var local_start_x = clamp(Setting.get_posx_from_time(from_time - c_start_time), 0.0, data.length)
 	var local_end_x   = clamp(Setting.get_posx_from_time(to_time   - c_start_time), 0.0, data.length)
-	print("Go paint: %f, %f" % [local_start_x, local_end_x])
 	if local_end_x <= local_start_x or data.length <= Setting.EPSILON:
 		processed_polygon.visible = false
 	else:

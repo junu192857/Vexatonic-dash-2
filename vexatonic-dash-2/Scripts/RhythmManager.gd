@@ -82,8 +82,6 @@ func _process(delta):
 	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 		place_character(levelData.lanes[lane_index])
 		lane_index += 1
-
-func _physics_process(delta):
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
@@ -93,6 +91,7 @@ func _physics_process(delta):
 		holder.update_visuals(time)
 
 	camera.move(time)
+	
 
 func sort_note_holders():
 	for holder in noteHolders:
@@ -169,7 +168,7 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 		return
 	var connector = CONNECTOR_SCENE.instantiate() as Node2D
 	var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
-	
+
 	# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
 	if (end_time - initial_end_time > Setting.EPSILON):
 		var following_connector = place_connector(p_color, initial_end_time, end_time, lane, false,\

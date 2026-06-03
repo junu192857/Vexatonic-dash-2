@@ -43,12 +43,13 @@ func is_holding_anyway() -> bool:
 func update_visual_polygon(time: float):
 	while (target_visual_connector != null and target_visual_connector.c_end_time < time):
 		target_visual_connector = find_child_connector()
-	target_visual_connector.make_new_polygon()
+	if (target_visual_connector):
+		target_visual_connector.make_new_polygon()
 
 func update_hold_visual(to_time: float) -> void:
 	var move_to_new_connector = false
 	
-	if not is_holding_anyway():
+	if (not is_holding_anyway() or end_judged):
 		return
 	
 	while (target_visual_connector != null and to_time > target_visual_connector.c_end_time):
@@ -62,16 +63,24 @@ func update_hold_visual(to_time: float) -> void:
 	
 	if target_visual_connector == null or visual_finalized:
 		return
-	if end_judged:
-		target_visual_connector.paint_range(hold_paint_from, to_time)
-		visual_finalized = true
-		return
+
 	target_visual_connector.paint_range(hold_paint_from, to_time)
-	print("Try painting from %f, %f" % [hold_paint_from, to_time])
+
+func update_last_hold_visual():
+	while (target_visual_connector != null):
+		target_visual_connector.paint_range(hold_paint_from, target_visual_connector.c_end_time)
+		hold_paint_from = target_visual_connector.c_end_time
+		target_visual_connector = find_child_connector()
+		if (target_visual_connector != null):
+			target_visual_connector.make_new_polygon()
+	visual_finalized = true
+	return
 	
+
 func find_child_connector():
 	var child_connector = null
 	for child in target_visual_connector.get_children():
 		if child is Connector:
 			child_connector = child
 	return child_connector
+	

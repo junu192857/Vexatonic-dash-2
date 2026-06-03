@@ -128,13 +128,13 @@ func process_release(time: float, is_left: bool):
 			note.release_hold(is_left)
 			if time >= note.get_data().end_time - Note.WILD_MS and time <= note.get_data().end_time:
 				note.end_judged = true
-				if not note.is_hit: # 짧은 롱노트 대응
-					print("이거 실행은 되나요..??")
-					note.is_hit = true
-					note.spread_judgement(Note.Judgement.MISS, note)
+				#if not note.is_hit: # 짧은 롱노트 대응
+				#	print("이거 실행은 되나요..??")
+				#	note.is_hit = true
+				#	note.spread_judgement(Note.Judgement.MISS, note)
 				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker())
-				#note.update_hold_visual(note.get_data().end_time)
+				note.update_last_hold_visual()
 	_advance_earliest_unprocessed()
 
 func move_to_next_note():
