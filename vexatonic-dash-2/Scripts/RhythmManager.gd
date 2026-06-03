@@ -17,7 +17,7 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
-const level_path = "res://Charts/Test"
+const level_path = "res://Charts/YOUNITHM"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

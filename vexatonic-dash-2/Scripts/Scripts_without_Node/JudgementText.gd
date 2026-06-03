@@ -13,6 +13,8 @@ func show_text(judgement: int, combo: int):
 			judgement_text.modulate = Color(0.0, 1.0, 1.0, 1.0)
 		2:
 			judgement_text.text = "WILD"
-			judgement_text.modulate = Color(1.0, 1.0, 1.0, 1.0)  # WILD 색도 채워야 할 것 같아
+			judgement_text.modulate = Color(0.766, 0.354, 0.0, 1.0)
+		3:
+			judgement_text.text = "MISS"
 	if (combo > 0):
 		combo_text.text = str(combo)
