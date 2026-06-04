@@ -4,9 +4,17 @@ extends Node
 @export var score_text: Label
 @export var canvasLayer: CanvasLayer
 
+
+func _ready():
+	match Setting.score_display:
+		Setting.SCORE_DISPLAY.Increasing:
+			score_text.text = "SCORE %07d" % 0
+		Setting.SCORE_DISPLAY.Decreasing:
+			score_text.text = "SCORE %07d" % 1000000
+
 func _on_status_update(judgement: int, score: float, combo: int, note: Note) -> void:
 	var rounded = roundi(score)
-	score_text.text = "SCORE: %07d" % rounded
+	score_text.text = "SCORE %07d" % rounded
 	var judgement_text = JUDGEMENT_TEXT.instantiate()
 	canvasLayer.add_child(judgement_text)
 	judgement_text.global_position = get_note_position(note)

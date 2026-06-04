@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+
+[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Scripts_without_Node/CameraManager.gd" id="6_4pq8y"]
+[ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/IngameDataManager.gd" id="7_wjq5j"]
+[ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/IngameUIManager.gd" id="8_pee8w"]
+[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+
+[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+metadata/_edit_vertical_guides_ = [-111.0]
+
+[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+script = ExtResource("2_wib5u")
+CHARACTER_SCENE = ExtResource("3_wib5u")
+NOTE_SCENE = ExtResource("3_4pq8y")
+LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+CONNECTOR_SCENE = ExtResource("4_wjq5j")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+
+[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+script = ExtResource("6_4pq8y")
+
+[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+
+[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+script = ExtResource("7_wjq5j")
+
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer")]
+script = ExtResource("8_pee8w")
+JUDGEMENT_TEXT = ExtResource("9_qa11p")
+score_text = NodePath("../../CanvasLayer/Control/Panel/ScoreText")
+canvasLayer = NodePath("../../CanvasLayer")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.1
+anchor_right = 0.2
+anchor_bottom = 0.15
+grow_horizontal = 0
+
+[node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_right = 0.9
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 40
+text = "SCORE 0000000"
+vertical_alignment = 1
+
+[connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
