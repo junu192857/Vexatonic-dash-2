@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://pfmgxw12a4yj"]
+
+[ext_resource type="Script" uid="uid://bso14830e2taa" path="res://Scripts/Scripts_without_Node/JudgementText.gd" id="1_06d2l"]
+
+[node name="JudgementScene" type="Control" unique_id=1702890444]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_06d2l")
+
+[node name="JudgementText" type="Label" parent="." unique_id=1403520215]
+layout_mode = 0
+offset_left = -71.0
+offset_top = -166.0
+offset_right = 71.0
+offset_bottom = -124.0
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ComboText" type="Label" parent="." unique_id=222949586]
+layout_mode = 0
+offset_left = -37.0
+offset_top = -128.0
+offset_right = 38.0
+offset_bottom = -86.0
+theme_override_font_sizes/font_size = 25
+horizontal_alignment = 1
+vertical_alignment = 1

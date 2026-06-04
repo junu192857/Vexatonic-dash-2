@@ -1,5 +1,6 @@
 class_name Setting
 
+# ================== 상수 ==============================
 static var speed = 1
 
 static var PX_PER_MS = 0.5
@@ -27,3 +28,10 @@ static var time_per_note_width = NOTE_WIDTH / (PX_PER_MS * speed)
 static var EPSILON = 0.1
 
 static var INFINITE = 99999999
+
+# ==================== 플레이어 세팅 ========================
+
+
+enum SCORE_DISPLAY {Increasing, Decreasing}
+
+static var score_display = SCORE_DISPLAY.Increasing
