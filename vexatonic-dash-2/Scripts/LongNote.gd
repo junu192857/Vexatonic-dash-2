@@ -10,6 +10,9 @@ var total_pressed_time: float = 0.0
 var visual_finalized: bool = false
 var target_visual_connector: Connector = null
 
+# 동타 보정을 위한 값. 0: 클릭 없음, 1: 왼쪽, 2: 오른쪽
+var previously_clicked: int = 0
+
 func get_marker() -> Note:
 	for child in get_children():
 		if child is Note:

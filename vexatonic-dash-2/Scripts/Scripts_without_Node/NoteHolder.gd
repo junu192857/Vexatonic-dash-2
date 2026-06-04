@@ -111,7 +111,15 @@ func process_input(time: float, is_left: bool):
 	if judgement != Note.Judgement.PASS:
 		if current_note.get_data().type == 1:
 			current_note.start_hold(is_left, time, true)
-		move_to_next_note()
+			match (current_note as LongNote).previously_clicked:
+				1:
+					current_note.is_holding_left = true
+				2:
+					current_note.is_holding_right = true
+		if move_to_next_note():
+			if current_note.get_data().type == 1 and current_note.get_data().time - Note.WILD_MS < time and \
+			time < current_note.get_data().time + Note.WILD_MS:
+				(current_note as LongNote).previously_clicked = 1 if is_left else 2
 		_advance_earliest_unprocessed()
 	elif current_note.get_data().type == 1:
 		# 시작점 윈도우 밖이지만 노트 지속 구간 내: 홀드 추적 시작
@@ -137,11 +145,12 @@ func process_release(time: float, is_left: bool):
 				note.release_hold(is_left, time)
 	_advance_earliest_unprocessed()
 
-func move_to_next_note():
+func move_to_next_note() -> bool:
 	current_index += 1
 	if notes.size() - 1 < current_index:
-		return
+		return false
 	current_note = notes[current_index]
+	return true
 	
 func update_visuals(time: float) -> void:
 	#print("Update_visuals at time %f" % time)
