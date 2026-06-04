@@ -34,4 +34,4 @@ static var INFINITE = 99999999
 
 enum SCORE_DISPLAY {Increasing, Decreasing}
 
-static var score_display = SCORE_DISPLAY.Decreasing
+static var score_display = SCORE_DISPLAY.Increasing

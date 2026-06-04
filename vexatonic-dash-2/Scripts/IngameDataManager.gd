@@ -42,7 +42,7 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool):
 	
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
-			status_updated.emit(judgement, score + current_score, combo, note)
+			status_updated.emit(judgement, current_score, combo, note)
 		Setting.SCORE_DISPLAY.Decreasing:
 			var perfect_score = pressed_note_count * score_per_note + calculate_longNote_score(total_long_length_current)
 			status_updated.emit(judgement, 1000000 - (perfect_score - current_score), combo, note)
