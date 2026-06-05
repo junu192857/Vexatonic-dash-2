@@ -133,7 +133,7 @@ func render_chart():
 		pos_x = Setting.get_posx_from_time(noteData.time)
 		var cur_note = place_note(noteData, pos_x, false, self)
 		assign_note(cur_note)
-		if (previous_time >= 0 and previous_lane == noteData.lane):
+		if (previous_time >= 0 and previous_lane == noteData.lane and Setting.gamemode != Setting.GAMEMODE.Suregi):
 			var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
 							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 	
@@ -153,8 +153,9 @@ func render_chart():
 	for lane:Lane in levelData.lanes:
 		#lane.print_data()
 		lane.sort_notes()
-		place_initial_connector(lane)
-		place_final_connector(lane)
+		if (Setting.gamemode != Setting.GAMEMODE.Suregi):
+			place_initial_connector(lane)
+			place_final_connector(lane)
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
 func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Node2D:
