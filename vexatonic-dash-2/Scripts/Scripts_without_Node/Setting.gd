@@ -30,8 +30,9 @@ static var EPSILON = 0.1
 static var INFINITE = 99999999
 
 # ==================== 플레이어 세팅 ========================
+
 enum SCORE_DISPLAY {Increasing, Decreasing}
 enum GAMEMODE {Normal_Character, Normal_line, Suregi}
 
-static var score_display = SCORE_DISPLAY.Increasing
-static var gamemode = GAMEMODE.Normal_line
+static var score_display = SCORE_DISPLAY.Decreasing
+static var gamemode = GAMEMODE.Suregi

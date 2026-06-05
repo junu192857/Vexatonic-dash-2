@@ -28,6 +28,7 @@ CONNECTOR_SCENE = ExtResource("4_wjq5j")
 script = ExtResource("6_4pq8y")
 
 [node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+ignore_rotation = false
 
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
