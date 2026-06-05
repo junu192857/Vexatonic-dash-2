@@ -6,7 +6,10 @@ var levelData: LevelData
 @onready var musicPlayer = $AudioStreamPlayer
 @onready var camera = $CameraManager
 
+
 var characters: Array[Character]
+@export var character_holder: Node2D
+
 var time: float
 var music_started = false
 var time_start_tick: float
@@ -53,22 +56,27 @@ func _ready() -> void:
 		#lane.print_data()
 		pass
 	
-	# 최초의 lane들에 캐릭터 생성
+	# 초기 캐릭터 및 판정선 생성
+	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
+		$CharacterHolder/Line.visible = true
 	for lane in levelData.lanes:
 		if (lane.is_init):
 			place_character(lane)
 			lane_index += 1
 	
+	
 	time_start_tick = Time.get_ticks_msec()
 
 func place_character(lane: Lane):
+	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
+		return
 	#var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
 	var character = CHARACTER_SCENE.instantiate() as Character
 	#sayane.position = Vector2(initial_pos_x, -Setting.CHARACTER_POS_Y)
 	character.set_lane(lane)
 	characters.append(character)
-	add_child(character)
-	
+	character_holder.add_child(character)
+
 	
 func _physics_process(delta: float) -> void:
 	if (not music_started):
@@ -83,6 +91,8 @@ func _physics_process(delta: float) -> void:
 	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 		place_character(levelData.lanes[lane_index])
 		lane_index += 1
+		
+	character_holder.position.x = Setting.get_posx_from_time(time)
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
