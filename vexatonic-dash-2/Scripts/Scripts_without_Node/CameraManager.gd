@@ -12,8 +12,13 @@ func _process(delta: float) -> void:
 	pass
 	
 func set_default_position():
-	var vp = get_viewport().get_visible_rect().size.x / camera.zoom.x
-	camera.position = Vector2(vp * 0.3, 0.0)
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+		camera.rotation = deg_to_rad(90)
+		var vp_height = get_viewport().get_visible_rect().size.y / camera.zoom.y
+		camera.position = Vector2(vp_height * 0.2, 0.0)
+	else:
+		var vp = get_viewport().get_visible_rect().size.x / camera.zoom.x
+		camera.position = Vector2(vp * 0.3, 0.0)
 
 func move(time:float):
 	position = Vector2(Setting.get_posx_from_time(time), 0.0)

@@ -8,7 +8,7 @@ func set_character_position(time:float) -> bool:
 		queue_free()
 		return true
 	else:
-		position = Vector2(Setting.get_posx_from_time(time), lane.get_height(time)+Setting.CHARACTER_POS_Y)
+		global_position.y = lane.get_height(time) + Setting.CHARACTER_POS_Y
 		return false
 	
 	

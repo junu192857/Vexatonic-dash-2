@@ -6,7 +6,10 @@ var levelData: LevelData
 @onready var musicPlayer = $AudioStreamPlayer
 @onready var camera = $CameraManager
 
+
 var characters: Array[Character]
+@export var character_holder: Node2D
+
 var time: float
 var music_started = false
 var time_start_tick: float
@@ -53,22 +56,27 @@ func _ready() -> void:
 		#lane.print_data()
 		pass
 	
-	# 최초의 lane들에 캐릭터 생성
+	# 초기 캐릭터 및 판정선 생성
+	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
+		$CharacterHolder/Line.visible = true
 	for lane in levelData.lanes:
 		if (lane.is_init):
 			place_character(lane)
 			lane_index += 1
 	
+	
 	time_start_tick = Time.get_ticks_msec()
 
 func place_character(lane: Lane):
+	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
+		return
 	#var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
 	var character = CHARACTER_SCENE.instantiate() as Character
 	#sayane.position = Vector2(initial_pos_x, -Setting.CHARACTER_POS_Y)
 	character.set_lane(lane)
 	characters.append(character)
-	add_child(character)
-	
+	character_holder.add_child(character)
+
 	
 func _physics_process(delta: float) -> void:
 	if (not music_started):
@@ -83,6 +91,8 @@ func _physics_process(delta: float) -> void:
 	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 		place_character(levelData.lanes[lane_index])
 		lane_index += 1
+		
+	character_holder.position.x = Setting.get_posx_from_time(time)
 	for character in characters:
 		if character.set_character_position(time):
 			characters.erase(character)
@@ -123,7 +133,7 @@ func render_chart():
 		pos_x = Setting.get_posx_from_time(noteData.time)
 		var cur_note = place_note(noteData, pos_x, false, self)
 		assign_note(cur_note)
-		if (previous_time >= 0 and previous_lane == noteData.lane):
+		if (previous_time >= 0 and previous_lane == noteData.lane and Setting.gamemode != Setting.GAMEMODE.Suregi):
 			var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
 							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 	
@@ -143,8 +153,9 @@ func render_chart():
 	for lane:Lane in levelData.lanes:
 		#lane.print_data()
 		lane.sort_notes()
-		place_initial_connector(lane)
-		place_final_connector(lane)
+		if (Setting.gamemode != Setting.GAMEMODE.Suregi):
+			place_initial_connector(lane)
+			place_final_connector(lane)
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
 func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Node2D:
