@@ -2,16 +2,18 @@ extends Node2D
 
 @onready var camera = $Camera2D
 
+var triggered_position: Vector2
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#camera.zoom = Vector2(2,2)
-	set_default_position()
+	set_camera_position()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 	
-func set_default_position():
+func set_camera_position():
 	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
 		camera.rotation = deg_to_rad(90)
 		var vp_height = get_viewport().get_visible_rect().size.y / camera.zoom.y
