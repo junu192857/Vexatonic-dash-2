@@ -63,6 +63,16 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 			current_lane.add_keyframe(new_keyframe)
 			continue
 		
+		if current_lane == null and parts[0] in ["MOVE", "ROTATE", "ZOOM"] and parts.size() >= 4:
+			var trigger_type = Trigger.TYPE.Move
+			match parts[0]:
+				"MOVE":   trigger_type = Trigger.TYPE.Move
+				"ROTATE": trigger_type = Trigger.TYPE.Rotate
+				"ZOOM":   trigger_type = Trigger.TYPE.Zoom
+			data.triggers.append(Trigger.new(trigger_type, float(parts[1]), float(parts[2]), float(parts[3])))
+			continue
+
+		
 		if current_lane == null and parts.size() >= 5:
 			data.noteDatas.append(NoteData.new(float(parts[0]), int(parts[1]), int(parts[2]), \
 					float(parts[3]) if int(parts[2]) == 1 else float(parts[0]), int(parts[4])))
