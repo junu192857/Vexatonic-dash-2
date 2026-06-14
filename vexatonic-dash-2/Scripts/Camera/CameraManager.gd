@@ -13,6 +13,7 @@ var _trigger_progress: Array[float]
 var _trigger_initial: Array[float]
 
 var triggered_delta_position : Vector2
+var temp_delta_position: Vector2
 var triggered_delta_rotation: Vector2
 
 var _initialized: bool = false
@@ -39,10 +40,10 @@ func set_camera_position():
 
 # RhythmManager가 매 프레임 호출
 func move(time: float) -> void:
-
 	_apply_triggers(time)
-	position = Vector2(Setting.get_posx_from_time(time), 0.0) + triggered_delta_position
-
+	position = Vector2(Setting.get_posx_from_time(time), 0.0) + triggered_delta_position + temp_delta_position
+	print(position)
+	
 func _apply_triggers(time: float) -> void:
 	if triggers.is_empty():
 		return
@@ -52,7 +53,9 @@ func _apply_triggers(time: float) -> void:
 		for i in range(triggers.size()):
 			_snapshot_initial(i)
 		_initialized = true
-
+	
+	temp_delta_position = Vector2.ZERO
+	
 	for i in range(triggers.size()):
 		var tr: Trigger = triggers[i]
 
@@ -67,19 +70,19 @@ func _apply_triggers(time: float) -> void:
 		else:
 			new_progress = clampf((time - tr.start) / tr.t, 0.0, 1.0)
 
-		if new_progress == prev_progress:
+		if new_progress == prev_progress and new_progress == 1.0:
 			continue
 
 		var delta_ratio = new_progress - prev_progress
 		_trigger_progress[i] = new_progress
-
+		print("new_progress: %f" % new_progress)
 		match tr.type:
 			Trigger.TYPE.Move:
 				if (new_progress == 1.0):
-					triggered_delta_position.y += (tr.c - tr.progress)
+					triggered_delta_position.y += tr.c
 				else:
-					triggered_delta_position.y += tr.c * delta_ratio
-					tr.progress += tr.c * delta_ratio
+					temp_delta_position.y += tr.c * new_progress
+					print("temp delta: %f" % [tr.c * new_progress])
 
 
 			Trigger.TYPE.Rotate:
