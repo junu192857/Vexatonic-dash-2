@@ -14,7 +14,10 @@ var _trigger_initial: Array[float]
 
 var triggered_delta_position : Vector2
 var temp_delta_position: Vector2
-var triggered_delta_rotation: Vector2
+
+var triggered_delta_zoom: float = 1.0
+var temp_delta_zoom: float = 0.0
+var triggered_zoom: bool = false
 
 var _initialized: bool = false
 
@@ -29,6 +32,9 @@ func set_triggers(p_triggers: Array[Trigger]) -> void:
 	_trigger_initial.fill(0.0)
 	_initialized = false
 
+func set_camera_zoom():
+	camera.zoom = Vector2.ONE * (triggered_delta_zoom + temp_delta_zoom)
+
 func set_camera_position():
 	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
 		camera.rotation = deg_to_rad(90)
@@ -41,6 +47,9 @@ func set_camera_position():
 # RhythmManager가 매 프레임 호출
 func move(time: float) -> void:
 	_apply_triggers(time)
+	if (triggered_zoom):
+		set_camera_zoom()
+		set_camera_position()
 	position = Vector2(Setting.get_posx_from_time(time), 0.0) + triggered_delta_position + temp_delta_position
 	print(position)
 	
@@ -55,6 +64,8 @@ func _apply_triggers(time: float) -> void:
 		_initialized = true
 	
 	temp_delta_position = Vector2.ZERO
+	temp_delta_zoom = 0.0
+	triggered_zoom = false
 	
 	for i in range(triggers.size()):
 		var tr: Trigger = triggers[i]
@@ -63,8 +74,10 @@ func _apply_triggers(time: float) -> void:
 			continue
 
 		var prev_progress = _trigger_progress[i]
-
 		var new_progress: float
+		
+		
+		
 		if tr.t <= 0.0:
 			new_progress = 1.0
 		else:
@@ -95,10 +108,12 @@ func _apply_triggers(time: float) -> void:
 				camera.rotation += delta_rad
 
 			Trigger.TYPE.Zoom:
-				var zoom_delta = tr.c * delta_ratio
-				camera.zoom += Vector2(zoom_delta, zoom_delta)
-				# 줌 변경 시 판정선 위치 보정
-				set_camera_position()
+				if (new_progress == 1.0):
+					triggered_delta_zoom += tr.c
+				else:
+					temp_delta_zoom += tr.c * new_progress
+				triggered_zoom = true
+
 
 func _snapshot_initial(i: int) -> void:
 	var tr: Trigger = triggers[i]
