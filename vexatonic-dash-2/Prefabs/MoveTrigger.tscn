@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bul34fxxophy1"]
+
+[ext_resource type="Texture2D" uid="uid://dl4d3ido7koqh" path="res://Textures/MoveTrigger.png" id="1_afe7y"]
+
+[node name="MoveTrigger" type="Node2D" unique_id=1311778669]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=299281638]
+position = Vector2(13.000008, 7.000002)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("1_afe7y")

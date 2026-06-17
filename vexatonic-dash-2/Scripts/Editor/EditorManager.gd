@@ -556,6 +556,7 @@ func generate_modify_preview():
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
 	can_do_something = true
+
 func cancel_put_lane_or_note():
 	if (preview):
 		preview.queue_free()
