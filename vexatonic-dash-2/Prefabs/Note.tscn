@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://byjtw0yjya7ia"]
 
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="1_6w4eq"]
-[ext_resource type="Script" uid="uid://brm0k422e5mbt" path="res://Scripts/Note.gd" id="2_cp8im"]
+[ext_resource type="Script" uid="uid://brm0k422e5mbt" path="res://Scripts/Note/Note.gd" id="2_cp8im"]
+
 
 [node name="Note" type="Node2D" unique_id=1307802017]
 z_index = 2

@@ -2,6 +2,7 @@ class_name LevelData
 
 var lanes: Array[Lane]
 var noteDatas: Array[NoteData]
+var triggers: Array[Trigger]
 
 #레벨 이름
 var name: String

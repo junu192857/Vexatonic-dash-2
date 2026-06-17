@@ -45,6 +45,7 @@ func _ready() -> void:
 	# 채보 찍기
 	render_chart()
 	sort_note_holders()
+	camera.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
 	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.music_path)

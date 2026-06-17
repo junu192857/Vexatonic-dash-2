@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://pfmgxw12a4yj"]
 
-[ext_resource type="Script" uid="uid://bso14830e2taa" path="res://Scripts/Scripts_without_Node/JudgementText.gd" id="1_06d2l"]
+[ext_resource type="Script" uid="uid://bso14830e2taa" path="res://Scripts/JudgementText.gd" id="1_06d2l"]
+
 
 [node name="JudgementScene" type="Control" unique_id=1702890444]
 layout_mode = 3
