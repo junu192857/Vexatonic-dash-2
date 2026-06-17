@@ -238,10 +238,11 @@ func _on_select_note(selected: int):
 			inputHandler.put_note.disconnect(_on_modify)
 		
 		# selected < 20이면 레인/노트, selected > 20이면 modify
+		# TODO: 노트 선택 로직 깔끔하게 바꾸기.
 		if (selected < 20):
 			selected_color = selected % 10 - 1
 			inputHandler.put_note.connect(_on_put_note)
-		elif (selected < 30):
+		elif (selected < 30): 
 			inputHandler.put_note.connect(_on_modify)
 		elif (selected < 40):
 			inputHandler.put_note.connect(_on_put_note)
