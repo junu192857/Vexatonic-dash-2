@@ -5,6 +5,8 @@ var levelData: LevelData
 @export var NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
 @export var LINE_SCENE: PackedScene
+@export var MOVE_TRIGGER_SCENE: PackedScene
+@export var ZOOM_TRIGGER_SCENE: PackedScene
 
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
@@ -194,7 +196,8 @@ const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, \
-					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, Nothing = 100}
+					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, MoveTrigger = 31, ZoomTrigger = 32, \
+					Nothing = 100}
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
 #Case 2: lane 분기
@@ -238,8 +241,10 @@ func _on_select_note(selected: int):
 		if (selected < 20):
 			selected_color = selected % 10 - 1
 			inputHandler.put_note.connect(_on_put_note)
-		else:
+		elif (selected < 30):
 			inputHandler.put_note.connect(_on_modify)
+		elif (selected < 40):
+			inputHandler.put_note.connect(_on_put_note)
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
