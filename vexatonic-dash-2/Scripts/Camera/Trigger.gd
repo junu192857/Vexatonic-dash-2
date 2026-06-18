@@ -1,6 +1,6 @@
 class_name Trigger
 
-enum TYPE { Move, Rotate, Zoom }
+enum TYPE { Move = 31, Zoom  = 32, Rotate = 33}
 
 var type: TYPE
 var start: float

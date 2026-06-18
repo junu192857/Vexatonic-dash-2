@@ -195,9 +195,14 @@ func realign_lines_by_move():
 const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
-enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, \
-					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, MoveTrigger = 31, ZoomTrigger = 32, \
+enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, 
+					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32,
 					Nothing = 100}
+
+const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13]
+const modify: Array[int] = [21, 22, 23]
+const trigger: Array[int] = [31, 32]
+
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
 #Case 2: lane 분기
@@ -238,13 +243,12 @@ func _on_select_note(selected: int):
 			inputHandler.put_note.disconnect(_on_modify)
 		
 		# selected < 20이면 레인/노트, selected > 20이면 modify
-		# TODO: 노트 선택 로직 깔끔하게 바꾸기.
-		if (selected < 20):
+		if (selected in colored_notes):
 			selected_color = selected % 10 - 1
 			inputHandler.put_note.connect(_on_put_note)
-		elif (selected < 30): 
+		elif (selected in modify): 
 			inputHandler.put_note.connect(_on_modify)
-		elif (selected < 40):
+		elif (selected in trigger):
 			inputHandler.put_note.connect(_on_put_note)
 		current_state = EditorState.Ready
 		if (preview != null):
@@ -262,7 +266,7 @@ func _on_move_preview():
 	mouse_pos = get_global_mouse_position()
 	snapped_x = get_snapped_x(mouse_pos.x)
 	
-	if (selected_note == NoteSelection.ModifyLane or selected_note == NoteSelection.ModifyNote):
+	if (selected_note in modify):
 		if (check_mouse_in_available_area()):
 			generate_modify_preview()
 		else:
@@ -309,12 +313,16 @@ func update_preview(selected: int):
 			else:
 				preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
 				can_do_something = true
+	elif selected in trigger:
+		if (current_state == EditorState.Ready):
+			preview.position = Vector2(snapped_x, mouse_pos.y)
 	else:
 		if (current_state == EditorState.Ready):
 			if (!find_note_placing_available()):
 				cancel_put_lane_or_note()
 			else:
 				preview.position = get_preview_pos_for_note()
+				can_do_something = true
 		else:
 			if (!find_longNote_placing_available()):
 				cancel_put_lane_or_note()
@@ -420,6 +428,11 @@ func generate_preview(selected: int) -> Node2D:
 			add_child(my_preview)
 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
 			my_preview.position = lane_start_pos
+	elif selected in trigger:
+		if (current_state == EditorState.Ready):
+			my_preview = MOVE_TRIGGER_SCENE.instantiate() if selected == NoteSelection.MoveTrigger else ZOOM_TRIGGER_SCENE.instantiate()
+			add_child(my_preview)
+			my_preview.position = Vector2(snapped_x, mouse_pos.y)
 	else: #Note인 경우
 		if (current_state == EditorState.Ready):
 			if (!find_note_placing_available()):
@@ -667,6 +680,7 @@ func find_lane_placing_case() -> LanePlacingCase:
 		return LanePlacingCase.Case1
 
 	return LanePlacingCase.None
+	
 
 func find_note_placing_available() -> bool:
 	#Ready 단계: 모든 레인에서 노드 위치의 후보를 찾음.
@@ -742,11 +756,13 @@ func _on_put_note_ready():
 	if selected_note == NoteSelection.Lane:
 		lane_start_pos = preview.global_position
 		current_state = EditorState.Placing
-	elif selected_note / 10 == 0:  # 단노트
+	elif selected_note in [1,2,3]:  # 단노트
 		_place_single_note()
-	elif selected_note / 10 == 1:  # 롱노트
+	elif selected_note in [11,12,13]:  # 롱노트
 		long_start_pos = preview.global_position
 		current_state = EditorState.Placing
+	elif selected_note in trigger:
+		_place_trigger()
 
 func _on_put_note_placing():
 	if selected_note == NoteSelection.Lane:
@@ -755,6 +771,13 @@ func _on_put_note_placing():
 		_place_long_note()
 	current_state = EditorState.Ready
 
+func _place_trigger():
+	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0)
+	trigger_data.node = preview
+	trigger_data.position = preview.position
+	# TODO: Editor의 LevelData에 Trigger 추가하
+	preview = null
+	
 func _place_single_note():
 	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
 	levelData.noteDatas.append(data)
