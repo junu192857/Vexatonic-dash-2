@@ -1016,6 +1016,13 @@ func _on_delete_something():
 	cleanup_modify_values()
 	current_state = EditorState.Ready
 
+func delete_trigger():
+	levelData.triggers.erase(target_trigger)
+	target_trigger.node.queue_free()
+	cleanup_modify_values()
+	modifyPanel.visible = false
+	modifying_trigger = false
+
 func show_modify_panel():
 	modifyPanel.visible = true
 	modifying_trigger = true
