@@ -224,6 +224,7 @@ var keyframe_indicator: ENote
 var previous_connector: EConnector
 var next_connector: EConnector
 var target_note: ENote
+var target_trigger: EditorTrigger
 
 var mouse_pos: Vector2
 var snapped_x: float
@@ -294,6 +295,8 @@ func cleanup_modify_values():
 		target_note = null
 	previous_connector = null
 	next_connector = null
+	if (target_trigger != null):
+		target_trigger.unselect_trigger()
 
 #새로운 노트나 레인을 찍기 위한 preview를 이동시키는 함수.
 func update_preview(selected: int):
@@ -513,6 +516,16 @@ func generate_modify_preview():
 						target_note.process_color()
 					target_note = new_target_note
 					target_note.select_color()
+			NoteSelection.ModifyTrigger:
+				var new_target_trigger = find_target_trigger()
+				if (new_target_trigger == null):
+					cleanup_modify_values()
+					return
+				if (target_trigger != new_target_trigger):
+					if (target_trigger != null):
+						target_trigger.unselect_trigger()
+					target_trigger = new_target_trigger
+					target_trigger.select_trigger()
 			_:
 				push_error("INVALID NOTE SELECTION")
 	else:
@@ -775,7 +788,7 @@ func _place_trigger():
 	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0)
 	trigger_data.node = preview
 	trigger_data.position = preview.position
-	# TODO: Editor의 LevelData에 Trigger 추가하
+	levelData.triggers.append(trigger_data)
 	preview = null
 	
 func _place_single_note():
@@ -1388,6 +1401,18 @@ func find_target_note() -> Variant:
 				target_lane = lane
 				return find_enote_by_data(lane, noteData).get_marker()
 	
+	return null
+
+func find_target_trigger():
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
+	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
+	
+	for triggerData: EditorTrigger in levelData.triggers:
+		if triggerData.position.x < camera_left or triggerData.position.y < camera_right:
+			continue
+		if triggerData.position.y - Setting.HALF_CONNECTOR_HEIGHT > mouse_pos.y or triggerData.position.y + Setting.HALF_CONNECTOR_HEIGHT < mouse_pos.y:
+			continue
+		return triggerData
 	return null
 
 func find_enote_by_data(lane: Lane, target_data: NoteData) -> Variant:
