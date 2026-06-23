@@ -277,6 +277,7 @@ func _on_move_preview():
 		else:
 			cancel_modify_lane()
 			cancel_modify_note()
+			cancel_modify_trigger()
 	else:
 		if (preview == null):
 			if (check_mouse_in_available_area()):
@@ -592,6 +593,9 @@ func generate_modify_preview():
 						return
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
+			NoteSelection.ModifyTrigger:
+				target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+				
 	can_do_something = true
 
 func cancel_put_something():
@@ -642,6 +646,7 @@ func cancel_modify_trigger():
 	can_do_something = false
 	if (target_trigger != null):
 		target_trigger.unselect_trigger()
+		target_trigger.node.position = target_trigger.editor_position
 
 func put_keyframe_indicator():
 	var indicator = NOTE_SCENE.instantiate()
@@ -795,9 +800,8 @@ func _on_put_note_placing():
 	current_state = EditorState.Ready
 
 func _place_trigger():
-	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0)
-	trigger_data.node = preview
-	trigger_data.position = preview.position
+	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0, preview.position)
+	trigger_data.assign_node(preview)
 	levelData.triggers.append(trigger_data)
 	preview = null	
 	
@@ -918,10 +922,8 @@ func _on_modify_ready():
 			if (target_note.get_data().type == 1):
 				long_start_pos = target_note.get_parent().global_position if target_note.is_marker else target_note.global_position
 			current_state = EditorState.Placing
-			#이 시점에서 target_lane, target_note 전부 결정 완료
 		NoteSelection.ModifyTrigger:
-			if (target_trigger != null):
-				show_modify_panel()
+			current_state = EditorState.Placing
 		_:
 			push_error("Please select Modify button")
 
@@ -956,6 +958,9 @@ func _on_modify_placing():
 			head.get_data().end_time = Setting.get_time_from_posx(snapped_x)
 			adjust_longNote_connector(head, target_note.get_data().time, target_note.get_data().end_time)
 		target_note.process_color()
+	elif selected_note == NoteSelection.ModifyTrigger:
+		show_modify_panel()
+		return
 	else:
 		push_error("Please select Modify button")
 		return
@@ -1048,12 +1053,20 @@ func quit_modify_panel():
 
 	var value_spinbox: SpinBox = modifyPanel.get_node("ValueLabel").get_child(0)
 	var length_spinbox: SpinBox = modifyPanel.get_node("LengthLabel").get_child(0)
+	
 
 	target_trigger.c = value_spinbox.value
-	target_trigger.t = length_spinbox.value
+	target_trigger.t = max(length_spinbox.value, 0)
+	target_trigger.editor_position = target_trigger.node.global_position
+	target_trigger.start = Setting.get_time_from_posx(target_trigger.editor_position.x)
+	target_trigger.show_length_line()
 	cancel_modify_trigger()
 	modifyPanel.visible = false
 	modifying_trigger = false
+	
+	if (current_state == EditorState.Placing):
+		cleanup_modify_values()
+		current_state = EditorState.Ready
 
 
 func adjust_note_position():
@@ -1236,6 +1249,18 @@ func save_chart():
 	for note in levelData.noteDatas:
 		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
 	
+	# 트리거 저장
+	for trigger in levelData.triggers:
+		var type_string
+		match trigger.type:
+			Trigger.TYPE.Move:
+				type_string = "MOVE"
+			Trigger.TYPE.Rotate:
+				type_string = "ROTATE"
+			Trigger.TYPE.Zoom:
+				type_string = "ZOOM"
+		file.store_line("%s %f %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.editor_position.x, trigger.editor_position.y])
+	
 	quit_save_panel()
 	
 
@@ -1370,7 +1395,19 @@ func parse(chart_path: String):
 			marker.set_color(noteData.color)
 			marker.is_marker = true
 			marker.global_position = Vector2(Setting.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
-			
+	
+	for trigger: EditorTrigger in levelData.triggers:
+		var trigger_node
+		match trigger.type:
+			Trigger.TYPE.Move:
+				trigger_node = MOVE_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.Zoom:
+				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
+		add_child(trigger_node)
+		trigger_node.global_position = trigger.editor_position
+		trigger.assign_node(trigger_node)
+		trigger.unselect_trigger()
+		trigger.show_length_line()
 
 # ================================ 편의 기능 ============================
 
@@ -1465,9 +1502,9 @@ func find_target_trigger():
 	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
 	
 	for triggerData: EditorTrigger in levelData.triggers:
-		if triggerData.position.x < camera_left or triggerData.position.x > camera_right:
+		if triggerData.editor_position.x < camera_left or triggerData.editor_position.x > camera_right:
 			continue
-		if triggerData.position.y - Setting.HALF_CONNECTOR_HEIGHT > mouse_pos.y or triggerData.position.y + Setting.HALF_CONNECTOR_HEIGHT < mouse_pos.y:
+		if triggerData.editor_position.y - Setting.HALF_CONNECTOR_HEIGHT > mouse_pos.y or triggerData.editor_position.y + Setting.HALF_CONNECTOR_HEIGHT < mouse_pos.y:
 			continue
 		return triggerData
 	return null

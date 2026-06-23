@@ -626,7 +626,7 @@ offset_left = 196.0
 offset_top = -1.0
 offset_right = 282.5
 offset_bottom = 30.0
-max_value = 1000.0
+max_value = 1000000.0
 
 [node name="ValueLabel" type="Label" parent="CanvasLayer/ModifyTriggerPanel" unique_id=1506332063]
 layout_mode = 0
