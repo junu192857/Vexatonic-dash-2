@@ -1,7 +1,7 @@
 class_name Setting
 
 # ================== 상수 ==============================
-static var speed = 2.0
+static var speed = 1.5
 
 static var PX_PER_MS = 0.5
 #단노트의 좌우 길이

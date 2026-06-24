@@ -15,3 +15,16 @@ var music_path: String
 var difficulty: Array
 # 곡의 길이(ms단위).
 var length: float
+
+func sort_noteDatas():
+	noteDatas.sort_custom(func(a: NoteData, b: NoteData):
+		if a.lane != b.lane:
+			return a.lane < b.lane
+		return a.time < b.time
+	)
+
+func sort_triggers():
+	triggers.sort_custom(func(a:Trigger, b:Trigger):
+		return a.start < b.start
+	)
+	

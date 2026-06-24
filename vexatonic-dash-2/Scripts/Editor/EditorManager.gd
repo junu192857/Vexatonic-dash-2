@@ -119,6 +119,8 @@ func _on_zoom_camera(zoom: bool):
 	var real_zoom = pow(1.2, camera_zoom_level)
 	camera.zoom = Vector2.ONE * real_zoom
 	realign_lines_by_zoom(zoom)
+	if camera_range != null:
+		camera_range.set_line_scale(pow(1.2, 2 - camera_zoom_level))
 # ===================== 박자 구분선 출력 =====================
 
 var bit: int = 16
@@ -1413,6 +1415,7 @@ func parse(chart_path: String):
 
 var music_playing: bool = false
 var music_bar
+var camera_range: CameraRangeRect
 
 func toggle_music():
 	if (!music_playing):
@@ -1424,11 +1427,15 @@ func toggle_music():
 		music_bar = put_line(initial_pos_x, true)
 		music_bar.get_child(0).modulate = Color(120,120,0)
 		music_bar.scale.x = pow(1.2, 2-camera_zoom_level)
+		camera_range = CameraRangeRect.new()
+		add_child(camera_range)
 	else:
 		noteSelectorPanel.get_node("PlayMusicButton").text = "Play Music"
 		music_playing = false
 		music_bar.queue_free()
 		music_bar = null
+		camera_range.queue_free()
+		camera_range = null
 		musicPlayer.stop()
 
 func get_music_start_pos() -> float:
@@ -1437,7 +1444,27 @@ func get_music_start_pos() -> float:
 
 func _process(_delta:float):
 	if (music_bar != null):
-		music_bar.global_position.x = Setting.get_posx_from_time(musicPlayer.get_playback_position() * 1000)
+		var current_time = musicPlayer.get_playback_position() * 1000
+		music_bar.global_position.x = Setting.get_posx_from_time(current_time)
+		camera_range.set_bounds(get_camera_bounds_at(current_time))
+
+func get_camera_bounds_at(time: float) -> Rect2:
+	var zoom = 1.0
+	var delta_y = 0.0
+	for tr in levelData.triggers:
+		if time < tr.start:
+			continue
+		var progress = 1.0 if tr.t <= 0.0 else clampf((time - tr.start) / tr.t, 0.0, 1.0)
+		match tr.type:
+			Trigger.TYPE.Zoom:
+				zoom += tr.c * progress
+			Trigger.TYPE.Move:
+				delta_y += tr.c * progress
+	var vp = get_viewport_rect().size
+	var vp_w = vp.x / zoom
+	var vp_h = vp.y / zoom
+	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
+	return Rect2(center_x - vp_w * 0.5, delta_y - vp_h * 0.5, vp_w, vp_h)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
