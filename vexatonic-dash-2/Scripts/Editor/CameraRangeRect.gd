@@ -10,7 +10,7 @@ func set_bounds(rect: Rect2) -> void:
 	queue_redraw()
 
 func set_line_scale(s: float) -> void:
-	line_scale = s
+	line_scale = s * 6.0
 	queue_redraw()
 
 

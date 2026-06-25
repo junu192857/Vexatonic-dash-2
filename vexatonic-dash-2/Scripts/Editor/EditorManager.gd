@@ -648,7 +648,7 @@ func cancel_modify_trigger():
 	can_do_something = false
 	if (target_trigger != null):
 		target_trigger.unselect_trigger()
-		target_trigger.node.position = target_trigger.editor_position
+		target_trigger.node.position = target_trigger.get_editor_position()
 
 func put_keyframe_indicator():
 	var indicator = NOTE_SCENE.instantiate()
@@ -802,7 +802,7 @@ func _on_put_note_placing():
 	current_state = EditorState.Ready
 
 func _place_trigger():
-	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0, preview.position)
+	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0, preview.position.y)
 	trigger_data.assign_node(preview)
 	levelData.triggers.append(trigger_data)
 	preview = null	
@@ -1017,18 +1017,14 @@ func _on_delete_something():
 				levelData.noteDatas.erase(noteData)
 				target_lane.notes.erase(target_note)
 				target_note.queue_free()  # 단노트 또는 롱노트 앞부분 삭제 시 자식도 같이 삭제됨
+		NoteSelection.ModifyTrigger:
+			levelData.triggers.erase(target_trigger)
+			target_trigger.node.queue_free()
 		_:
 			push_error("Please select modify button")
 			return
 	cleanup_modify_values()
 	current_state = EditorState.Ready
-
-func delete_trigger():
-	levelData.triggers.erase(target_trigger)
-	target_trigger.node.queue_free()
-	cleanup_modify_values()
-	modifyPanel.visible = false
-	modifying_trigger = false
 
 func show_modify_panel():
 	modifyPanel.visible = true
@@ -1059,8 +1055,8 @@ func quit_modify_panel():
 
 	target_trigger.c = value_spinbox.value
 	target_trigger.t = max(length_spinbox.value, 0)
-	target_trigger.editor_position = target_trigger.node.global_position
-	target_trigger.start = Setting.get_time_from_posx(target_trigger.editor_position.x)
+	target_trigger.editor_pos_y = target_trigger.node.global_position.y
+	target_trigger.start = Setting.get_time_from_posx(target_trigger.node.global_position.x)
 	target_trigger.show_length_line()
 	cancel_modify_trigger()
 	modifyPanel.visible = false
@@ -1261,7 +1257,7 @@ func save_chart():
 				type_string = "ROTATE"
 			Trigger.TYPE.Zoom:
 				type_string = "ZOOM"
-		file.store_line("%s %f %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.editor_position.x, trigger.editor_position.y])
+		file.store_line("%s %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.node.global_position.y])
 	
 	quit_save_panel()
 	
@@ -1406,7 +1402,7 @@ func parse(chart_path: String):
 			Trigger.TYPE.Zoom:
 				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
 		add_child(trigger_node)
-		trigger_node.global_position = trigger.editor_position
+		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)
 		trigger.unselect_trigger()
 		trigger.show_length_line()
@@ -1528,10 +1524,14 @@ func find_target_trigger():
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
 	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
 	
+	
+	
 	for triggerData: EditorTrigger in levelData.triggers:
-		if triggerData.editor_position.x < camera_left or triggerData.editor_position.x > camera_right:
+		var trigger_position = triggerData.get_editor_position()
+		if trigger_position.x < camera_left or trigger_position.x > camera_right:
 			continue
-		if triggerData.editor_position.y - Setting.HALF_CONNECTOR_HEIGHT > mouse_pos.y or triggerData.editor_position.y + Setting.HALF_CONNECTOR_HEIGHT < mouse_pos.y:
+		var distance = trigger_position.distance_to(mouse_pos)
+		if distance > 2 * Setting.HALF_CONNECTOR_HEIGHT:
 			continue
 		return triggerData
 	return null

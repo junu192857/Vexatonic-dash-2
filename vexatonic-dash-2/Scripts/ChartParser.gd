@@ -72,7 +72,7 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 				_:
 					push_error("PARSE ERROR: UNKNOWN TRIGGER TYPE")
 			if (is_editor):
-				data.triggers.append(EditorTrigger.new(trigger_type, float(parts[1]), float(parts[2]), float(parts[3]), Vector2(float(parts[4]), float(parts[5]))))
+				data.triggers.append(EditorTrigger.new(trigger_type, float(parts[1]), float(parts[2]), float(parts[3]),float(parts[4])))
 			else:
 				data.triggers.append(Trigger.new(trigger_type, float(parts[1]), float(parts[2]), float(parts[3])))
 			continue
