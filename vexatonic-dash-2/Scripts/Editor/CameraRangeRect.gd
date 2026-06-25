@@ -10,13 +10,13 @@ func set_bounds(rect: Rect2) -> void:
 	queue_redraw()
 
 func set_line_scale(s: float) -> void:
-	line_scale = s * 6.0
+	line_scale = s
 	queue_redraw()
 
 
 func _draw() -> void:
 	var r = _rect
-	var s = line_scale
+	var s = line_scale * Setting.EDITOR_LINE_WIDTH
 	# 가로변 (두께 = y방향 s)
 	draw_rect(Rect2(r.position.x, r.position.y, r.size.x, s), color, true)
 	draw_rect(Rect2(r.position.x, r.position.y + r.size.y - s, r.size.x, s), color, true)
