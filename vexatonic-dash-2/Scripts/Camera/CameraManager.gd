@@ -125,6 +125,7 @@ func _snapshot_initial(i: int) -> void:
 		Trigger.TYPE.Zoom:
 			_trigger_initial[i] = camera.zoom.x
 
+
 # 판정선 중앙 위치 반환 (Camera2D 로컬 좌표)
 func _get_rotation_pivot() -> Vector2:
 	var vp = get_viewport().get_visible_rect().size

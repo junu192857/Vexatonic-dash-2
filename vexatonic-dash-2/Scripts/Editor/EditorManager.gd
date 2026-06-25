@@ -5,6 +5,8 @@ var levelData: LevelData
 @export var NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
 @export var LINE_SCENE: PackedScene
+@export var MOVE_TRIGGER_SCENE: PackedScene
+@export var ZOOM_TRIGGER_SCENE: PackedScene
 
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
@@ -15,6 +17,7 @@ var levelData: LevelData
 @onready var settingPanel = $CanvasLayer/SettingPanel
 @onready var savePanel = $CanvasLayer/SavePanel
 @onready var loadPanel = $CanvasLayer/LoadPanel
+@onready var modifyPanel = $CanvasLayer/ModifyTriggerPanel
 
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
@@ -95,13 +98,13 @@ var drag_start: Vector2
 var camera_zoom_level: int = 1
 
 func _on_move_camera(delta: Vector2):
-	if !editor_ready:
+	if !editor_ready or modifying_trigger:
 		return
 	camera.position -= delta
 	realign_lines_by_move()
 
 func _on_zoom_camera(zoom: bool):
-	if !editor_ready:
+	if !editor_ready or modifying_trigger:
 		return
 	if zoom:
 		if camera_zoom_level < 5:
@@ -116,12 +119,16 @@ func _on_zoom_camera(zoom: bool):
 	var real_zoom = pow(1.2, camera_zoom_level)
 	camera.zoom = Vector2.ONE * real_zoom
 	realign_lines_by_zoom(zoom)
+	if camera_range != null:
+		camera_range.set_line_scale(pow(1.2, 2 - camera_zoom_level))
 # ===================== 박자 구분선 출력 =====================
 
 var bit: int = 16
 @onready var line_holder = $LineHolder
 
 func set_bit(p_bit: int):
+	if !editor_ready or modifying_trigger:
+		return
 	bit = p_bit # 4, 6, 8, 12, 16, 24, 32, 48, free(0)
 	place_bar_lines()
 
@@ -193,8 +200,14 @@ func realign_lines_by_move():
 const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
-enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, \
-					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, Nothing = 100}
+enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, 
+					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32,
+					Nothing = 100}
+
+const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13]
+const modify: Array[int] = [21, 22, 23]
+const trigger: Array[int] = [31, 32]
+
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
 #Case 2: lane 분기
@@ -216,6 +229,7 @@ var keyframe_indicator: ENote
 var previous_connector: EConnector
 var next_connector: EConnector
 var target_note: ENote
+var target_trigger: EditorTrigger
 
 var mouse_pos: Vector2
 var snapped_x: float
@@ -223,9 +237,10 @@ var adjusted_y: float
 var shifting: bool
 
 var can_do_something
+var modifying_trigger: bool
 
 func _on_select_note(selected: int):
-	if (!editor_ready):
+	if !editor_ready or modifying_trigger:
 		return
 	if selected in NoteSelection.values():
 		selected_note = selected as NoteSelection
@@ -235,11 +250,13 @@ func _on_select_note(selected: int):
 			inputHandler.put_note.disconnect(_on_modify)
 		
 		# selected < 20이면 레인/노트, selected > 20이면 modify
-		if (selected < 20):
+		if (selected in colored_notes):
 			selected_color = selected % 10 - 1
 			inputHandler.put_note.connect(_on_put_note)
-		else:
+		elif (selected in modify): 
 			inputHandler.put_note.connect(_on_modify)
+		elif (selected in trigger):
+			inputHandler.put_note.connect(_on_put_note)
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
@@ -251,17 +268,18 @@ func _on_select_note(selected: int):
 	
 
 func _on_move_preview():
-	if (!editor_ready):
+	if !editor_ready or modifying_trigger:
 		return
 	mouse_pos = get_global_mouse_position()
 	snapped_x = get_snapped_x(mouse_pos.x)
 	
-	if (selected_note == NoteSelection.ModifyLane or selected_note == NoteSelection.ModifyNote):
+	if (selected_note in modify):
 		if (check_mouse_in_available_area()):
 			generate_modify_preview()
 		else:
 			cancel_modify_lane()
 			cancel_modify_note()
+			cancel_modify_trigger()
 	else:
 		if (preview == null):
 			if (check_mouse_in_available_area()):
@@ -284,6 +302,9 @@ func cleanup_modify_values():
 		target_note = null
 	previous_connector = null
 	next_connector = null
+	if (target_trigger != null):
+		target_trigger.unselect_trigger()
+		target_trigger = null
 
 #새로운 노트나 레인을 찍기 위한 preview를 이동시키는 함수.
 func update_preview(selected: int):
@@ -293,25 +314,29 @@ func update_preview(selected: int):
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case()
 			if lane_case == LanePlacingCase.None:
-				cancel_put_lane_or_note()
+				cancel_put_something()
 			else: 
 				preview.position = get_preview_pos_for_lane(lane_case)
 				can_do_something = true
 		else:
 			if (lane_start_pos.x >= snapped_x):
-				cancel_put_lane_or_note()
+				cancel_put_something()
 			else:
 				preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
 				can_do_something = true
+	elif selected in trigger:
+		if (current_state == EditorState.Ready):
+			preview.position = Vector2(snapped_x, mouse_pos.y)
 	else:
 		if (current_state == EditorState.Ready):
 			if (!find_note_placing_available()):
-				cancel_put_lane_or_note()
+				cancel_put_something()
 			else:
 				preview.position = get_preview_pos_for_note()
+				can_do_something = true
 		else:
 			if (!find_longNote_placing_available()):
-				cancel_put_lane_or_note()
+				cancel_put_something()
 			else:
 				print("REAL snapped_x: %f" % snapped_x)
 				var connector_start_x = long_start_pos.x + Setting.NOTE_WIDTH / 2.0
@@ -399,7 +424,7 @@ func generate_preview(selected: int) -> Node2D:
 		if (current_state == EditorState.Ready):
 			lane_case = find_lane_placing_case()
 			if lane_case == LanePlacingCase.None:
-				cancel_put_lane_or_note()
+				cancel_put_something()
 				return null
 			else:
 				my_preview = CONNECTOR_SCENE.instantiate()
@@ -407,17 +432,22 @@ func generate_preview(selected: int) -> Node2D:
 				my_preview.position = get_preview_pos_for_lane(lane_case)
 		else:
 			if (lane_start_pos.x >= snapped_x):
-				cancel_put_lane_or_note()
+				cancel_put_something()
 				return null
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
 			add_child(my_preview)
 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
 			my_preview.position = lane_start_pos
+	elif selected in trigger:
+		if (current_state == EditorState.Ready):
+			my_preview = MOVE_TRIGGER_SCENE.instantiate() if selected == NoteSelection.MoveTrigger else ZOOM_TRIGGER_SCENE.instantiate()
+			add_child(my_preview)
+			my_preview.position = Vector2(snapped_x, mouse_pos.y)
 	else: #Note인 경우
 		if (current_state == EditorState.Ready):
 			if (!find_note_placing_available()):
-				cancel_put_lane_or_note()
+				cancel_put_something()
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
@@ -425,7 +455,7 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.set_color(selected_color)
 		else: #Note이고 Placing인 경우: 무조건 LongNote
 			if (!find_longNote_placing_available()):
-				cancel_put_lane_or_note()
+				cancel_put_something()
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
@@ -470,7 +500,7 @@ func generate_preview(selected: int) -> Node2D:
 	return my_preview
 
 func generate_modify_preview():
-	if (!editor_ready):
+	if (!editor_ready or modifying_trigger):
 		return
 	if (current_state == EditorState.Ready):
 		match selected_note:
@@ -494,6 +524,16 @@ func generate_modify_preview():
 						target_note.process_color()
 					target_note = new_target_note
 					target_note.select_color()
+			NoteSelection.ModifyTrigger:
+				var new_target_trigger = find_target_trigger()
+				if (new_target_trigger == null):
+					cleanup_modify_values()
+					return
+				if (target_trigger != new_target_trigger):
+					if (target_trigger != null):
+						target_trigger.unselect_trigger()
+					target_trigger = new_target_trigger
+					target_trigger.select_trigger()
 			_:
 				push_error("INVALID NOTE SELECTION")
 	else:
@@ -555,8 +595,12 @@ func generate_modify_preview():
 						return
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
+			NoteSelection.ModifyTrigger:
+				target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+				
 	can_do_something = true
-func cancel_put_lane_or_note():
+
+func cancel_put_something():
 	if (preview):
 		preview.queue_free()
 		preview = null
@@ -599,6 +643,12 @@ func cancel_modify_note():
 			else:
 				move_only_parent(target_note, Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time)))
 				adjust_longNote_connector(target_note, data.time, data.end_time)
+
+func cancel_modify_trigger():
+	can_do_something = false
+	if (target_trigger != null):
+		target_trigger.unselect_trigger()
+		target_trigger.node.position = target_trigger.get_editor_position()
 
 func put_keyframe_indicator():
 	var indicator = NOTE_SCENE.instantiate()
@@ -660,6 +710,7 @@ func find_lane_placing_case() -> LanePlacingCase:
 		return LanePlacingCase.Case1
 
 	return LanePlacingCase.None
+	
 
 func find_note_placing_available() -> bool:
 	#Ready 단계: 모든 레인에서 노드 위치의 후보를 찾음.
@@ -722,7 +773,7 @@ func get_preview_pos_for_note() -> Vector2:
 	return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 
 func _on_put_note():
-	if !editor_ready or !can_do_something or !check_mouse_in_available_area():
+	if !editor_ready or !can_do_something or modifying_trigger or !check_mouse_in_available_area():
 		return
 	if (preview == null):
 		return
@@ -735,11 +786,13 @@ func _on_put_note_ready():
 	if selected_note == NoteSelection.Lane:
 		lane_start_pos = preview.global_position
 		current_state = EditorState.Placing
-	elif selected_note / 10 == 0:  # 단노트
+	elif selected_note in [1,2,3]:  # 단노트
 		_place_single_note()
-	elif selected_note / 10 == 1:  # 롱노트
+	elif selected_note in [11,12,13]:  # 롱노트
 		long_start_pos = preview.global_position
 		current_state = EditorState.Placing
+	elif selected_note in trigger:
+		_place_trigger()
 
 func _on_put_note_placing():
 	if selected_note == NoteSelection.Lane:
@@ -748,6 +801,15 @@ func _on_put_note_placing():
 		_place_long_note()
 	current_state = EditorState.Ready
 
+func _place_trigger():
+	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0, preview.position.y)
+	trigger_data.assign_node(preview)
+	levelData.triggers.append(trigger_data)
+	preview = null	
+	
+	target_trigger = trigger_data
+	show_modify_panel()
+	
 func _place_single_note():
 	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
 	levelData.noteDatas.append(data)
@@ -811,7 +873,7 @@ func _place_lane_case3():
 
 func _on_modify():
 	print("Hello from modify")
-	if !editor_ready or !check_mouse_in_available_area() or !can_do_something:
+	if !editor_ready or modifying_trigger or !check_mouse_in_available_area() or !can_do_something:
 		return
 	match current_state:
 		EditorState.Ready:
@@ -820,50 +882,52 @@ func _on_modify():
 			_on_modify_placing()
 
 func _on_modify_ready():
-	if (selected_note == NoteSelection.ModifyLane):
-		print("Target lane index: %d" % target_lane.lane_index)
-		if target_keyframe.lane_index == -1:  # Adding new keyframe
-			# 1. previous_connector 찾기
-			print("Finding previous connector..")
-			for connector in target_lane.editor_connectors:
-				var conn_start_x = Setting.get_posx_from_time(connector.start_keyframe.kf.x)
-				var target_x = Setting.get_posx_from_time(target_keyframe.kf.x)
-				if conn_start_x < target_x:
-					if previous_connector == null or conn_start_x > Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x):
-						previous_connector = connector
-	
-			if previous_connector == null:
-				push_error("previous_connector를 찾을 수 없습니다.")
-				return
-	
-			# 2. previous_connector의 end_keyframe을 target_keyframe으로 바꾸기
-			var old_end_keyframe = previous_connector.end_keyframe
-			previous_connector.end_keyframe = target_keyframe
-			previous_connector.set_data_from_keyframes()
-			# 3. next_connector 새로 만들기
-			next_connector = CONNECTOR_SCENE.instantiate()
-			add_child(next_connector)
-			next_connector.set_editor_values(target_lane, target_keyframe, old_end_keyframe)
-			next_connector.set_data_from_keyframes()
-			
-			current_state = EditorState.Placing
-		else:
-			for connector in target_lane.editor_connectors:
-				if connector.end_keyframe == target_keyframe:
-					previous_connector = connector
-					print("Set previous connector")
-				if connector.start_keyframe == target_keyframe:
-					next_connector = connector
-					print("Set end connector")
-			current_state = EditorState.Placing
+	match selected_note:
+		NoteSelection.ModifyLane:
+			print("Target lane index: %d" % target_lane.lane_index)
+			if target_keyframe.lane_index == -1:  # Adding new keyframe
+				# 1. previous_connector 찾기
+				print("Finding previous connector..")
+				for connector in target_lane.editor_connectors:
+					var conn_start_x = Setting.get_posx_from_time(connector.start_keyframe.kf.x)
+					var target_x = Setting.get_posx_from_time(target_keyframe.kf.x)
+					if conn_start_x < target_x:
+						if previous_connector == null or conn_start_x > Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x):
+							previous_connector = connector
 		
-	elif (selected_note == NoteSelection.ModifyNote):
-		if (target_note.get_data().type == 1):
-			long_start_pos = target_note.get_parent().global_position if target_note.is_marker else target_note.global_position
-		current_state = EditorState.Placing
-		#이 시점에서 target_lane, target_note 전부 결정 완료
-	else:
-		push_error("Please select Modify button")
+				if previous_connector == null:
+					push_error("previous_connector를 찾을 수 없습니다.")
+					return
+		
+				# 2. previous_connector의 end_keyframe을 target_keyframe으로 바꾸기
+				var old_end_keyframe = previous_connector.end_keyframe
+				previous_connector.end_keyframe = target_keyframe
+				previous_connector.set_data_from_keyframes()
+				# 3. next_connector 새로 만들기
+				next_connector = CONNECTOR_SCENE.instantiate()
+				add_child(next_connector)
+				next_connector.set_editor_values(target_lane, target_keyframe, old_end_keyframe)
+				next_connector.set_data_from_keyframes()
+				
+				current_state = EditorState.Placing
+			else:
+				for connector in target_lane.editor_connectors:
+					if connector.end_keyframe == target_keyframe:
+						previous_connector = connector
+						print("Set previous connector")
+					if connector.start_keyframe == target_keyframe:
+						next_connector = connector
+						print("Set end connector")
+				current_state = EditorState.Placing
+			
+		NoteSelection.ModifyNote:
+			if (target_note.get_data().type == 1):
+				long_start_pos = target_note.get_parent().global_position if target_note.is_marker else target_note.global_position
+			current_state = EditorState.Placing
+		NoteSelection.ModifyTrigger:
+			current_state = EditorState.Placing
+		_:
+			push_error("Please select Modify button")
 
 func _on_modify_placing():
 	if selected_note == NoteSelection.ModifyLane:
@@ -896,6 +960,9 @@ func _on_modify_placing():
 			head.get_data().end_time = Setting.get_time_from_posx(snapped_x)
 			adjust_longNote_connector(head, target_note.get_data().time, target_note.get_data().end_time)
 		target_note.process_color()
+	elif selected_note == NoteSelection.ModifyTrigger:
+		show_modify_panel()
+		return
 	else:
 		push_error("Please select Modify button")
 		return
@@ -903,7 +970,7 @@ func _on_modify_placing():
 	current_state = EditorState.Ready
 
 func _on_delete_something():
-	if (!editor_ready or current_state != EditorState.Placing):
+	if (!editor_ready or modifying_trigger or current_state != EditorState.Placing):
 		return
 	match selected_note:
 		NoteSelection.ModifyLane:
@@ -950,11 +1017,55 @@ func _on_delete_something():
 				levelData.noteDatas.erase(noteData)
 				target_lane.notes.erase(target_note)
 				target_note.queue_free()  # 단노트 또는 롱노트 앞부분 삭제 시 자식도 같이 삭제됨
+		NoteSelection.ModifyTrigger:
+			levelData.triggers.erase(target_trigger)
+			target_trigger.node.queue_free()
 		_:
 			push_error("Please select modify button")
 			return
 	cleanup_modify_values()
 	current_state = EditorState.Ready
+
+func show_modify_panel():
+	modifyPanel.visible = true
+	modifying_trigger = true
+	
+	if (target_trigger == null):
+		push_error("Why no target trigger?!")
+	
+	var value_label: Label = modifyPanel.get_node("ValueLabel")
+	var value_spinbox: SpinBox = value_label.get_child(0)
+	var length_spinbox: SpinBox = modifyPanel.get_node("LengthLabel").get_child(0)
+	
+	match target_trigger.type:
+		Trigger.TYPE.Move:
+			value_label.text = "Move_Length:"
+		Trigger.TYPE.Zoom:
+			value_label.text = "Zoom_value:"
+	value_spinbox.value = target_trigger.c
+	length_spinbox.value = target_trigger.t
+
+func quit_modify_panel():
+	if (target_trigger == null):
+		push_error("Why no target trigger?!")
+
+	var value_spinbox: SpinBox = modifyPanel.get_node("ValueLabel").get_child(0)
+	var length_spinbox: SpinBox = modifyPanel.get_node("LengthLabel").get_child(0)
+	
+
+	target_trigger.c = value_spinbox.value
+	target_trigger.t = max(length_spinbox.value, 0)
+	target_trigger.editor_pos_y = target_trigger.node.global_position.y
+	target_trigger.start = Setting.get_time_from_posx(target_trigger.node.global_position.x)
+	target_trigger.show_length_line()
+	cancel_modify_trigger()
+	modifyPanel.visible = false
+	modifying_trigger = false
+	
+	if (current_state == EditorState.Placing):
+		cleanup_modify_values()
+		current_state = EditorState.Ready
+
 
 func adjust_note_position():
 	var lane_start_time = target_lane.keyframes[0].kf.x
@@ -1136,6 +1247,18 @@ func save_chart():
 	for note in levelData.noteDatas:
 		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
 	
+	# 트리거 저장
+	for trigger in levelData.triggers:
+		var type_string
+		match trigger.type:
+			Trigger.TYPE.Move:
+				type_string = "MOVE"
+			Trigger.TYPE.Rotate:
+				type_string = "ROTATE"
+			Trigger.TYPE.Zoom:
+				type_string = "ZOOM"
+		file.store_line("%s %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.node.global_position.y])
+	
 	quit_save_panel()
 	
 
@@ -1270,12 +1393,25 @@ func parse(chart_path: String):
 			marker.set_color(noteData.color)
 			marker.is_marker = true
 			marker.global_position = Vector2(Setting.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
-			
+	
+	for trigger: EditorTrigger in levelData.triggers:
+		var trigger_node
+		match trigger.type:
+			Trigger.TYPE.Move:
+				trigger_node = MOVE_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.Zoom:
+				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
+		add_child(trigger_node)
+		trigger_node.global_position = trigger.get_editor_position()
+		trigger.assign_node(trigger_node)
+		trigger.unselect_trigger()
+		trigger.show_length_line()
 
 # ================================ 편의 기능 ============================
 
 var music_playing: bool = false
 var music_bar
+var camera_range: CameraRangeRect
 
 func toggle_music():
 	if (!music_playing):
@@ -1287,11 +1423,15 @@ func toggle_music():
 		music_bar = put_line(initial_pos_x, true)
 		music_bar.get_child(0).modulate = Color(120,120,0)
 		music_bar.scale.x = pow(1.2, 2-camera_zoom_level)
+		camera_range = CameraRangeRect.new()
+		add_child(camera_range)
 	else:
 		noteSelectorPanel.get_node("PlayMusicButton").text = "Play Music"
 		music_playing = false
 		music_bar.queue_free()
 		music_bar = null
+		camera_range.queue_free()
+		camera_range = null
 		musicPlayer.stop()
 
 func get_music_start_pos() -> float:
@@ -1300,7 +1440,27 @@ func get_music_start_pos() -> float:
 
 func _process(_delta:float):
 	if (music_bar != null):
-		music_bar.global_position.x = Setting.get_posx_from_time(musicPlayer.get_playback_position() * 1000)
+		var current_time = musicPlayer.get_playback_position() * 1000
+		music_bar.global_position.x = Setting.get_posx_from_time(current_time)
+		camera_range.set_bounds(get_camera_bounds_at(current_time))
+
+func get_camera_bounds_at(time: float) -> Rect2:
+	var zoom = 1.0
+	var delta_y = 0.0
+	for tr in levelData.triggers:
+		if time < tr.start:
+			continue
+		var progress = 1.0 if tr.t <= 0.0 else clampf((time - tr.start) / tr.t, 0.0, 1.0)
+		match tr.type:
+			Trigger.TYPE.Zoom:
+				zoom += tr.c * progress
+			Trigger.TYPE.Move:
+				delta_y += tr.c * progress
+	var vp = get_viewport_rect().size
+	var vp_w = vp.x / zoom
+	var vp_h = vp.y / zoom
+	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
+	return Rect2(center_x - vp_w * 0.5, delta_y - vp_h * 0.5, vp_w, vp_h)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
@@ -1360,6 +1520,22 @@ func find_target_note() -> Variant:
 	
 	return null
 
+func find_target_trigger():
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
+	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
+	
+	
+	
+	for triggerData: EditorTrigger in levelData.triggers:
+		var trigger_position = triggerData.get_editor_position()
+		if trigger_position.x < camera_left or trigger_position.x > camera_right:
+			continue
+		var distance = trigger_position.distance_to(mouse_pos)
+		if distance > 2 * Setting.HALF_CONNECTOR_HEIGHT:
+			continue
+		return triggerData
+	return null
+
 func find_enote_by_data(lane: Lane, target_data: NoteData) -> Variant:
 	for note in lane.notes:
 		if note.get_data() == target_data:
@@ -1381,13 +1557,13 @@ func move_only_parent(parent: Node2D, pos: Vector2):
 		fixed_children[i].global_position = saved_positions[i]
 
 func _on_toggle_shifting(pressed: bool):
-	if (!editor_ready):
+	if (!editor_ready or modifying_trigger):
 		return
 	shifting = pressed
 	_on_move_preview()
 	
 func _on_move_to_last_note():
-	if (!editor_ready):
+	if (!editor_ready or modifying_trigger):
 		return
 	var last_note = levelData.noteDatas.reduce(func(a, b): return a if a.time > b.time else b)
 	camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))

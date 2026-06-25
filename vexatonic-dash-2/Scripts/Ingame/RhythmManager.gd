@@ -37,11 +37,8 @@ func _ready() -> void:
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
-	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
-		if a.lane != b.lane:
-			return a.lane < b.lane
-		return a.time < b.time
-	)
+	levelData.sort_noteDatas()
+	levelData.sort_triggers()
 	# 채보 찍기
 	render_chart()
 	sort_note_holders()
