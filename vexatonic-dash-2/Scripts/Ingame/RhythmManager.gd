@@ -42,6 +42,12 @@ func _ready() -> void:
 	# 채보 찍기
 	render_chart()
 	sort_note_holders()
+	
+	if Setting.judge_offset != 0.0:
+		for noteData in levelData.noteDatas:
+			noteData.time -= Setting.judge_offset
+			noteData.end_time -= Setting.judge_offset
+	
 	camera.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
@@ -79,12 +85,12 @@ func place_character(lane: Lane):
 func _physics_process(delta: float) -> void:
 	if (not music_started):
 		time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
-		if time >= 0:
+		if time >= Setting.sound_offset:
 			musicPlayer.play()
 			music_start_tick = Time.get_ticks_msec()
 			music_started = true
 	else:
-		time = musicPlayer.get_playback_position() * 1000
+		time = musicPlayer.get_playback_position() * 1000 + Setting.sound_offset
 	
 	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 		place_character(levelData.lanes[lane_index])
