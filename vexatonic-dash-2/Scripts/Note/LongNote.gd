@@ -29,9 +29,13 @@ func start_hold(is_left: bool, time: float, start_adjust: bool) -> void:
 	else:
 		is_holding_right = true
 	if (not before and is_holding_anyway()):
-		hold_paint_from = get_data().time if start_adjust else time
-		last_press_start = hold_paint_from
+		if (start_adjust):
+			last_press_start = get_data().time
+			hold_paint_from = target_visual_connector.c_start_time
+		last_press_start = get_data().time if start_adjust else time
+		hold_paint_from = target_visual_connector.c_start_time if start_adjust else time
 		update_visual_polygon(time)
+		
 
 func release_hold(is_left: bool, time: float) -> void:
 	var before = is_holding_anyway()
@@ -82,6 +86,7 @@ func update_hold_visual(to_time: float) -> void:
 		return
 
 	target_visual_connector.paint_range(hold_paint_from, to_time)
+
 
 func update_last_hold_visual():
 	while (target_visual_connector != null):

@@ -91,6 +91,7 @@ func _judge_long_end(note: Note):
 		note.finalize_hold_time(note.get_data().end_time)
 		note.get_marker().process_color()
 		note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker(), true)
+		note.update_last_hold_visual()
 	else:
 		note.spread_judgement(Note.Judgement.MISS, note.get_marker(), true)
 
