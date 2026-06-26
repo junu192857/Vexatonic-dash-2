@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cw8p2v3afm85j"]
+
+[ext_resource type="Texture2D" uid="uid://c5fdc3k4f5wh0" path="res://Textures/BPMTrigger.png" id="1_gvsxb"]
+
+[node name="BPMTrigger" type="Node2D" unique_id=1311778669]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=326156791]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_right = 6.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=299281638]
+position = Vector2(17, 2)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("1_gvsxb")
