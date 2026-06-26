@@ -13,9 +13,6 @@ static var CHARACTER_POS_Y = -26
 
 const DIFFICULTY_NAMES = ["Easy", "Hard", "Vex"]
 
-static func get_speed() -> float:
-	return speed
-
 static var EPSILON = 0.1
 
 static var INFINITE = 99999999
@@ -31,6 +28,8 @@ enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
 
 static var score_display = SCORE_DISPLAY.Decreasing
 static var gamemode = GAMEMODE.Normal_Character
+static var sound_offset: float = 100.0
+static var judge_offset: float = 0
 
 # ==================== 관련 함수 ============================
 

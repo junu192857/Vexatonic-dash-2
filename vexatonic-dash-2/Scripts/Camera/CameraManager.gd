@@ -51,7 +51,6 @@ func move(time: float) -> void:
 		set_camera_zoom()
 		set_camera_position()
 	position = Vector2(Setting.get_posx_from_time(time), 0.0) + triggered_delta_position + temp_delta_position
-	print(position)
 	
 func _apply_triggers(time: float) -> void:
 	if triggers.is_empty():
