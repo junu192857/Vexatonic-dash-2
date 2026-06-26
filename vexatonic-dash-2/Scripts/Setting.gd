@@ -30,8 +30,32 @@ static var score_display = SCORE_DISPLAY.Decreasing
 static var gamemode = GAMEMODE.Normal_Character
 static var sound_offset: float = 0
 static var judge_offset: float = 0
+static var selected_difficulty: int = 0
 
 # ==================== 관련 함수 ============================
+
+const SETTINGS_PATH = "user://settings.cfg"
+const SECTION = "player"
+
+#Setting.save()를 호출해야 저장이 됨. 아직은 안 됨
+static func save() -> void:
+	var cfg = ConfigFile.new()
+	cfg.set_value(SECTION, "speed", speed)
+	cfg.set_value(SECTION, "score_display", score_display)
+	cfg.set_value(SECTION, "gamemode", gamemode)
+	cfg.set_value(SECTION, "sound_offset", sound_offset)
+	cfg.set_value(SECTION, "judge_offset", judge_offset)
+	cfg.save(SETTINGS_PATH)
+
+static func load() -> void:
+	var cfg = ConfigFile.new()
+	if cfg.load(SETTINGS_PATH) != OK:
+		return
+	speed         = cfg.get_value(SECTION, "speed",         speed)
+	score_display = cfg.get_value(SECTION, "score_display", score_display)
+	gamemode      = cfg.get_value(SECTION, "gamemode",      gamemode)
+	sound_offset  = cfg.get_value(SECTION, "sound_offset",  sound_offset)
+	judge_offset  = cfg.get_value(SECTION, "judge_offset",  judge_offset)
 
 static var time_per_note_width = NOTE_WIDTH / (PX_PER_MS * speed)
 

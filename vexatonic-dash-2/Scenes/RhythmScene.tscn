@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
 [ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
 [ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Camera/CameraManager.gd" id="6_4pq8y"]
+[ext_resource type="Script" uid="uid://4ysqft6mylr6" path="res://Scripts/Ingame/InputHandler.gd" id="6_lcd7m"]
 [ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="7_frbmc"]
 [ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/Ingame/IngameDataManager.gd" id="7_wjq5j"]
 [ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/Ingame/IngameUIManager.gd" id="8_pee8w"]
@@ -21,6 +22,9 @@ character_holder = NodePath("CharacterHolder")
 NOTE_SCENE = ExtResource("3_4pq8y")
 LONG_NOTE_SCENE = ExtResource("4_4pq8y")
 CONNECTOR_SCENE = ExtResource("4_wjq5j")
+
+[node name="InputHandler" type="Node2D" parent="RhythmManager" unique_id=545202408]
+script = ExtResource("6_lcd7m")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
 
