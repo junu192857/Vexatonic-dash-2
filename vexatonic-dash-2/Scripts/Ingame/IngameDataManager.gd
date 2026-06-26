@@ -96,7 +96,7 @@ func on_song_end(chart_path: String) -> void:
 
 	var cfg = ConfigFile.new()
 	cfg.load(PLAY_DATA_PATH)
-	var s = chart_path
+	var s = "%s|%d" % [chart_path, Setting.selected_difficulty]
 
 	var old_score = cfg.get_value(s, "best_score", 0)
 	var old_judge = cfg.get_value(s, "best_judge", 0)

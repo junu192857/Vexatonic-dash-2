@@ -236,7 +236,7 @@ func assign_note(note: Note):
 
 func end_game():
 	game_finished = true
-	$IngameDataManager.on_song_end(level_path + Setting.DIFFICULTY_NAMES[Setting.selected_difficulty])
+	$IngameDataManager.on_song_end(level_path)
 
 
 
