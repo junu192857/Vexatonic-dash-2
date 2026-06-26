@@ -28,7 +28,7 @@ enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
 
 static var score_display = SCORE_DISPLAY.Decreasing
 static var gamemode = GAMEMODE.Normal_Character
-static var sound_offset: float = 100.0
+static var sound_offset: float = 0
 static var judge_offset: float = 0
 
 # ==================== 관련 함수 ============================

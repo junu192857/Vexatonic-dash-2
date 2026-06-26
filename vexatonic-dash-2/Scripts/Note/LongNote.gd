@@ -29,9 +29,6 @@ func start_hold(is_left: bool, time: float, start_adjust: bool) -> void:
 	else:
 		is_holding_right = true
 	if (not before and is_holding_anyway()):
-		if (start_adjust):
-			last_press_start = get_data().time
-			hold_paint_from = target_visual_connector.c_start_time
 		last_press_start = get_data().time if start_adjust else time
 		hold_paint_from = target_visual_connector.c_start_time if start_adjust else time
 		update_visual_polygon(time)
