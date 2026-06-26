@@ -26,8 +26,8 @@ const level_path = "res://Charts/YOUNITHM"
 func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
-	InputHandler.note_pressed.connect(_on_pressed)
-	InputHandler.note_released.connect(_on_released)
+	$InputHandler.note_pressed.connect(_on_pressed)
+	$InputHandler.note_released.connect(_on_released)
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
