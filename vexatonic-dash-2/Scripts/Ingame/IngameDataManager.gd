@@ -91,7 +91,7 @@ func _get_rank(final_score_int: int) -> Rank:
 
 func on_song_end(chart_path: String) -> void:
 	var final_score = roundi(score + calculate_longNote_score(pressed_long_length))
-	var paint = roundi(calculate_longNote_score(pressed_long_length)) == 100000
+	var paint = roundi(calculate_longNote_score(pressed_long_length)) == 10000
 	var rank = _get_rank(final_score)
 
 	var cfg = ConfigFile.new()
