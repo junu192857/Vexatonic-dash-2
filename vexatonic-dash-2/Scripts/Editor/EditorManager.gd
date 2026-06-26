@@ -7,6 +7,7 @@ var levelData: LevelData
 @export var LINE_SCENE: PackedScene
 @export var MOVE_TRIGGER_SCENE: PackedScene
 @export var ZOOM_TRIGGER_SCENE: PackedScene
+@export var BPM_TRIGGER_SCENE: PackedScene
 
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
@@ -201,12 +202,12 @@ const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, 
-					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32,
+					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34,
 					Nothing = 100}
 
 const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13]
 const modify: Array[int] = [21, 22, 23]
-const trigger: Array[int] = [31, 32]
+const trigger: Array[int] = [31, 32, 33, 34]
 
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
@@ -441,7 +442,13 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.position = lane_start_pos
 	elif selected in trigger:
 		if (current_state == EditorState.Ready):
-			my_preview = MOVE_TRIGGER_SCENE.instantiate() if selected == NoteSelection.MoveTrigger else ZOOM_TRIGGER_SCENE.instantiate()
+			match selected:
+				NoteSelection.MoveTrigger:
+					my_preview = MOVE_TRIGGER_SCENE.instantiate()
+				NoteSelection.ZoomTrigger:
+					my_preview = ZOOM_TRIGGER_SCENE.instantiate()
+				NoteSelection.BPMTrigger:
+					my_preview = BPM_TRIGGER_SCENE.instantiate()
 			add_child(my_preview)
 			my_preview.position = Vector2(snapped_x, mouse_pos.y)
 	else: #Note인 경우
@@ -1040,8 +1047,13 @@ func show_modify_panel():
 	match target_trigger.type:
 		Trigger.TYPE.Move:
 			value_label.text = "Move_Length:"
+			length_spinbox.visible = true
 		Trigger.TYPE.Zoom:
 			value_label.text = "Zoom_value:"
+			length_spinbox.visible = true
+		Trigger.TYPE.BPM:
+			value_label.text = "Set BPM:"
+			length_spinbox.visible = false
 	value_spinbox.value = target_trigger.c
 	length_spinbox.value = target_trigger.t
 
