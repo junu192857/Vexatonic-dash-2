@@ -62,6 +62,7 @@ func initiate_editor():
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
+	_update_sorted_bpm_triggers()
 	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.length), 6.0)
 
 func set_initial_value():
@@ -78,8 +79,9 @@ func set_initial_value():
 	add_child(trigger_node)
 	trigger_node.global_position = initial_bpm_trigger.get_editor_position()
 	initial_bpm_trigger.assign_node(trigger_node)
+	initial_bpm_trigger.show_data()
 	initial_bpm_trigger.unselect_trigger()
-	chart_loaded = false
+
 	
 	chart_loaded = false
 	
@@ -149,13 +151,11 @@ func place_bar_lines():
 			bar.queue_free()
 	
 	var effective_bit = bit if bit != 0 else 4
-	
-	var bpm_triggers = _update_sorted_bpm_triggers()
 
-	for i in range(bpm_triggers.size()):
-		var bpm_start_time = bpm_triggers[i].start
-		var bpm = bpm_triggers[i].c
-		var bpm_end_time = levelData.length if i + 1 >= bpm_triggers.size() else min(bpm_triggers[i + 1].start, levelData.length)
+	for i in range(sorted_bpm.size()):
+		var bpm_start_time = sorted_bpm[i].start
+		var bpm = sorted_bpm[i].c
+		var bpm_end_time = levelData.length if i + 1 >= sorted_bpm.size() else min(sorted_bpm[i + 1].start, levelData.length)
 
 
 		if bpm_start_time < 0:
@@ -1059,6 +1059,7 @@ func _on_delete_something():
 		NoteSelection.ModifyTrigger:
 			levelData.triggers.erase(target_trigger)
 			_update_sorted_bpm_triggers()
+			place_bar_lines()
 			target_trigger.node.queue_free()
 		_:
 			push_error("Please select modify button")
@@ -1102,13 +1103,14 @@ func quit_modify_panel():
 	target_trigger.t = max(length_spinbox.value, 0)
 	target_trigger.editor_pos_y = target_trigger.node.global_position.y
 	target_trigger.start = Setting.get_time_from_posx(target_trigger.node.global_position.x)
-	target_trigger.show_length_line()
+	target_trigger.show_data()
 	cancel_modify_trigger()
 	modifyPanel.visible = false
 	modifying_trigger = false
 	
 	if (target_trigger.type == Trigger.TYPE.BPM):
 		_update_sorted_bpm_triggers()
+		place_bar_lines()
 	
 	if (current_state == EditorState.Placing):
 		cleanup_modify_values()
@@ -1199,15 +1201,14 @@ func get_snapped_x(mouse_x: float) -> float:
 		return mouse_x
 	
 	var time = Setting.get_time_from_posx(mouse_x)
-	
-	var bpm_triggers = _update_sorted_bpm_triggers()
 
-	var bpm = bpm_triggers[0].c
-	var bpm_start_time = bpm_triggers[0].start
-	for i in range(bpm_triggers.size() - 1):
-		if time >= bpm_triggers[i].start and time < bpm_triggers[i + 1].start:
-			bpm = bpm_triggers[i].c
-			bpm_start_time = bpm_triggers[i].start
+
+	var bpm = sorted_bpm[0].c
+	var bpm_start_time = sorted_bpm[0].start
+	for i in range(sorted_bpm.size() - 1):
+		if time >= sorted_bpm[i].start and time < sorted_bpm[i + 1].start:
+			bpm = sorted_bpm[i].c
+			bpm_start_time = sorted_bpm[i].start
 			break
 	
 	var beat_duration = 60000.0 / bpm
@@ -1461,7 +1462,7 @@ func parse(chart_path: String):
 		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)
 		trigger.unselect_trigger()
-		trigger.show_length_line()
+		trigger.show_data()
 
 # ================================ 편의 기능 ============================
 

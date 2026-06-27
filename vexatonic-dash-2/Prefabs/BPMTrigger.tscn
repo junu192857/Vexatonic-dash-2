@@ -1,10 +1,18 @@
 [gd_scene format=3 uid="uid://cw8p2v3afm85j"]
 
-[ext_resource type="Texture2D" uid="uid://c5fdc3k4f5wh0" path="res://Textures/BPMTrigger.png" id="1_gvsxb"]
+[ext_resource type="Texture2D" uid="uid://c67u88fbq5r6p" path="res://Textures/BPMTrigger.png" id="1_gvsxb"]
 
 [node name="BPMTrigger" type="Node2D" unique_id=1311778669]
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=299281638]
-position = Vector2(17, 2)
-scale = Vector2(0.1, 0.1)
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1122377917]
+position = Vector2(2, 3)
+scale = Vector2(0.2731209, 0.2661765)
 texture = ExtResource("1_gvsxb")
+
+[node name="Label" type="Label" parent="." unique_id=995511180]
+offset_left = -24.0
+offset_top = -13.0
+offset_right = 16.0
+offset_bottom = 10.0
+text = "0"
+horizontal_alignment = 1
