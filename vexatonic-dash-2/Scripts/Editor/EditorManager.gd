@@ -1636,3 +1636,4 @@ func _on_move_to_last_note():
 		camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
 	else:
 		camera.global_position = Vector2.ZERO
+	
