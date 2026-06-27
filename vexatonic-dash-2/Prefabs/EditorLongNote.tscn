@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://ch83j6vcqxcer"]
+
+[ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="2_vgjc4"]
+
+[sub_resource type="GDScript" id="GDScript_80fbl"]
+script/source = "extends LongNote
+class_name ELongNote
+
+
+func _ready():
+	return
+
+const SELECTED_COLORS = [Color(1,0,1), Color(0,1,1), Color(1,1,0.7)]
+
+func set_color(color: int):
+	sprite.modulate = PROCESSED_COLORS[color]
+
+func select_color():
+	sprite.modulate = SELECTED_COLORS[get_data().color]
+"
+
+[node name="Note" type="Node2D" unique_id=1307802017]
+z_index = 2
+z_as_relative = false
+script = SubResource("GDScript_80fbl")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729566812]
+texture = ExtResource("2_vgjc4")

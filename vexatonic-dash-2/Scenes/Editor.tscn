@@ -150,21 +150,23 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="RedoButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=151240166]
+[node name="ZoomUpButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=151240166]
 layout_mode = 0
-offset_left = 1752.0
-offset_top = 157.0
-offset_right = 1852.0
-offset_bottom = 257.0
-text = "Redo"
+offset_left = 1491.0
+offset_top = 166.0
+offset_right = 1591.0
+offset_bottom = 266.0
+text = "ZoomUp
+"
 
-[node name="UndoButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=889295401]
+[node name="ZoomDownButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=889295401]
 layout_mode = 0
-offset_left = 1753.0
-offset_top = 28.0
-offset_right = 1853.0
-offset_bottom = 128.0
-text = "Undo"
+offset_left = 1612.0
+offset_top = 164.0
+offset_right = 1712.0
+offset_bottom = 264.0
+text = "ZoomDown
+"
 
 [node name="Button6" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1549482070]
 layout_mode = 0
@@ -702,6 +704,8 @@ grow_vertical = 2
 [connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button3" to="." method="set_difficulty" binds= [2]]
 [connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button2" to="." method="set_difficulty" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button" to="." method="set_difficulty" binds= [0]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomUpButton" to="." method="_on_zoom_camera" binds= [true]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomDownButton" to="." method="_on_zoom_camera" binds= [false]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_note" binds= [13]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button5" to="." method="_on_select_note" binds= [22]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_note" binds= [12]]
