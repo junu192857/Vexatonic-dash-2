@@ -12,6 +12,7 @@ var characters: Array[Character]
 
 var time: float
 var music_started = false
+var game_finished = false
 var time_start_tick: float
 var music_start_tick: float
 #어느 레인까지 캐릭터가 생성되었는지 체크하는 용도
@@ -20,31 +21,34 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
-const level_path = "res://Charts/YOUNITHM"
+var level_path = "res://Charts/YOUNITHM"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
-	InputHandler.note_pressed.connect(_on_pressed)
-	InputHandler.note_released.connect(_on_released)
+	$InputHandler.note_pressed.connect(_on_pressed)
+	$InputHandler.note_released.connect(_on_released)
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
 	
-	levelData = ChartParser.parse(level_path, 0)
+	levelData = ChartParser.parse(level_path, Setting.selected_difficulty)
 	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
-	levelData.noteDatas.sort_custom(func(a: NoteData, b: NoteData):
-		if a.lane != b.lane:
-			return a.lane < b.lane
-		return a.time < b.time
-	)
+	levelData.sort_noteDatas()
+	levelData.sort_triggers()
 	# 채보 찍기
 	render_chart()
 	sort_note_holders()
+	
+	if Setting.judge_offset != 0.0:
+		for noteData in levelData.noteDatas:
+			noteData.time -= Setting.judge_offset
+			noteData.end_time -= Setting.judge_offset
+	
 	camera.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
@@ -80,29 +84,30 @@ func place_character(lane: Lane):
 
 	
 func _physics_process(delta: float) -> void:
-	if (not music_started):
-		time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
-		if time >= 0:
-			musicPlayer.play()
-			music_start_tick = Time.get_ticks_msec()
-			music_started = true
-	else:
-		time = musicPlayer.get_playback_position() * 1000
-	
-	if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
-		place_character(levelData.lanes[lane_index])
-		lane_index += 1
+	if (not game_finished):
+		if (not music_started):
+			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
+			if time >= Setting.sound_offset:
+				musicPlayer.play()
+				music_start_tick = Time.get_ticks_msec()
+				music_started = true
+		else:
+			time = musicPlayer.get_playback_position() * 1000 + Setting.sound_offset
 		
-	character_holder.position.x = Setting.get_posx_from_time(time)
-	for character in characters:
-		if character.set_character_position(time):
-			characters.erase(character)
-	
-	for holder in noteHolders:
-		holder.check_miss(time)
-		holder.update_visuals(time)
+		if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
+			place_character(levelData.lanes[lane_index])
+			lane_index += 1
+			
+		character_holder.position.x = Setting.get_posx_from_time(time)
+		for character in characters:
+			if character.set_character_position(time):
+				characters.erase(character)
+		
+		for holder in noteHolders:
+			holder.check_miss(time)
+			holder.update_visuals(time)
 
-	camera.move(time)
+		camera.move(time)
 	
 
 func sort_note_holders():
@@ -227,10 +232,11 @@ func assign_note(note: Note):
 	noteHolders[note.get_data().color].notes.append(note)
 	note.judgement_spread.connect($IngameDataManager.catch_judgement)
 
-#==================================================================================
+#============================== End Level ==================================
 
-
-
+func end_game():
+	game_finished = true
+	$IngameDataManager.on_song_end(level_path)
 
 
 
@@ -238,10 +244,12 @@ func assign_note(note: Note):
 #================================== Input Reading =================================
 
 func _on_pressed(p_color:int, is_left: bool):
-	noteHolders[p_color].process_input(time, is_left)
+	if not game_finished:
+		noteHolders[p_color].process_input(time, is_left)
 
 func _on_released(p_color:int, is_left: bool):
-	noteHolders[p_color].process_release(time, is_left)
+	if not game_finished:
+		noteHolders[p_color].process_release(time, is_left)
 
 
 #===================================================================================

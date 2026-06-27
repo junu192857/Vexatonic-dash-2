@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/Editor/EditorInputHandler.gd" id="5_dfuwn"]
 [ext_resource type="PackedScene" uid="uid://bul34fxxophy1" path="res://Prefabs/MoveTrigger.tscn" id="5_qexec"]
 [ext_resource type="PackedScene" uid="uid://cq60k3h6dbxia" path="res://Prefabs/ZoomTrigger.tscn" id="6_847jc"]
-[ext_resource type="PackedScene" uid="uid://cw8p2v3afm85j" path="res://Prefabs/BPMTrigger.tscn" id="7_847jc"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_brgpd"]
 
@@ -23,7 +22,6 @@ CONNECTOR_SCENE = ExtResource("3_brgpd")
 LINE_SCENE = ExtResource("4_5v8xv")
 MOVE_TRIGGER_SCENE = ExtResource("5_qexec")
 ZOOM_TRIGGER_SCENE = ExtResource("6_847jc")
-BPM_TRIGGER_SCENE = ExtResource("7_847jc")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
 
@@ -217,17 +215,6 @@ offset_bottom = 131.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "BlueNote"
-
-[node name="ChangeBPMButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=130064388]
-layout_mode = 0
-offset_left = 887.0
-offset_top = 163.0
-offset_right = 987.0
-offset_bottom = 263.0
-toggle_mode = true
-button_group = SubResource("ButtonGroup_dfuwn")
-text = "Change
-BPM"
 
 [node name="ZoomTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1830663796]
 layout_mode = 0
@@ -445,14 +432,6 @@ offset_top = 599.0
 offset_right = 113.0
 offset_bottom = 686.0
 text = "Debug Note"
-
-[node name="DebugBPMButton" type="Button" parent="CanvasLayer/SettingPanel" unique_id=161068773]
-layout_mode = 0
-offset_left = 125.0
-offset_top = 505.0
-offset_right = 225.0
-offset_bottom = 592.0
-text = "Debug BPM"
 
 [node name="SaveButton2" type="Button" parent="CanvasLayer/SettingPanel" unique_id=900100908]
 layout_mode = 0
@@ -707,7 +686,6 @@ grow_vertical = 2
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_note" binds= [12]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_note" binds= [11]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button10" to="." method="_on_select_note" binds= [2]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ChangeBPMButton" to="." method="_on_select_note" binds= [34]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomTriggerButton" to="." method="_on_select_note" binds= [32]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/MoveTriggerButton" to="." method="_on_select_note" binds= [31]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button9" to="." method="_on_select_note" binds= [21]]
@@ -721,7 +699,6 @@ grow_vertical = 2
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
 [connection signal="file_selected" from="CanvasLayer/InitialPanel/FileDialog" to="." method="select_music"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton3" to="." method="print_note_info"]
-[connection signal="pressed" from="CanvasLayer/SettingPanel/DebugBPMButton" to="." method="print_bpm_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton2" to="." method="print_lane_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton" to="." method="open_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button4" to="." method="set_bit" binds= [32]]

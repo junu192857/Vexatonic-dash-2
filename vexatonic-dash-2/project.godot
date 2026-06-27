@@ -12,13 +12,13 @@ config_version=5
 
 config/name="Vexatonic Dash 2"
 run/main_scene="uid://l50nt5bpgqai"
-config/features=PackedStringArray("4.6", "Mobile")
+config/features=PackedStringArray("4.7", "Mobile")
 run/low_processor_mode=true
 config/icon="res://icon.svg"
 
 [autoload]
 
-InputHandler="*uid://4ysqft6mylr6"
+SettingLoader="*uid://hqkfmofjf5hs"
 
 [debug]
 
