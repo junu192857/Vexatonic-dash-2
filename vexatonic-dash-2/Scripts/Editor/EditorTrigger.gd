@@ -31,7 +31,7 @@ func show_data():
 	if (type != Trigger.TYPE.BPM):
 		length_line.size = Vector2(Setting.get_posx_from_time(t), 6.0)
 	else:
-		bpmText.text = "%f" % c
+		bpmText.text = "%.2f" % c
 
 func get_editor_position():
 	return Vector2(Setting.get_posx_from_time(start), editor_pos_y)
