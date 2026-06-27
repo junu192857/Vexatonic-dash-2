@@ -1,12 +1,14 @@
 extends Node2D
 
 var levelData: LevelData
+var sorted_bpm: Array
 
 @export var NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
 @export var LINE_SCENE: PackedScene
 @export var MOVE_TRIGGER_SCENE: PackedScene
 @export var ZOOM_TRIGGER_SCENE: PackedScene
+@export var BPM_TRIGGER_SCENE: PackedScene
 
 @onready var inputHandler = $EditorInputHandler
 @onready var camera = $Camera2D
@@ -60,19 +62,31 @@ func initiate_editor():
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
+
+	_update_sorted_bpm_triggers()
 	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.length), 6.0)
 
 func set_initial_value():
 	levelData = LevelData.new()
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
-	levelData.bpm.append(Vector2(0, bpm))
-	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
+
 	levelData.music_path = music_path.get_file()
 	levelData.length = music_time * 1000
-
+	
+	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, -500.0)
+	levelData.triggers.append(initial_bpm_trigger)
+	var trigger_node = BPM_TRIGGER_SCENE.instantiate()
+	add_child(trigger_node)
+	trigger_node.global_position = initial_bpm_trigger.get_editor_position()
+	initial_bpm_trigger.assign_node(trigger_node)
+	initial_bpm_trigger.show_data()
+	initial_bpm_trigger.unselect_trigger()
+	
+	levelData.triggers.append(EditorTrigger.new(Trigger.TYPE.BPM, Setting.INFINITE, 60.0, 0.0, 0.0))
+	
 	chart_loaded = false
-
+	
 func start_find_music():
 	initialPanel.get_node("FileDialog").popup()
 	
@@ -139,17 +153,13 @@ func place_bar_lines():
 			bar.queue_free()
 	
 	var effective_bit = bit if bit != 0 else 4
-	
-	for i in range(levelData.bpm.size() - 1):
-		print("bpm time: %f" % levelData.bpm[i].x)
-	
-	for i in range(levelData.bpm.size() - 1):
-		if levelData.bpm[i].x > levelData.bpm[i+1].x:
-			push_error("Please sort by time ascending")
-			return
-		var bpm_start_time = levelData.bpm[i].x
-		var bpm = levelData.bpm[i].y
-		var bpm_end_time = min(levelData.bpm[i + 1].x, levelData.length)
+
+	for i in range(sorted_bpm.size()):
+		var bpm_start_time = sorted_bpm[i].start
+		var bpm = sorted_bpm[i].c
+		var bpm_end_time = levelData.length if i + 1 >= sorted_bpm.size() else min(sorted_bpm[i + 1].start, levelData.length)
+
+
 		if bpm_start_time < 0:
 			push_error("time cannot be negative")
 			return
@@ -201,12 +211,12 @@ const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, 
-					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32,
+					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34,
 					Nothing = 100}
 
 const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13]
 const modify: Array[int] = [21, 22, 23]
-const trigger: Array[int] = [31, 32]
+const trigger: Array[int] = [31, 32, 33, 34]
 
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
@@ -326,7 +336,11 @@ func update_preview(selected: int):
 				can_do_something = true
 	elif selected in trigger:
 		if (current_state == EditorState.Ready):
-			preview.position = Vector2(snapped_x, mouse_pos.y)
+			if (!find_trigger_placing_avilable()):
+				cancel_put_something()
+			else:
+				preview.position = Vector2(snapped_x, mouse_pos.y)
+				can_do_something = true
 	else:
 		if (current_state == EditorState.Ready):
 			if (!find_note_placing_available()):
@@ -441,9 +455,19 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview.position = lane_start_pos
 	elif selected in trigger:
 		if (current_state == EditorState.Ready):
-			my_preview = MOVE_TRIGGER_SCENE.instantiate() if selected == NoteSelection.MoveTrigger else ZOOM_TRIGGER_SCENE.instantiate()
-			add_child(my_preview)
-			my_preview.position = Vector2(snapped_x, mouse_pos.y)
+			if (!find_trigger_placing_avilable()):
+				cancel_put_something()
+				return null
+			else:
+				match selected:
+					NoteSelection.MoveTrigger:
+						my_preview = MOVE_TRIGGER_SCENE.instantiate()
+					NoteSelection.ZoomTrigger:
+						my_preview = ZOOM_TRIGGER_SCENE.instantiate()
+					NoteSelection.BPMTrigger:
+						my_preview = BPM_TRIGGER_SCENE.instantiate()
+				add_child(my_preview)
+				my_preview.position = Vector2(snapped_x, mouse_pos.y)
 	else: #Note인 경우
 		if (current_state == EditorState.Ready):
 			if (!find_note_placing_available()):
@@ -588,7 +612,6 @@ func generate_modify_preview():
 					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x))))
 					adjust_longNote_connector(target_note, Setting.get_time_from_posx(snapped_x), target_note.get_data().end_time)
-				
 				else:  # 롱노트 뒷부분
 					if (!find_longNote_placing_available()):
 						cancel_modify_note()
@@ -596,8 +619,12 @@ func generate_modify_preview():
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
 			NoteSelection.ModifyTrigger:
-				target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
-				
+				if (!find_trigger_placing_avilable()):
+					cancel_modify_trigger()
+					return
+				else:
+					target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+					target_trigger.select_trigger()
 	can_do_something = true
 
 func cancel_put_something():
@@ -711,6 +738,19 @@ func find_lane_placing_case() -> LanePlacingCase:
 
 	return LanePlacingCase.None
 	
+func find_trigger_placing_avilable() -> bool:
+	if (current_state == EditorState.Ready and selected_note == NoteSelection.BPMTrigger):
+		for i: Trigger in sorted_bpm:
+			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON):
+				return false
+		return snapped_x > Setting.EPSILON
+	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.BPM):
+		for i: Trigger in sorted_bpm:
+			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
+				return false
+		return snapped_x > Setting.EPSILON
+	else:
+		return true
 
 func find_note_placing_available() -> bool:
 	#Ready 단계: 모든 레인에서 노드 위치의 후보를 찾음.
@@ -1019,6 +1059,8 @@ func _on_delete_something():
 				target_note.queue_free()  # 단노트 또는 롱노트 앞부분 삭제 시 자식도 같이 삭제됨
 		NoteSelection.ModifyTrigger:
 			levelData.triggers.erase(target_trigger)
+			_update_sorted_bpm_triggers()
+			place_bar_lines()
 			target_trigger.node.queue_free()
 		_:
 			push_error("Please select modify button")
@@ -1040,8 +1082,13 @@ func show_modify_panel():
 	match target_trigger.type:
 		Trigger.TYPE.Move:
 			value_label.text = "Move_Length:"
+			length_spinbox.visible = true
 		Trigger.TYPE.Zoom:
 			value_label.text = "Zoom_value:"
+			length_spinbox.visible = true
+		Trigger.TYPE.BPM:
+			value_label.text = "Set BPM:"
+			length_spinbox.visible = false
 	value_spinbox.value = target_trigger.c
 	length_spinbox.value = target_trigger.t
 
@@ -1057,10 +1104,14 @@ func quit_modify_panel():
 	target_trigger.t = max(length_spinbox.value, 0)
 	target_trigger.editor_pos_y = target_trigger.node.global_position.y
 	target_trigger.start = Setting.get_time_from_posx(target_trigger.node.global_position.x)
-	target_trigger.show_length_line()
+	target_trigger.show_data()
 	cancel_modify_trigger()
 	modifyPanel.visible = false
 	modifying_trigger = false
+	
+	if (target_trigger.type == Trigger.TYPE.BPM):
+		_update_sorted_bpm_triggers()
+		place_bar_lines()
 	
 	if (current_state == EditorState.Placing):
 		cleanup_modify_values()
@@ -1151,13 +1202,14 @@ func get_snapped_x(mouse_x: float) -> float:
 		return mouse_x
 	
 	var time = Setting.get_time_from_posx(mouse_x)
-	
-	var bpm = levelData.bpm[0].y
-	var bpm_start_time = levelData.bpm[0].x
-	for i in range(levelData.bpm.size() - 1):
-		if time >= levelData.bpm[i].x and time < levelData.bpm[i + 1].x:
-			bpm = levelData.bpm[i].y
-			bpm_start_time = levelData.bpm[i].x
+
+
+	var bpm = sorted_bpm[0].c
+	var bpm_start_time = sorted_bpm[0].start
+	for i in range(sorted_bpm.size() - 1):
+		if time >= sorted_bpm[i].start and time < sorted_bpm[i + 1].start:
+			bpm = sorted_bpm[i].c
+			bpm_start_time = sorted_bpm[i].start
 			break
 	
 	var beat_duration = 60000.0 / bpm
@@ -1167,6 +1219,11 @@ func get_snapped_x(mouse_x: float) -> float:
 	var snapped_time = bpm_start_time + round(elapsed / snap_duration) * snap_duration
 	
 	return Setting.get_posx_from_time(snapped_time)
+
+func _update_sorted_bpm_triggers() -> Array:
+	sorted_bpm = levelData.triggers.filter(func(t): return t.type == Trigger.TYPE.BPM)
+	sorted_bpm.sort_custom(func(a, b): return a.start < b.start)
+	return sorted_bpm
 
 # ======================== Testing ===================================
 
@@ -1179,6 +1236,11 @@ func print_lane_info():
 func print_note_info():
 	for note in levelData.noteDatas:
 		print("Note color: %d, start_time: %f, end_time: %f, at lane %d" % [note.color, note.time, note.end_time, note.lane])
+
+func print_bpm_info():
+	for bpm_trigger in sorted_bpm:
+		print("BPM; Time %f, bpm %f" % [bpm_trigger.start, bpm_trigger.c])
+
 # ======================== Save Chart ================================
 
 var save_difficulty = -1
@@ -1233,8 +1295,9 @@ func save_chart():
 		return
 	
 	# BPM 저장
-	for i in range(levelData.bpm.size() - 1):
-		file.store_line("BPM %s %s" % [levelData.bpm[i].x, levelData.bpm[i].y])
+	for trigger in _update_sorted_bpm_triggers():
+		if (trigger.start != Setting.INFINITE):
+			file.store_line("BPM %f %f 0 %f" % [trigger.start, trigger.c, trigger.node.global_position.y])
 	
 	# LANE 저장
 	for lane in levelData.lanes:
@@ -1249,6 +1312,8 @@ func save_chart():
 	
 	# 트리거 저장
 	for trigger in levelData.triggers:
+		if trigger.type == Trigger.TYPE.BPM:
+			continue
 		var type_string
 		match trigger.type:
 			Trigger.TYPE.Move:
@@ -1325,11 +1390,9 @@ func select_chart(path: String):
 
 func finish_load_chart():
 	parse(chart_path)
-	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
-	for bpm in levelData.bpm:
-		print("time: %f bpm:%f" % [bpm.x, bpm.y])
 	chart_loaded = true
 	loadPanel.visible = false
+	levelData.triggers.append(EditorTrigger.new(Trigger.TYPE.BPM, Setting.INFINITE, 60.0, 0.0, 0.0))
 	initiate_editor()
 	place_bar_lines()
 	
@@ -1401,12 +1464,14 @@ func parse(chart_path: String):
 				trigger_node = MOVE_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.Zoom:
 				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.BPM:
+				trigger_node = BPM_TRIGGER_SCENE.instantiate()
 		add_child(trigger_node)
 		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)
 		trigger.unselect_trigger()
-		trigger.show_length_line()
-
+		trigger.show_data()
+	
 # ================================ 편의 기능 ============================
 
 var music_playing: bool = false
@@ -1524,10 +1589,10 @@ func find_target_trigger():
 	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
 	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
 	
-	
-	
 	for triggerData: EditorTrigger in levelData.triggers:
 		var trigger_position = triggerData.get_editor_position()
+		if (trigger_position.x < Setting.EPSILON):
+			continue
 		if trigger_position.x < camera_left or trigger_position.x > camera_right:
 			continue
 		var distance = trigger_position.distance_to(mouse_pos)

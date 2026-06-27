@@ -5,6 +5,7 @@ var editor_pos_y: float
 var node: Node2D
 var length_line: ColorRect
 var sprite: Sprite2D
+var bpmText: Label
 
 func select_trigger():
 	sprite.modulate = Color(1,1,1)
@@ -19,11 +20,18 @@ func _init(p_type: TYPE, p_start: float, p_c: float, p_t: float, p_y: float) -> 
 
 func assign_node(p_node: Node2D):
 	node = p_node
-	length_line = node.get_child(0)
-	sprite = node.get_child(1)
+	if (type != Trigger.TYPE.BPM):
+		length_line = node.get_child(0)
+		sprite = node.get_child(1)
+	else:
+		sprite = node.get_child(0)
+		bpmText = node.get_child(1)
 
-func show_length_line():
-	length_line.size = Vector2(Setting.get_posx_from_time(t), 6.0)
+func show_data():
+	if (type != Trigger.TYPE.BPM):
+		length_line.size = Vector2(Setting.get_posx_from_time(t), 6.0)
+	else:
+		bpmText.text = "%.2f" % c
 
 func get_editor_position():
 	return Vector2(Setting.get_posx_from_time(start), editor_pos_y)
