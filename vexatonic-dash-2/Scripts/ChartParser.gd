@@ -42,9 +42,11 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 		var parts = line.split(" ")
 		
 		if parts[0] == "BPM":
-			data.bpm.append(Vector2(float(parts[1]), float(parts[2])))
-			print("BPM added")
-			continue
+			if is_editor:
+				var editor_y = float(parts[4]) if parts.size() >= 5 else 0.0
+				data.triggers.append(EditorTrigger.new(Trigger.TYPE.BPM, float(parts[1]), float(parts[2]), 0.0, editor_y))
+			#else:
+				#data.triggers.append(Trigger.new(Trigger.TYPE.BPM, float(parts[1]), float(parts[2]), 0.0))
 		
 		if parts[0] == "LANE":
 			var index = int(parts[1])
@@ -63,7 +65,7 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 			current_lane.add_keyframe(new_keyframe)
 			continue
 		
-		if current_lane == null and parts[0] in ["MOVE", "ROTATE", "ZOOM"] and parts.size() >= 4:
+		if current_lane == null and parts[0] in ["MOVE", "ROTATE", "ZOOM"] and parts.size() >= 5:
 			var trigger_type
 			match parts[0]:
 				"MOVE":   trigger_type = Trigger.TYPE.Move

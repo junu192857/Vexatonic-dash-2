@@ -67,13 +67,21 @@ func set_initial_value():
 	levelData = LevelData.new()
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
-	levelData.bpm.append(Vector2(0, bpm))
-	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
+
 	levelData.music_path = music_path.get_file()
 	levelData.length = music_time * 1000
-
+	
+	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, 0.0)
+	levelData.triggers.append(initial_bpm_trigger)
+	var trigger_node = BPM_TRIGGER_SCENE.instantiate()
+	add_child(trigger_node)
+	trigger_node.global_position = initial_bpm_trigger.get_editor_position()
+	initial_bpm_trigger.assign_node(trigger_node)
+	initial_bpm_trigger.unselect_trigger()
 	chart_loaded = false
-
+	
+	chart_loaded = false
+	
 func start_find_music():
 	initialPanel.get_node("FileDialog").popup()
 	
@@ -141,16 +149,14 @@ func place_bar_lines():
 	
 	var effective_bit = bit if bit != 0 else 4
 	
-	for i in range(levelData.bpm.size() - 1):
-		print("bpm time: %f" % levelData.bpm[i].x)
-	
-	for i in range(levelData.bpm.size() - 1):
-		if levelData.bpm[i].x > levelData.bpm[i+1].x:
-			push_error("Please sort by time ascending")
-			return
-		var bpm_start_time = levelData.bpm[i].x
-		var bpm = levelData.bpm[i].y
-		var bpm_end_time = min(levelData.bpm[i + 1].x, levelData.length)
+	var bpm_triggers = _get_sorted_bpm_triggers()
+
+	for i in range(bpm_triggers.size()):
+		var bpm_start_time = bpm_triggers[i].start
+		var bpm = bpm_triggers[i].c
+		var bpm_end_time = levelData.length if i + 1 >= bpm_triggers.size() else min(bpm_triggers[i + 1].start, levelData.length)
+
+
 		if bpm_start_time < 0:
 			push_error("time cannot be negative")
 			return
@@ -1074,6 +1080,7 @@ func quit_modify_panel():
 	modifyPanel.visible = false
 	modifying_trigger = false
 	
+	
 	if (current_state == EditorState.Placing):
 		cleanup_modify_values()
 		current_state = EditorState.Ready
@@ -1164,12 +1171,14 @@ func get_snapped_x(mouse_x: float) -> float:
 	
 	var time = Setting.get_time_from_posx(mouse_x)
 	
-	var bpm = levelData.bpm[0].y
-	var bpm_start_time = levelData.bpm[0].x
-	for i in range(levelData.bpm.size() - 1):
-		if time >= levelData.bpm[i].x and time < levelData.bpm[i + 1].x:
-			bpm = levelData.bpm[i].y
-			bpm_start_time = levelData.bpm[i].x
+	var bpm_triggers = _get_sorted_bpm_triggers()
+
+	var bpm = bpm_triggers[0].c
+	var bpm_start_time = bpm_triggers[0].start
+	for i in range(bpm_triggers.size() - 1):
+		if time >= bpm_triggers[i].start and time < bpm_triggers[i + 1].start:
+			bpm = bpm_triggers[i].c
+			bpm_start_time = bpm_triggers[i].start
 			break
 	
 	var beat_duration = 60000.0 / bpm
@@ -1179,6 +1188,11 @@ func get_snapped_x(mouse_x: float) -> float:
 	var snapped_time = bpm_start_time + round(elapsed / snap_duration) * snap_duration
 	
 	return Setting.get_posx_from_time(snapped_time)
+
+func _get_sorted_bpm_triggers() -> Array:
+	var result = levelData.triggers.filter(func(t): return t.type == Trigger.TYPE.BPM)
+	result.sort_custom(func(a, b): return a.start < b.start)
+	return result
 
 # ======================== Testing ===================================
 
@@ -1245,8 +1259,8 @@ func save_chart():
 		return
 	
 	# BPM 저장
-	for i in range(levelData.bpm.size() - 1):
-		file.store_line("BPM %s %s" % [levelData.bpm[i].x, levelData.bpm[i].y])
+	for trigger in _get_sorted_bpm_triggers():
+		file.store_line("BPM %f %f 0 %f" % [trigger.start, trigger.c, trigger.node.global_position.y])
 	
 	# LANE 저장
 	for lane in levelData.lanes:
@@ -1261,6 +1275,8 @@ func save_chart():
 	
 	# 트리거 저장
 	for trigger in levelData.triggers:
+		if trigger.type == Trigger.TYPE.BPM:
+			continue
 		var type_string
 		match trigger.type:
 			Trigger.TYPE.Move:
@@ -1337,9 +1353,6 @@ func select_chart(path: String):
 
 func finish_load_chart():
 	parse(chart_path)
-	levelData.bpm.append(Vector2(Setting.INFINITE, 60))
-	for bpm in levelData.bpm:
-		print("time: %f bpm:%f" % [bpm.x, bpm.y])
 	chart_loaded = true
 	loadPanel.visible = false
 	initiate_editor()
@@ -1413,6 +1426,8 @@ func parse(chart_path: String):
 				trigger_node = MOVE_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.Zoom:
 				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.BPM:
+				trigger_node = BPM_TRIGGER_SCENE.instantiate()
 		add_child(trigger_node)
 		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)
