@@ -701,7 +701,8 @@ func check_mouse_in_available_area() -> bool:
 func find_lane_placing_case() -> LanePlacingCase:
 	#if (!check_mouse_in_available_area(mouse_pos)):
 	#	return LanePlacingCase.None
-	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
+
 
 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
 	for lane in levelData.lanes:
@@ -1631,4 +1632,7 @@ func _on_move_to_last_note():
 	if (!editor_ready or modifying_trigger):
 		return
 	var last_note = levelData.noteDatas.reduce(func(a, b): return a if a.time > b.time else b)
-	camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
+	if (last_note != null):
+		camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
+	else:
+		camera.global_position = Vector2.ZERO
