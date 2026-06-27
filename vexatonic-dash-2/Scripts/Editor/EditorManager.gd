@@ -62,6 +62,7 @@ func initiate_editor():
 	initialPanel.visible = false
 	noteSelectorPanel.visible = true
 	settingPanel.visible = true
+
 	_update_sorted_bpm_triggers()
 	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.length), 6.0)
 
@@ -73,7 +74,7 @@ func set_initial_value():
 	levelData.music_path = music_path.get_file()
 	levelData.length = music_time * 1000
 	
-	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, 0.0)
+	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, -500.0)
 	levelData.triggers.append(initial_bpm_trigger)
 	var trigger_node = BPM_TRIGGER_SCENE.instantiate()
 	add_child(trigger_node)
@@ -81,7 +82,8 @@ func set_initial_value():
 	initial_bpm_trigger.assign_node(trigger_node)
 	initial_bpm_trigger.show_data()
 	initial_bpm_trigger.unselect_trigger()
-
+	
+	levelData.triggers.append(EditorTrigger.new(Trigger.TYPE.BPM, Setting.INFINITE, 60.0, 0.0, 0.0))
 	
 	chart_loaded = false
 	
@@ -610,7 +612,6 @@ func generate_modify_preview():
 					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x))))
 					adjust_longNote_connector(target_note, Setting.get_time_from_posx(snapped_x), target_note.get_data().end_time)
-				
 				else:  # 롱노트 뒷부분
 					if (!find_longNote_placing_available()):
 						cancel_modify_note()
@@ -1235,6 +1236,11 @@ func print_lane_info():
 func print_note_info():
 	for note in levelData.noteDatas:
 		print("Note color: %d, start_time: %f, end_time: %f, at lane %d" % [note.color, note.time, note.end_time, note.lane])
+
+func print_bpm_info():
+	for bpm_trigger in sorted_bpm:
+		print("BPM; Time %f, bpm %f" % [bpm_trigger.start, bpm_trigger.c])
+
 # ======================== Save Chart ================================
 
 var save_difficulty = -1
@@ -1290,7 +1296,8 @@ func save_chart():
 	
 	# BPM 저장
 	for trigger in _update_sorted_bpm_triggers():
-		file.store_line("BPM %f %f 0 %f" % [trigger.start, trigger.c, trigger.node.global_position.y])
+		if (trigger.start != Setting.INFINITE):
+			file.store_line("BPM %f %f 0 %f" % [trigger.start, trigger.c, trigger.node.global_position.y])
 	
 	# LANE 저장
 	for lane in levelData.lanes:
@@ -1385,6 +1392,7 @@ func finish_load_chart():
 	parse(chart_path)
 	chart_loaded = true
 	loadPanel.visible = false
+	levelData.triggers.append(EditorTrigger.new(Trigger.TYPE.BPM, Setting.INFINITE, 60.0, 0.0, 0.0))
 	initiate_editor()
 	place_bar_lines()
 	
@@ -1463,7 +1471,7 @@ func parse(chart_path: String):
 		trigger.assign_node(trigger_node)
 		trigger.unselect_trigger()
 		trigger.show_data()
-
+	
 # ================================ 편의 기능 ============================
 
 var music_playing: bool = false

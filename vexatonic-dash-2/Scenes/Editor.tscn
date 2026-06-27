@@ -446,6 +446,14 @@ offset_right = 113.0
 offset_bottom = 686.0
 text = "Debug Note"
 
+[node name="DebugBPMButton" type="Button" parent="CanvasLayer/SettingPanel" unique_id=161068773]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 505.0
+offset_right = 225.0
+offset_bottom = 592.0
+text = "Debug BPM"
+
 [node name="SaveButton2" type="Button" parent="CanvasLayer/SettingPanel" unique_id=900100908]
 layout_mode = 0
 offset_left = 118.0
@@ -713,6 +721,7 @@ grow_vertical = 2
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
 [connection signal="file_selected" from="CanvasLayer/InitialPanel/FileDialog" to="." method="select_music"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton3" to="." method="print_note_info"]
+[connection signal="pressed" from="CanvasLayer/SettingPanel/DebugBPMButton" to="." method="print_bpm_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton2" to="." method="print_lane_info"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton" to="." method="open_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SettingPanel/Button4" to="." method="set_bit" binds= [32]]
