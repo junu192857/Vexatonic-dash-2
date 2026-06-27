@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://bnu0nicmspy2h"]
+
+[ext_resource type="Script" uid="uid://d2451kxcgvdtg" path="res://Scripts/UI/MenuUI.gd" id="1_45sxf"]
+[ext_resource type="Texture2D" uid="uid://c2d5ob2wotntx" path="res://UI/Images/IMG_1580.png" id="1_jkpkg"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_a8bay"]
+texture = ExtResource("1_jkpkg")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bo16v"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jkpkg"]
+
+[node name="MenuUi" type="Control" unique_id=1884851329]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_45sxf")
+
+[node name="BGPanel" type="Panel" parent="." unique_id=152120988]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_a8bay")
+
+[node name="DarkPanel" type="Panel" parent="BGPanel" unique_id=1858313207]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainButtonVBoxContatiner" type="VBoxContainer" parent="." unique_id=739202543]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -79.0
+offset_right = 300.0
+offset_bottom = 221.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="MainButtonVBoxContatiner" unique_id=106368942]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(6.1806735e-05, 6.180702e-05, 6.180678e-05, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_bo16v")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_jkpkg")
+text = "시작"
+
+[node name="Button2" type="Button" parent="MainButtonVBoxContatiner" unique_id=1863005946]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_bo16v")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_jkpkg")
+text = "222"
+
+[node name="Button3" type="Button" parent="MainButtonVBoxContatiner" unique_id=271897123]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_bo16v")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_jkpkg")
+text = "333"
+
+[node name="TitleText" type="Label" parent="." unique_id=1299559055]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -216.5
+offset_top = -401.0
+offset_right = 216.5
+offset_bottom = -189.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 100
+text = "Vextaton Dash 2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="MainButtonVBoxContatiner/Button" to="." method="OnStartPressed"]

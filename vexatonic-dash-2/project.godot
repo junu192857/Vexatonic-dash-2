@@ -31,6 +31,10 @@ window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep_width"
 
+[dotnet]
+
+project/assembly_name="Vexatonic Dash 2"
+
 [input]
 
 a={
