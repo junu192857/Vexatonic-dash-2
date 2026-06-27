@@ -20,6 +20,7 @@ var temp_delta_zoom: float = 0.0
 var triggered_zoom: bool = false
 
 var _initialized: bool = false
+var earliest_remaining_trigger: int = 0
 
 func _ready() -> void:
 	set_camera_position()
@@ -66,11 +67,11 @@ func _apply_triggers(time: float) -> void:
 	temp_delta_zoom = 0.0
 	triggered_zoom = false
 	
-	for i in range(triggers.size()):
+	for i in range(earliest_remaining_trigger, triggers.size()):
 		var tr: Trigger = triggers[i]
 
-		if time < tr.start:
-			continue
+		if time < tr.start: #아직 시작하지 않은 트리거
+			break
 
 		var prev_progress = _trigger_progress[i]
 		var new_progress: float
@@ -82,7 +83,9 @@ func _apply_triggers(time: float) -> void:
 		else:
 			new_progress = clampf((time - tr.start) / tr.t, 0.0, 1.0)
 
-		if new_progress == prev_progress and new_progress == 1.0:
+		if new_progress == prev_progress and new_progress == 1.0: # 끝난 트리거
+			if (i == earliest_remaining_trigger):
+				earliest_remaining_trigger += 1
 			continue
 
 		var delta_ratio = new_progress - prev_progress
