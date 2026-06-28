@@ -9,7 +9,8 @@ const SPARKLIC_MS = 84
 const WILD_MS = 126
 
 enum Judgement { VEXATONIC = 0, SPARKLIC = 1, WILD = 2, MISS = 3, PASS = 4 }
-signal judgement_spread(judgement: int, note: Note, is_long_end: bool)
+enum Fastslow { NOTHING = 0, FAST = 1, SLOW = 2 }
+signal judgement_spread(judgement: int, note: Note, is_long_end: bool, fastslow: Fastslow)
 
 @onready var sprite:Sprite2D = $Sprite2D
 
@@ -48,23 +49,28 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	print("Processing input: pressed time: %f, note time: %f" % [pressed_ms, data.time])
 	if is_hit: return Judgement.PASS
 	if data.color != p_color: return Judgement.PASS
-	var deltaTime = absf(pressed_ms - data.time)
-	if deltaTime > WILD_MS: return Judgement.PASS
+	var deltaTime = pressed_ms - data.time
+	if abs(deltaTime) > WILD_MS: return Judgement.PASS
 	var judgement = (
-		Judgement.VEXATONIC if deltaTime <= VEXATONIC_MS else
-		Judgement.SPARKLIC if deltaTime <= SPARKLIC_MS else
+		Judgement.VEXATONIC if abs(deltaTime) <= VEXATONIC_MS else
+		Judgement.SPARKLIC if abs(deltaTime) <= SPARKLIC_MS else
 		Judgement.WILD
+	)
+	var fs = (
+		Fastslow.NOTHING if judgement == Judgement.VEXATONIC or judgement == Judgement.MISS else
+		Fastslow.FAST if deltaTime < 0.0 else
+		Fastslow.SLOW
 	)
 	process_color()
 	is_hit = true
-	spread_judgement(judgement, self, false)
+	spread_judgement(judgement, self, false, fs)
 	return judgement
 
 func process_color(): 
 	sprite.modulate = PROCESSED_COLORS[get_data().color]
 
-func spread_judgement(judgement: int, note: Note, is_long_end: bool):
-	judgement_spread.emit(judgement, note, is_long_end)
+func spread_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Fastslow = Fastslow.NOTHING):
+	judgement_spread.emit(judgement, note, is_long_end, fastslow)
 
 func get_data() -> NoteData:
 	if is_marker:

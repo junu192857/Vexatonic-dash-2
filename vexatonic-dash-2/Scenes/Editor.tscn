@@ -650,7 +650,7 @@ offset_top = -1.0
 offset_right = 282.5
 offset_bottom = 30.0
 max_value = 1000000.0
-step = 0.0
+step = 0.01
 allow_lesser = true
 
 [node name="ValueLabel" type="Label" parent="CanvasLayer/ModifyTriggerPanel" unique_id=1506332063]
@@ -670,7 +670,7 @@ offset_right = 272.5
 offset_bottom = 28.0
 min_value = -10000.0
 max_value = 10000.0
-step = 0.0
+step = 0.01
 allow_greater = true
 allow_lesser = true
 

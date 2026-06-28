@@ -623,7 +623,12 @@ func generate_modify_preview():
 					cancel_modify_trigger()
 					return
 				else:
-					target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+					if (target_trigger.type == Trigger.TYPE.BPM or not shifting):
+						target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+						target_trigger.show_data()
+					else:
+						target_trigger.node.global_position = Vector2(Setting.get_posx_from_time(target_trigger.start), target_trigger.editor_pos_y)
+						target_trigger.show_line_preview(mouse_pos)
 					target_trigger.select_trigger()
 	can_do_something = true
 
@@ -849,7 +854,10 @@ func _place_trigger():
 	preview = null	
 	
 	target_trigger = trigger_data
-	show_modify_panel()
+	if (trigger_data.type != Trigger.TYPE.Move):
+		show_modify_panel()
+	else:
+		current_state = EditorState.Placing
 	
 func _place_single_note():
 	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
@@ -1002,6 +1010,7 @@ func _on_modify_placing():
 			adjust_longNote_connector(head, target_note.get_data().time, target_note.get_data().end_time)
 		target_note.process_color()
 	elif selected_note == NoteSelection.ModifyTrigger:
+		target_trigger.set_new_data()
 		show_modify_panel()
 		return
 	else:
@@ -1623,9 +1632,9 @@ func move_only_parent(parent: Node2D, pos: Vector2):
 		fixed_children[i].global_position = saved_positions[i]
 
 func _on_toggle_shifting(pressed: bool):
+	shifting = pressed
 	if (!editor_ready or modifying_trigger):
 		return
-	shifting = pressed
 	_on_move_preview()
 	
 func _on_move_to_last_note():
