@@ -854,10 +854,7 @@ func _place_trigger():
 	preview = null	
 	
 	target_trigger = trigger_data
-	if (trigger_data.type != Trigger.TYPE.Move):
-		show_modify_panel()
-	else:
-		current_state = EditorState.Placing
+	show_modify_panel()
 	
 func _place_single_note():
 	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
