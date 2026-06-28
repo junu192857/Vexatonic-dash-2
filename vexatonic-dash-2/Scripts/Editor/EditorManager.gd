@@ -20,6 +20,7 @@ var sorted_bpm: Array
 @onready var savePanel = $CanvasLayer/SavePanel
 @onready var loadPanel = $CanvasLayer/LoadPanel
 @onready var modifyPanel = $CanvasLayer/ModifyTriggerPanel
+@onready var ingameStatusHolder = $CanvasLayer/IngameStatusHolder
 
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
@@ -1488,6 +1489,7 @@ var camera_range: CameraRangeRect
 func toggle_music():
 	if (!music_playing):
 		noteSelectorPanel.get_node("PlayMusicButton").text = "Stop Music"
+		ingameStatusHolder.visible = true
 		music_playing = true
 		var initial_pos_x = get_music_start_pos()
 		var music_start_time = Setting.get_time_from_posx(initial_pos_x) / 1000
@@ -1499,6 +1501,7 @@ func toggle_music():
 		add_child(camera_range)
 	else:
 		noteSelectorPanel.get_node("PlayMusicButton").text = "Play Music"
+		ingameStatusHolder.visible = false
 		music_playing = false
 		music_bar.queue_free()
 		music_bar = null
@@ -1511,14 +1514,29 @@ func get_music_start_pos() -> float:
 	return max(0.0, camera_left)
 
 func _process(_delta:float):
-	if (music_bar != null):
+	if (music_playing):
 		var current_time = musicPlayer.get_playback_position() * 1000
 		music_bar.global_position.x = Setting.get_posx_from_time(current_time)
-		camera_range.set_bounds(get_camera_bounds_at(current_time))
+		var trigger_vector2 = get_trigger_process_at_time(current_time)
+		camera_range.set_bounds(get_camera_bounds_at(current_time, trigger_vector2))
+		set_ingame_status(current_time, trigger_vector2)
 
-func get_camera_bounds_at(time: float) -> Rect2:
-	var zoom = 1.0
+func set_ingame_status(time: float, trigger_vector2: Vector2):
+	ingameStatusHolder.get_child(2).text = "Time: %.2f" % time
+	ingameStatusHolder.get_child(1).text = "Camera_Y: %.2f" % trigger_vector2.x
+	ingameStatusHolder.get_child(0).text = "Camera_Zoom: %.2f" % trigger_vector2.y
+
+func get_camera_bounds_at(time: float, trigger_vector: Vector2) -> Rect2:
+	var vp = get_viewport_rect().size
+	var vp_w = vp.x / trigger_vector.y
+	var vp_h = vp.y / trigger_vector.y
+	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
+	return Rect2(center_x - vp_w * 0.5, trigger_vector.x - vp_h * 0.5, vp_w, vp_h)
+
+#return: (delta_y, zoom) 형태의 Vector2
+func get_trigger_process_at_time(time: float) -> Vector2:
 	var delta_y = 0.0
+	var zoom = 1.0
 	for tr in levelData.triggers:
 		if time < tr.start:
 			continue
@@ -1528,11 +1546,7 @@ func get_camera_bounds_at(time: float) -> Rect2:
 				zoom += tr.c * progress
 			Trigger.TYPE.Move:
 				delta_y += tr.c * progress
-	var vp = get_viewport_rect().size
-	var vp_w = vp.x / zoom
-	var vp_h = vp.y / zoom
-	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
-	return Rect2(center_x - vp_w * 0.5, delta_y - vp_h * 0.5, vp_w, vp_h)
+	return Vector2(delta_y, zoom)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane

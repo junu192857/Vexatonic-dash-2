@@ -19,6 +19,8 @@ func show_text(judgement: int, combo: int, fastslow = Note.Fastslow):
 			judgement_text.text = "MISS"
 	if (combo > 0):
 		combo_text.text = str(combo)
+	else:
+		combo_text.text = ""
 	match fastslow:
 		Note.Fastslow.NOTHING:
 			fastslow_text.text = ""
