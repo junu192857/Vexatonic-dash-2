@@ -4,7 +4,10 @@ var levelData: LevelData
 
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
-@onready var camera = $CameraManager
+@onready var cameraManager = $CameraManager
+@onready var camera = $CameraManager/Camera2D
+@onready var line = $CharacterHolder/Line
+@onready var lineSprite = $CharacterHolder/Line/Sprite2D
 
 
 var characters: Array[Character]
@@ -49,7 +52,7 @@ func _ready() -> void:
 			noteData.time -= Setting.judge_offset
 			noteData.end_time -= Setting.judge_offset
 	
-	camera.set_triggers(levelData.triggers)
+	cameraManager.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
 	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.music_path)
@@ -98,7 +101,9 @@ func _physics_process(delta: float) -> void:
 			place_character(levelData.lanes[lane_index])
 			lane_index += 1
 			
-		character_holder.position.x = Setting.get_posx_from_time(time)
+		character_holder.position = Vector2(Setting.get_posx_from_time(time), cameraManager.position.y)
+		if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
+			lineSprite.scale = Vector2(0.01, 6.0) / camera.zoom.y
 		for character in characters:
 			if character.set_character_position(time):
 				characters.erase(character)
@@ -107,7 +112,7 @@ func _physics_process(delta: float) -> void:
 			holder.check_miss(time)
 			holder.update_visuals(time)
 
-		camera.move(time)
+		cameraManager.move(time)
 	
 
 func sort_note_holders():
