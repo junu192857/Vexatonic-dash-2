@@ -1557,7 +1557,7 @@ func find_target_keyframe():
 		for kf in lane.keyframes:
 			var kf_x = Setting.get_posx_from_time(kf.kf.x)
 			var kf_y = kf.kf.y
-			if abs(mouse_pos.x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
+			if abs(snapped_x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				set_target_lane(lane)
 				return kf

@@ -21,7 +21,7 @@ static var EDITOR_LINE_WIDTH = 6.0
 
 # ==================== 플레이어 세팅 ========================
 
-static var speed = 1.5
+static var speed = 2.0
 
 enum SCORE_DISPLAY {Increasing, Decreasing}
 enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
@@ -29,7 +29,7 @@ enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
 static var score_display = SCORE_DISPLAY.Decreasing
 static var gamemode = GAMEMODE.Normal_Character
 static var sound_offset: float = 0
-static var judge_offset: float = 0
+static var judge_offset: float = -20
 static var selected_difficulty: int = 1
 
 # ==================== 관련 함수 ============================
