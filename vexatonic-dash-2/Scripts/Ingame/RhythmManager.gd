@@ -125,6 +125,7 @@ func sort_note_holders():
 @export var NOTE_SCENE: PackedScene
 @export var LONG_NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
+@export var SUREGI_CONNECTOR_SCENE: PackedScene
 
 # render_chart() 후 생성된 Note, Connector, Marker의 관계
 #
@@ -187,15 +188,20 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false
 func place_connector(p_color:int, start_time: float, end_time: float, lane: int, first: bool, parent:Node2D, p_pos:Vector2):
-	if (end_time - start_time <= 0):
-		return
-	var connector = CONNECTOR_SCENE.instantiate() as Node2D
-	var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
+	var connector
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi and p_color == -1):
+		connector = SUREGI_CONNECTOR_SCENE.instantiate()
+		connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
+	else:
+		if (end_time - start_time <= 0):
+			return
+		connector = CONNECTOR_SCENE.instantiate() as Node2D
+		var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
 
-	# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
-	if (end_time - initial_end_time > Setting.EPSILON):
-		var following_connector = place_connector(p_color, initial_end_time, end_time, lane, false,\
-								  connector, Vector2(connector.data.length, connector.data.delta_y))
+		# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
+		if (end_time - initial_end_time > Setting.EPSILON):
+			var following_connector = place_connector(p_color, initial_end_time, end_time, lane, false,\
+									  connector, Vector2(connector.data.length, connector.data.delta_y))
 
 	parent.add_child(connector)
 	connector.position = p_pos
@@ -209,11 +215,11 @@ func place_initial_connector(lane: Lane):
 		if (lane.is_init):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
-			var initial_connector = place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+			place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 		else:
 			if (lane.keyframes[0].kf.x < lane.notes[0].get_time()):
-				var initial_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+				place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
