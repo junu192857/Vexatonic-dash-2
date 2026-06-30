@@ -762,7 +762,8 @@ func find_trigger_placing_avilable() -> bool:
 func find_note_placing_available() -> bool:
 	#Ready 단계: 모든 레인에서 노드 위치의 후보를 찾음.
 	if (current_state == EditorState.Ready):
-		for lane in levelData.lanes:
+		for i in range(levelData.lanes.size()):
+			var lane = levelData.lanes[levelData.lanes.size()-i-1]
 			var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
 			var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
 			var delta_start = lane_x_start - snapped_x
