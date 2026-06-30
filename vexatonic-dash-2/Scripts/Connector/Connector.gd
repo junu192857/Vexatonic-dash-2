@@ -1,7 +1,7 @@
 extends Node2D
 class_name Connector
 
-@onready var polygon:Polygon2D = $Polygon2D
+var polygon:Polygon2D
 
 var data:ConnectorData
 var lane
@@ -36,6 +36,8 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	return end_time
 
 func _ready():
+	polygon = $Polygon2D
+	
 	polygon.polygon = PackedVector2Array([
 		Vector2(0,-Setting.HALF_CONNECTOR_HEIGHT), #좌상
 		Vector2(data.length,-Setting.HALF_CONNECTOR_HEIGHT+data.delta_y), #우상
