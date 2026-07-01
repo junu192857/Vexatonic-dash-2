@@ -45,17 +45,9 @@ func check_miss(time: float):
 		_advance_earliest_unprocessed()
 		return
 
-	# 2-2: 다음 노트가 현재 노트보다 가까우면 이동
-	#if current_index + 1 < notes.size():
-	#	var next_note = notes[current_index + 1]
-	#	if next_note.get_data().time - time < time - current_note.get_data().time:
-	#		#_force_start_miss(current_note)
-	#		move_to_next_note()
-	#		_advance_earliest_unprocessed()
-	#		return
 
 	# 시작점 윈도우 경과 → Miss
-	if not current_note.is_hit and time > current_note.get_data().time + Note.WILD_MS:
+	while (current_index < notes.size() and not current_note.is_hit and time > current_note.get_data().time + Note.WILD_MS):
 		_force_start_miss(current_note)
 		move_to_next_note()
 		_advance_earliest_unprocessed()

@@ -23,3 +23,5 @@ func _draw() -> void:
 	# 세로변 (두께 = x방향 s)
 	draw_rect(Rect2(r.position.x, r.position.y, s, r.size.y), color, true)
 	draw_rect(Rect2(r.position.x + r.size.x - s, r.position.y, s, r.size.y), color, true)
+	# 중앙변 (두꼐 = y방향 s)
+	draw_rect(Rect2(r.position.x, r.position.y + 0.5 * (r.size.y - s), r.size.x, s), color, true)

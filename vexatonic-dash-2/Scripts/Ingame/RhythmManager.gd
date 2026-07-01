@@ -4,7 +4,10 @@ var levelData: LevelData
 
 @export var CHARACTER_SCENE: PackedScene
 @onready var musicPlayer = $AudioStreamPlayer
-@onready var camera = $CameraManager
+@onready var cameraManager = $CameraManager
+@onready var camera = $CameraManager/Camera2D
+@onready var line = $CharacterHolder/Line
+@onready var lineSprite = $CharacterHolder/Line/Sprite2D
 
 
 var characters: Array[Character]
@@ -21,7 +24,7 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
-var level_path = "res://Charts/YOUNITHM"
+var level_path = "res://Charts/Melodiniq"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -49,7 +52,7 @@ func _ready() -> void:
 			noteData.time -= Setting.judge_offset
 			noteData.end_time -= Setting.judge_offset
 	
-	camera.set_triggers(levelData.triggers)
+	cameraManager.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
 	print("MUSIC_PATH: " + levelData.music_path)
 	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.music_path)
@@ -98,7 +101,9 @@ func _physics_process(delta: float) -> void:
 			place_character(levelData.lanes[lane_index])
 			lane_index += 1
 			
-		character_holder.position.x = Setting.get_posx_from_time(time)
+		character_holder.position = Vector2(Setting.get_posx_from_time(time), cameraManager.position.y)
+		if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
+			lineSprite.scale = Vector2(0.01, 6.0) / camera.zoom.y
 		for character in characters:
 			if character.set_character_position(time):
 				characters.erase(character)
@@ -107,7 +112,7 @@ func _physics_process(delta: float) -> void:
 			holder.check_miss(time)
 			holder.update_visuals(time)
 
-		camera.move(time)
+		cameraManager.move(time)
 	
 
 func sort_note_holders():
@@ -120,6 +125,7 @@ func sort_note_holders():
 @export var NOTE_SCENE: PackedScene
 @export var LONG_NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
+@export var SUREGI_CONNECTOR_SCENE: PackedScene
 
 # render_chart() 후 생성된 Note, Connector, Marker의 관계
 #
@@ -139,8 +145,12 @@ func render_chart():
 		pos_x = Setting.get_posx_from_time(noteData.time)
 		var cur_note = place_note(noteData, pos_x, false, self)
 		assign_note(cur_note)
-		if (previous_time >= 0 and previous_lane == noteData.lane and Setting.gamemode != Setting.GAMEMODE.Suregi):
-			var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
+		if (previous_time >= 0 and previous_lane == noteData.lane):
+			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+				var connector = place_suregi_connector(previous_note.data.color, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
+							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
+			else:
+				var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
 							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 	
 		previous_time = noteData.time
@@ -159,13 +169,12 @@ func render_chart():
 	for lane:Lane in levelData.lanes:
 		#lane.print_data()
 		lane.sort_notes()
-		if (Setting.gamemode != Setting.GAMEMODE.Suregi):
-			place_initial_connector(lane)
-			place_final_connector(lane)
+		place_initial_connector(lane)
+		place_final_connector(lane)
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
-func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Node2D:
-	var note = (LONG_NOTE_SCENE if not is_marker and data.type == 1 else NOTE_SCENE).instantiate() as Node2D
+func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Note:
+	var note = (LONG_NOTE_SCENE if not is_marker and data.type == 1 else NOTE_SCENE).instantiate()
 	note.set_data(data)
 	var lane = Lane.find_lane(levelData.lanes, data.lane)
 	parent.add_child(note)
@@ -182,9 +191,10 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false
 func place_connector(p_color:int, start_time: float, end_time: float, lane: int, first: bool, parent:Node2D, p_pos:Vector2):
+	var connector
 	if (end_time - start_time <= 0):
 		return
-	var connector = CONNECTOR_SCENE.instantiate() as Node2D
+	connector = CONNECTOR_SCENE.instantiate() as Node2D
 	var initial_end_time = connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
 
 	# 하나의 Connector 안에서 레인이 꺾이는 경우: 꺾이는 지점부터 새로운 Connector 생성
@@ -197,6 +207,14 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 	if (p_color > -1):
 		connector.z_index = 1
 	return connector
+
+func place_suregi_connector(p_color: int, start_time: float, end_time: float, lane: int, first: bool, parent:Node2D, p_pos:Vector2):
+	var connector
+	connector = SUREGI_CONNECTOR_SCENE.instantiate() as Node2D
+	connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
+	parent.add_child(connector)
+	connector.position = p_pos
+	return connector
 	
 # 레인의 첫 번째 노트 이전의 Connector 생성. 첫 번째 노트가 없으면 패스
 func place_initial_connector(lane: Lane):
@@ -204,11 +222,19 @@ func place_initial_connector(lane: Lane):
 		if (lane.is_init):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
-			var initial_connector = place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
+			else:
+				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 		else:
 			if (lane.keyframes[0].kf.x < lane.notes[0].get_time()):
-				var initial_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+				if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
+				else:
+					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
@@ -219,10 +245,18 @@ func place_final_connector(lane: Lane):
 		var last_note_time = lane.notes[-1].get_end_time() #find last note or marker
 		if lane.keyframes[-1].kf.x  > last_note_time + Setting.time_per_note_width / 2:
 			var connector_time = last_note_time + Setting.time_per_note_width / 2
-			var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
+			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+				var final_connector = place_suregi_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
+								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
+			else:
+				var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
 								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
 	else:
-		var final_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
+		if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+			var final_connector = place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
+							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
+		else:
+			var final_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
 							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 
 # 생성된 노트를 레인의 노트 큐에 할당

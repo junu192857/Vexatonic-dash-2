@@ -20,6 +20,7 @@ var sorted_bpm: Array
 @onready var savePanel = $CanvasLayer/SavePanel
 @onready var loadPanel = $CanvasLayer/LoadPanel
 @onready var modifyPanel = $CanvasLayer/ModifyTriggerPanel
+@onready var ingameStatusHolder = $CanvasLayer/IngameStatusHolder
 
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
@@ -31,6 +32,7 @@ func _ready():
 	inputHandler.delete_something.connect(_on_delete_something)
 	inputHandler.toggle_shifting.connect(_on_toggle_shifting)
 	inputHandler.move_to_last_note.connect(_on_move_to_last_note)
+	inputHandler.move_camera_horizontally.connect(_on_move_horizontally)
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
@@ -623,7 +625,12 @@ func generate_modify_preview():
 					cancel_modify_trigger()
 					return
 				else:
-					target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+					if (target_trigger.type == Trigger.TYPE.BPM or not shifting):
+						target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+						target_trigger.show_data()
+					else:
+						target_trigger.node.global_position = Vector2(Setting.get_posx_from_time(target_trigger.start), target_trigger.editor_pos_y)
+						target_trigger.show_line_preview(mouse_pos)
 					target_trigger.select_trigger()
 	can_do_something = true
 
@@ -701,7 +708,8 @@ func check_mouse_in_available_area() -> bool:
 func find_lane_placing_case() -> LanePlacingCase:
 	#if (!check_mouse_in_available_area(mouse_pos)):
 	#	return LanePlacingCase.None
-	var camera_left = camera.global_position.x - get_viewport_rect().size.x / 2
+	var camera_left = camera.global_position.x - get_viewport_rect().size.x / camera.zoom.x / 2
+
 
 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
 	for lane in levelData.lanes:
@@ -755,7 +763,8 @@ func find_trigger_placing_avilable() -> bool:
 func find_note_placing_available() -> bool:
 	#Ready 단계: 모든 레인에서 노드 위치의 후보를 찾음.
 	if (current_state == EditorState.Ready):
-		for lane in levelData.lanes:
+		for i in range(levelData.lanes.size()):
+			var lane = levelData.lanes[levelData.lanes.size()-i-1]
 			var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
 			var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
 			var delta_start = lane_x_start - snapped_x
@@ -1001,6 +1010,7 @@ func _on_modify_placing():
 			adjust_longNote_connector(head, target_note.get_data().time, target_note.get_data().end_time)
 		target_note.process_color()
 	elif selected_note == NoteSelection.ModifyTrigger:
+		target_trigger.set_new_data()
 		show_modify_panel()
 		return
 	else:
@@ -1481,6 +1491,7 @@ var camera_range: CameraRangeRect
 func toggle_music():
 	if (!music_playing):
 		noteSelectorPanel.get_node("PlayMusicButton").text = "Stop Music"
+		ingameStatusHolder.visible = true
 		music_playing = true
 		var initial_pos_x = get_music_start_pos()
 		var music_start_time = Setting.get_time_from_posx(initial_pos_x) / 1000
@@ -1492,6 +1503,7 @@ func toggle_music():
 		add_child(camera_range)
 	else:
 		noteSelectorPanel.get_node("PlayMusicButton").text = "Play Music"
+		ingameStatusHolder.visible = false
 		music_playing = false
 		music_bar.queue_free()
 		music_bar = null
@@ -1504,14 +1516,29 @@ func get_music_start_pos() -> float:
 	return max(0.0, camera_left)
 
 func _process(_delta:float):
-	if (music_bar != null):
+	if (music_playing):
 		var current_time = musicPlayer.get_playback_position() * 1000
 		music_bar.global_position.x = Setting.get_posx_from_time(current_time)
-		camera_range.set_bounds(get_camera_bounds_at(current_time))
+		var trigger_vector2 = get_trigger_process_at_time(current_time)
+		camera_range.set_bounds(get_camera_bounds_at(current_time, trigger_vector2))
+		set_ingame_status(current_time, trigger_vector2)
 
-func get_camera_bounds_at(time: float) -> Rect2:
-	var zoom = 1.0
+func set_ingame_status(time: float, trigger_vector2: Vector2):
+	ingameStatusHolder.get_child(2).text = "Time: %.2f" % time
+	ingameStatusHolder.get_child(1).text = "Camera_Y: %.2f" % trigger_vector2.x
+	ingameStatusHolder.get_child(0).text = "Camera_Zoom: %.2f" % trigger_vector2.y
+
+func get_camera_bounds_at(time: float, trigger_vector: Vector2) -> Rect2:
+	var vp = get_viewport_rect().size
+	var vp_w = vp.x / trigger_vector.y
+	var vp_h = vp.y / trigger_vector.y
+	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
+	return Rect2(center_x - vp_w * 0.5, trigger_vector.x - vp_h * 0.5, vp_w, vp_h)
+
+#return: (delta_y, zoom) 형태의 Vector2
+func get_trigger_process_at_time(time: float) -> Vector2:
 	var delta_y = 0.0
+	var zoom = 1.0
 	for tr in levelData.triggers:
 		if time < tr.start:
 			continue
@@ -1521,11 +1548,7 @@ func get_camera_bounds_at(time: float) -> Rect2:
 				zoom += tr.c * progress
 			Trigger.TYPE.Move:
 				delta_y += tr.c * progress
-	var vp = get_viewport_rect().size
-	var vp_w = vp.x / zoom
-	var vp_h = vp.y / zoom
-	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
-	return Rect2(center_x - vp_w * 0.5, delta_y - vp_h * 0.5, vp_w, vp_h)
+	return Vector2(delta_y, zoom)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
@@ -1536,7 +1559,7 @@ func find_target_keyframe():
 		for kf in lane.keyframes:
 			var kf_x = Setting.get_posx_from_time(kf.kf.x)
 			var kf_y = kf.kf.y
-			if abs(mouse_pos.x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
+			if abs(snapped_x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				set_target_lane(lane)
 				return kf
@@ -1622,13 +1645,22 @@ func move_only_parent(parent: Node2D, pos: Vector2):
 		fixed_children[i].global_position = saved_positions[i]
 
 func _on_toggle_shifting(pressed: bool):
+	shifting = pressed
 	if (!editor_ready or modifying_trigger):
 		return
-	shifting = pressed
 	_on_move_preview()
 	
 func _on_move_to_last_note():
 	if (!editor_ready or modifying_trigger):
 		return
 	var last_note = levelData.noteDatas.reduce(func(a, b): return a if a.time > b.time else b)
-	camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
+	if (last_note != null):
+		camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
+	else:
+		camera.global_position = Vector2.ZERO
+	
+func _on_move_horizontally(is_left: bool):
+	if (is_left):
+		camera.move_local_x(-1 * get_viewport_rect().size.x / camera.zoom.x / 2)
+	else:
+		camera.move_local_x(get_viewport_rect().size.x / camera.zoom.x / 2)

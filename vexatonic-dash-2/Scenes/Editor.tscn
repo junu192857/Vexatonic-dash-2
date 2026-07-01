@@ -150,21 +150,23 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="RedoButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=151240166]
+[node name="ZoomUpButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=151240166]
 layout_mode = 0
-offset_left = 1752.0
-offset_top = 157.0
-offset_right = 1852.0
-offset_bottom = 257.0
-text = "Redo"
+offset_left = 1491.0
+offset_top = 166.0
+offset_right = 1591.0
+offset_bottom = 266.0
+text = "ZoomUp
+"
 
-[node name="UndoButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=889295401]
+[node name="ZoomDownButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=889295401]
 layout_mode = 0
-offset_left = 1753.0
-offset_top = 28.0
-offset_right = 1853.0
-offset_bottom = 128.0
-text = "Undo"
+offset_left = 1612.0
+offset_top = 164.0
+offset_right = 1712.0
+offset_bottom = 264.0
+text = "ZoomDown
+"
 
 [node name="Button6" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1549482070]
 layout_mode = 0
@@ -648,7 +650,7 @@ offset_top = -1.0
 offset_right = 282.5
 offset_bottom = 30.0
 max_value = 1000000.0
-step = 0.0
+step = 0.01
 allow_lesser = true
 
 [node name="ValueLabel" type="Label" parent="CanvasLayer/ModifyTriggerPanel" unique_id=1506332063]
@@ -668,7 +670,7 @@ offset_right = 272.5
 offset_bottom = 28.0
 min_value = -10000.0
 max_value = 10000.0
-step = 0.0
+step = 0.01
 allow_greater = true
 allow_lesser = true
 
@@ -687,6 +689,37 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "Finish"
 
+[node name="IngameStatusHolder" type="Control" parent="CanvasLayer" unique_id=1014779688]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CameraZoomText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=1395987564]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 64.0
+offset_right = 152.0
+offset_bottom = 87.0
+text = "Camera_Zoom:"
+
+[node name="CameraYText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=1754299761]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 41.0
+offset_right = 152.0
+offset_bottom = 64.0
+text = "Camera_Y:"
+
+[node name="TimeText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=126211545]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 17.0
+offset_right = 150.0
+offset_bottom = 40.0
+text = "Time:"
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=787913441]
 
 [node name="x_axis_bar" type="ColorRect" parent="." unique_id=1732663918]
@@ -702,6 +735,8 @@ grow_vertical = 2
 [connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button3" to="." method="set_difficulty" binds= [2]]
 [connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button2" to="." method="set_difficulty" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button" to="." method="set_difficulty" binds= [0]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomUpButton" to="." method="_on_zoom_camera" binds= [true]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomDownButton" to="." method="_on_zoom_camera" binds= [false]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_note" binds= [13]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button5" to="." method="_on_select_note" binds= [22]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_note" binds= [12]]

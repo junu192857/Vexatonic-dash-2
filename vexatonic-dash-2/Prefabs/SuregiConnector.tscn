@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://nkkobamofph3"]
+
+[ext_resource type="Script" uid="uid://dm5w26wccoav4" path="res://Scripts/Connector/SuregiConnector.gd" id="1_2jije"]
+
+[node name="SuregiConnector" type="Node2D" unique_id=691671917]
+z_as_relative = false
+script = ExtResource("1_2jije")
+
+[node name="Line2D" type="Line2D" parent="." unique_id=1730307325]
+width = 6.0

@@ -12,13 +12,13 @@ func _ready():
 		Setting.SCORE_DISPLAY.Decreasing:
 			score_text.text = "SCORE %07d" % 1000000
 
-func _on_status_update(judgement: int, score: float, combo: int, note: Note) -> void:
+func _on_status_update(judgement: int, score: float, combo: int, note: Note, fastslow: Note.Fastslow) -> void:
 	var rounded = roundi(score)
 	score_text.text = "SCORE %07d" % rounded
 	var judgement_text = JUDGEMENT_TEXT.instantiate()
 	canvasLayer.add_child(judgement_text)
 	judgement_text.global_position = get_note_position(note)
-	judgement_text.show_text(judgement, combo)
+	judgement_text.show_text(judgement, combo, fastslow)
 	
 	var tween = judgement_text.create_tween()
 	tween.tween_property(judgement_text, "position:y", judgement_text.position.y - 100, 0.6)

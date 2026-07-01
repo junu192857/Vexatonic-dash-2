@@ -1,7 +1,6 @@
 extends Connector
 class_name EConnector
 
-#@onready var polygon:Polygon2D = $Polygon2D
 
 #var data:ConnectorData
 var start_keyframe: Keyframe
@@ -10,6 +9,7 @@ var end_keyframe: Keyframe
 
 func _ready():
 	data = ConnectorData.new(-1, 24, 0)
+	polygon = $Polygon2D
 	polygon.uv = PackedVector2Array([
 		Vector2(0,0),
 		Vector2(240,0),
