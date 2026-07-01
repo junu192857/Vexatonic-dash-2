@@ -32,6 +32,7 @@ func _ready():
 	inputHandler.delete_something.connect(_on_delete_something)
 	inputHandler.toggle_shifting.connect(_on_toggle_shifting)
 	inputHandler.move_to_last_note.connect(_on_move_to_last_note)
+	inputHandler.move_camera_horizontally.connect(_on_move_horizontally)
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
@@ -1658,3 +1659,8 @@ func _on_move_to_last_note():
 	else:
 		camera.global_position = Vector2.ZERO
 	
+func _on_move_horizontally(is_left: bool):
+	if (is_left):
+		camera.move_local_x(-1 * get_viewport_rect().size.x / camera.zoom.x / 2)
+	else:
+		camera.move_local_x(get_viewport_rect().size.x / camera.zoom.x / 2)

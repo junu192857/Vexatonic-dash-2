@@ -63,7 +63,6 @@ func set_color():
 
 func make_new_polygon():
 	processed_polygon = Polygon2D.new()
-	processed_polygon.z_index = 2
 	add_child(processed_polygon)
 	processed_polygon.visible = false
 
