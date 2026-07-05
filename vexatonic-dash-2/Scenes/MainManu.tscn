@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://dhh0rmb85vmni"]
+
+[ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_jyp5g"]
+
+[node name="MainManu" type="Node2D" unique_id=1665967289]
+script = ExtResource("1_jyp5g")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013899153]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=2129972978]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameEndButton" type="Button" parent="CanvasLayer/Control" unique_id=1244450197]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.82000005
+anchor_right = 0.65000004
+anchor_bottom = 0.89500004
+offset_left = 0.5999756
+offset_top = 0.39996338
+offset_right = 0.43981934
+offset_bottom = 0.39996338
+text = "Game End"
+
+[node name="ButtonForSomething" type="Button" parent="CanvasLayer/Control" unique_id=1151269989]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.70400006
+anchor_right = 0.65000004
+anchor_bottom = 0.77900004
+offset_top = -0.32006836
+offset_right = -0.16015625
+offset_bottom = -0.32006836
+text = "Do Something"
+
+[node name="GameStartButton" type="Button" parent="CanvasLayer/Control" unique_id=1664065325]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.586
+anchor_right = 0.65
+anchor_bottom = 0.661
+text = "Game Start"
+
+[node name="Label" type="Label" parent="CanvasLayer/Control" unique_id=23012843]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.32500002
+anchor_top = 0.116000004
+anchor_right = 0.675
+anchor_bottom = 0.425
+offset_left = 0.49993896
+offset_right = -0.5
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 120
+text = "Vexatonic
+         Dash 2"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
+[connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
