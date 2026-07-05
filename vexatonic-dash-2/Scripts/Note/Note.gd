@@ -77,7 +77,7 @@ func get_marker() -> Note:
 	return null
 
 func set_line():
-	line.modulate = Color(1,0.5,0)
+	line.modulate = Color(0.812, 0.225, 0.0, 1.0)
 	line.visible = true
 
 func start_hold(_is_left: bool, _time: float, _start_adjust: bool) -> void: pass
