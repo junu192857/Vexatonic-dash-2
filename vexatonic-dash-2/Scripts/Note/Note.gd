@@ -3,6 +3,7 @@ class_name Note
 
 const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
+const SELECTED_COLORS = [Color(1,0,1), Color(0,1,1), Color(1,1,0.7)]
 
 const VEXATONIC_MS = 42
 const SPARKLIC_MS = 84
@@ -13,6 +14,7 @@ enum Fastslow { NOTHING = 0, FAST = 1, SLOW = 2 }
 signal judgement_spread(judgement: int, note: Note, is_long_end: bool, fastslow: Fastslow)
 
 @onready var sprite:Sprite2D = $Sprite2D
+@onready var line:Line2D = $Line2D
 
 var data: NoteData
 
@@ -21,20 +23,6 @@ var is_marker
 var end_judged := false
 
 #=============== NoteData 값 가져오기 =======================
-func get_time() -> float:
-	return data.time
-
-func get_color() -> int:
-	return data.color
-
-func get_type() -> int:
-	return data.type
-
-func get_end_time() -> float:
-	return data.end_time
-
-func get_lane() -> int:
-	return data.lane
 
 func set_data(p_data: NoteData):
 	if (is_marker):
@@ -51,11 +39,12 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	if data.color != p_color: return Judgement.PASS
 	var deltaTime = pressed_ms - data.time
 	if abs(deltaTime) > WILD_MS: return Judgement.PASS
-	var judgement = (
+	var raw_judgement = (
 		Judgement.VEXATONIC if abs(deltaTime) <= VEXATONIC_MS else
 		Judgement.SPARKLIC if abs(deltaTime) <= SPARKLIC_MS else
 		Judgement.WILD
 	)
+	var judgement = Judgement.VEXATONIC if (get_data().adjusted == 1 and raw_judgement != Judgement.VEXATONIC) else raw_judgement
 	var fs = (
 		Fastslow.NOTHING if judgement == Judgement.VEXATONIC or judgement == Judgement.MISS else
 		Fastslow.FAST if deltaTime < 0.0 else
@@ -86,6 +75,10 @@ func get_marker() -> Note:
 		if child is Note:
 			return child
 	return null
+
+func set_line():
+	line.modulate = Color(0.812, 0.225, 0.0, 1.0)
+	line.visible = true
 
 func start_hold(_is_left: bool, _time: float, _start_adjust: bool) -> void: pass
 func release_hold(_is_left: bool, _time: float) -> void: pass

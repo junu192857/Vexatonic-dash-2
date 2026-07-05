@@ -10,3 +10,8 @@ script = ExtResource("2_cp8im")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729566812]
 texture = ExtResource("1_6w4eq")
+
+[node name="Line2D" type="Line2D" parent="." unique_id=384051781]
+visible = false
+points = PackedVector2Array(-14, 30, 12, 30, 12, -30, -12, -30, -12, 30)
+width = 4.0

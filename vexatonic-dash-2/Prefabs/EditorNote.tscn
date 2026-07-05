@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://cmj2wlhm80k1d" path="res://Scripts/Editor/EditorNote.gd" id="1_1f3cg"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="2_vdcar"]
 
-
 [node name="Note" type="Node2D" unique_id=1307802017]
 z_index = 2
 z_as_relative = false
@@ -11,3 +10,8 @@ script = ExtResource("1_1f3cg")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729566812]
 texture = ExtResource("2_vdcar")
+
+[node name="Line2D" type="Line2D" parent="." unique_id=2122295850]
+visible = false
+points = PackedVector2Array(-14, 30, 12, 30, 12, -30, -12, -30, -12, 30)
+width = 4.0

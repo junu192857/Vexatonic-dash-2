@@ -180,13 +180,12 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 	parent.add_child(note)
 	if !is_marker:
 		note.global_position = Vector2(pos_x, lane.get_height(data.time))
+		if data.adjusted == 1:
+			note.set_line()
 		lane.adjust_keyframe(data.time, note.global_position.y)
 	else:
 		note.global_position = Vector2(pos_x, lane.get_height(data.end_time))
 		lane.adjust_keyframe(data.end_time, note.global_position.y)
-		
-	
-	#print("Place Note at x: %f y: %f"% [pos_x, note.global_position.y])
 	return note
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false
@@ -210,6 +209,8 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 
 func place_suregi_connector(p_color: int, start_time: float, end_time: float, lane: int, first: bool, parent:Node2D, p_pos:Vector2):
 	var connector
+	if (end_time - start_time <= 0):
+		return
 	connector = SUREGI_CONNECTOR_SCENE.instantiate() as Node2D
 	connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
 	parent.add_child(connector)
@@ -223,18 +224,18 @@ func place_initial_connector(lane: Lane):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 			else:
-				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 		else:
-			if (lane.keyframes[0].kf.x < lane.notes[0].get_time()):
+			if (lane.keyframes[0].kf.x < lane.notes[0].get_data().time):
 				if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 				else:
-					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
@@ -242,7 +243,7 @@ func place_initial_connector(lane: Lane):
 func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
-		var last_note_time = lane.notes[-1].get_end_time() #find last note or marker
+		var last_note_time = lane.notes[-1].get_data().end_time #find last note or marker
 		if lane.keyframes[-1].kf.x  > last_note_time + Setting.time_per_note_width / 2:
 			var connector_time = last_note_time + Setting.time_per_note_width / 2
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
