@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://dcm8fyygstrbs" path="res://Scripts/Character/Character.gd" id="1_dkyrv"]
 [ext_resource type="Texture2D" uid="uid://dlso3gh16d8w6" path="res://Textures/daxbotsheet.png" id="2_2evft"]
 
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_n3ll4"]
 atlas = ExtResource("2_2evft")
 region = Rect2(0, 0, 64, 68)
@@ -35,13 +34,14 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_r0cns")
 }],
-"loop": true,
+"loop": 1,
 "name": &"new_animation",
 "speed": 10.0
 }]
 
 [node name="Character" type="Node2D" unique_id=995761361]
 z_index = 3
+z_as_relative = false
 script = ExtResource("1_dkyrv")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1796983103]

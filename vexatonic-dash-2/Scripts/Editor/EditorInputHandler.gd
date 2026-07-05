@@ -7,6 +7,7 @@ signal put_note()
 signal delete_something()
 signal toggle_shifting(pressed: bool)
 signal move_to_last_note()
+signal move_camera_horizontally(is_left: bool)
 
 var dragging = false
 var drag_start: Vector2
@@ -28,8 +29,12 @@ func _input(event):
 			delete_something.emit()
 		if event.keycode == KEY_SHIFT:
 			toggle_shifting.emit(event.pressed)
-		if event.keycode == KEY_F:
+		if event.keycode == KEY_F and event.pressed:
 			move_to_last_note.emit()
+		if event.keycode == KEY_A and event.pressed:
+			move_camera_horizontally.emit(true)
+		if event.keycode == KEY_D and event.pressed:
+			move_camera_horizontally.emit(false)
 			
 	if event is InputEventMouseMotion:
 		if dragging:

@@ -4,16 +4,7 @@
 
 [node name="ZoomTrigger" type="Node2D" unique_id=1311778669]
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=326156791]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_right = 6.0
-offset_bottom = 6.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Line2D" type="Line2D" parent="." unique_id=1123272427]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=299281638]
 position = Vector2(11, 2.0000005)

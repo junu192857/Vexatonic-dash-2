@@ -90,14 +90,12 @@ func _apply_triggers(time: float) -> void:
 
 		var delta_ratio = new_progress - prev_progress
 		_trigger_progress[i] = new_progress
-		print("new_progress: %f" % new_progress)
 		match tr.type:
 			Trigger.TYPE.Move:
 				if (new_progress == 1.0):
 					triggered_delta_position.y += tr.c
 				else:
 					temp_delta_position.y += tr.c * new_progress
-					print("temp delta: %f" % [tr.c * new_progress])
 
 
 			Trigger.TYPE.Rotate:

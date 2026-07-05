@@ -3,7 +3,7 @@ extends Trigger
 
 var editor_pos_y: float
 var node: Node2D
-var length_line: ColorRect
+var length_line: Line2D
 var sprite: Sprite2D
 var bpmText: Label
 
@@ -28,10 +28,45 @@ func assign_node(p_node: Node2D):
 		bpmText = node.get_child(1)
 
 func show_data():
-	if (type != Trigger.TYPE.BPM):
-		length_line.size = Vector2(Setting.get_posx_from_time(t), 6.0)
-	else:
-		bpmText.text = "%.2f" % c
+	match (type):
+		Trigger.TYPE.Move:
+			length_line.points = PackedVector2Array([
+				Vector2(0, 0),
+				Vector2(Setting.get_posx_from_time(t), c)
+			])
+		Trigger.TYPE.Zoom:
+			length_line.points = PackedVector2Array([
+				Vector2(0,0),
+				Vector2(Setting.get_posx_from_time(t), 0)
+			])
+		Trigger.TYPE.BPM:
+			bpmText.text = "%.2f" % c
+
+func show_line_preview(end_global_point: Vector2):
+	match(type):
+		Trigger.TYPE.Move:
+			length_line.points = PackedVector2Array([
+				Vector2(0,0),
+				end_global_point - node.position
+			])
+		Trigger.TYPE.Zoom:
+			length_line.points = PackedVector2Array([
+				Vector2(0,0),
+				Vector2.RIGHT * (end_global_point.x - node.position.x)
+			])
+		_:
+			return
+
+func set_new_data():
+	editor_pos_y = node.global_position.y
+	match(type):
+		Trigger.TYPE.Move:
+			c = length_line.points[1].y
+			t = Setting.get_time_from_posx(length_line.points[1].x)
+		Trigger.TYPE.Zoom:
+			t = Setting.get_time_from_posx(length_line.points[1].x)
+		_:
+			return
 
 func get_editor_position():
 	return Vector2(Setting.get_posx_from_time(start), editor_pos_y)

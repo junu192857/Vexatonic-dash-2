@@ -21,21 +21,34 @@ static var EDITOR_LINE_WIDTH = 6.0
 
 # ==================== 플레이어 세팅 ========================
 
-static var speed = 1.5
+static var speed = 2.0
 
 enum SCORE_DISPLAY {Increasing, Decreasing}
 enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
 
 static var score_display = SCORE_DISPLAY.Decreasing
-static var gamemode = GAMEMODE.Normal_Character
+static var gamemode = GAMEMODE.Suregi
 static var sound_offset: float = 0
-static var judge_offset: float = 0
-static var selected_difficulty: int = 0
+static var judge_offset: float = -20
+static var selected_difficulty: int = 1
 
 # ==================== 관련 함수 ============================
 
 const SETTINGS_PATH = "user://settings.cfg"
 const SECTION = "player"
+
+static func get_half_connector_height(scene_name: String):
+	if (gamemode == GAMEMODE.Suregi and scene_name == "RhythmScene"):
+		return 37.5
+	else:
+		return 25
+		
+static func get_note_width(scene_name: String):
+	if (gamemode == GAMEMODE.Suregi and scene_name == "RhythmScene"):
+		return 36
+	else:
+		return 24
+		
 
 #Setting.save()를 호출해야 저장이 됨. 아직은 안 됨
 static func save() -> void:

@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://brkwgyts3o65g" path="res://Scripts/Note/LongNote.gd" id="1_d5cgi"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="2_emsgy"]
 
-
 [node name="Note" type="Node2D" unique_id=1307802017]
 z_index = 2
 z_as_relative = false

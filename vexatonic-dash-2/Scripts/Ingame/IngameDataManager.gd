@@ -17,10 +17,10 @@ var pressed_note_count: int = 0
 var vexatonic_count: int = 0
 var _combo_lamp: ComboLamp = ComboLamp.FullVexatonic
 
-signal status_updated(judgement: int, score: float, combo: int, note: Note)
+signal status_updated(judgement: int, score: float, combo: int, note: Note, fastslow: Note.Fastslow)
 
 
-func catch_judgement(judgement: int, note: Note, is_long_end: bool):
+func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
 	match judgement:
 		0: #Vexatonic
 			score += score_per_note
@@ -52,10 +52,10 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool):
 	
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
-			status_updated.emit(judgement, current_score, combo, note)
+			status_updated.emit(judgement, current_score, combo, note, fastslow)
 		Setting.SCORE_DISPLAY.Decreasing:
 			var perfect_score = pressed_note_count * score_per_note + calculate_longNote_score(total_long_length_current)
-			status_updated.emit(judgement, 1000000 - (perfect_score - current_score), combo, note)
+			status_updated.emit(judgement, 1000000 - (perfect_score - current_score), combo, note, fastslow)
 	
 
 func set_total_notes(noteDatas: Array[NoteData]):
