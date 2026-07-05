@@ -180,13 +180,12 @@ func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> 
 	parent.add_child(note)
 	if !is_marker:
 		note.global_position = Vector2(pos_x, lane.get_height(data.time))
+		if data.adjusted == 1:
+			note.set_line()
 		lane.adjust_keyframe(data.time, note.global_position.y)
 	else:
 		note.global_position = Vector2(pos_x, lane.get_height(data.end_time))
 		lane.adjust_keyframe(data.end_time, note.global_position.y)
-		
-	
-	#print("Place Note at x: %f y: %f"% [pos_x, note.global_position.y])
 	return note
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false

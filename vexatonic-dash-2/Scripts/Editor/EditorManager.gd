@@ -232,6 +232,7 @@ var long_start_pos: Vector2
 var long_end_time: float
 
 var selected_note: NoteSelection = NoteSelection.Nothing
+var adjusted_toggled: bool = false
 var selected_color
 var current_state: EditorState = EditorState.Ready
 var preview: Node2D
@@ -277,7 +278,10 @@ func _on_select_note(selected: int):
 		print("Note Changed: %d" % selected_note)
 	else:
 		push_error("Invalid EditMode: %d" % selected)
-	
+
+func _on_toggled_adjust(toggled_on: bool):
+	adjusted_toggled = toggled_on
+	print("Adjust toggled")
 
 func _on_move_preview():
 	if !editor_ready or modifying_trigger:
@@ -477,6 +481,8 @@ func generate_preview(selected: int) -> Node2D:
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
+			if (adjusted_toggled):
+				my_preview.set_line()
 			my_preview.position = get_preview_pos_for_note()
 			my_preview.set_color(selected_color)
 		else: #Note이고 Placing인 경우: 무조건 LongNote
@@ -485,6 +491,8 @@ func generate_preview(selected: int) -> Node2D:
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
+			if (adjusted_toggled):
+				my_preview.set_line()
 			my_preview.position = long_start_pos
 			my_preview.set_color(selected_color)
 			
@@ -860,14 +868,14 @@ func _place_trigger():
 	show_modify_panel()
 	
 func _place_single_note():
-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index)
+	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index, adjusted_toggled)
 	levelData.noteDatas.append(data)
 	preview.set_data(data)
 	target_lane.add_note(preview)
 	preview = null
 
 func _place_long_note():
-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index)
+	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index, adjusted_toggled)
 	levelData.noteDatas.append(data)
 	preview.set_data(data)
 	target_lane.add_note(preview)
@@ -1318,7 +1326,7 @@ func save_chart():
 	
 	# 노트 저장
 	for note in levelData.noteDatas:
-		file.store_line("%f %d %d %f %d" % [note.time, note.color, note.type, note.end_time, note.lane])
+		file.store_line("%f %d %d %f %d %d" % [note.time, note.color, note.type, note.end_time, note.lane, note.adjusted])
 	
 	# 트리거 저장
 	for trigger in levelData.triggers:
@@ -1428,6 +1436,8 @@ func parse(chart_path: String):
 		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
 		note.set_data(noteData)
 		add_child(note)
+		if (noteData.adjusted):
+			note.set_line()
 		note.position = Vector2(Setting.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
 		note.set_color(noteData.color)
 		lane.add_note(note)

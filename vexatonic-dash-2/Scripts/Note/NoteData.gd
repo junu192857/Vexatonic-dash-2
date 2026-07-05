@@ -10,10 +10,13 @@ var type: int
 var end_time: float
 #해당 노트가 속한 레인 번호
 var lane: int
+# 1이면 보정 노트 (Sparklic/Wild → Vexatonic으로 보정), 0이면 일반 노트
+var adjusted: int
 
-func _init(p_time: float, p_color: int, p_type: int, p_end_time: float, p_lane: int):
+func _init(p_time: float, p_color: int, p_type: int, p_end_time: float, p_lane: int, p_adjusted: int = 0):
 	time = p_time
 	color = p_color
 	type = p_type
 	end_time = p_end_time
 	lane = p_lane
+	adjusted = p_adjusted

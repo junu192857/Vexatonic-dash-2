@@ -170,20 +170,20 @@ text = "ZoomDown
 
 [node name="Button6" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1549482070]
 layout_mode = 0
-offset_left = 478.0
-offset_top = 163.0
-offset_right = 578.0
-offset_bottom = 263.0
+offset_left = 477.0
+offset_top = 160.0
+offset_right = 577.0
+offset_bottom = 260.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "YellowLong"
 
 [node name="Button5" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=562787188]
 layout_mode = 0
-offset_left = 1078.0
-offset_top = 21.0
-offset_right = 1178.0
-offset_bottom = 121.0
+offset_left = 1199.0
+offset_top = 25.0
+offset_right = 1299.0
+offset_bottom = 125.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Modify
@@ -192,9 +192,9 @@ Note"
 [node name="Button4" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=360759748]
 layout_mode = 0
 offset_left = 327.0
-offset_top = 160.0
+offset_top = 157.0
 offset_right = 427.0
-offset_bottom = 260.0
+offset_bottom = 257.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "BlueLong"
@@ -255,10 +255,10 @@ Camera"
 
 [node name="Button9" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1223151017]
 layout_mode = 0
-offset_left = 956.0
-offset_top = 25.0
-offset_right = 1056.0
-offset_bottom = 125.0
+offset_left = 1074.0
+offset_top = 26.0
+offset_right = 1174.0
+offset_bottom = 126.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Modify
@@ -296,10 +296,10 @@ text = "Lane"
 
 [node name="Button2" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=228103161]
 layout_mode = 0
-offset_left = 1193.0
-offset_top = 20.0
-offset_right = 1293.0
-offset_bottom = 120.0
+offset_left = 1323.0
+offset_top = 24.0
+offset_right = 1423.0
+offset_bottom = 124.0
 pivot_offset = Vector2(0, 120)
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
@@ -313,6 +313,15 @@ offset_top = 31.0
 offset_right = 1708.0
 offset_bottom = 127.0
 text = "Play Music"
+
+[node name="Button11" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=474866379]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 155.0
+offset_right = 128.0
+offset_bottom = 251.0
+toggle_mode = true
+text = "Adjusted"
 
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
@@ -751,6 +760,7 @@ grow_vertical = 2
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_note" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button2" to="." method="_on_select_note" binds= [23]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/PlayMusicButton" to="." method="toggle_music"]
+[connection signal="toggled" from="CanvasLayer/NoteSelectorPanel/Button11" to="." method="_on_toggled_adjust"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
