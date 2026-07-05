@@ -96,7 +96,6 @@ func _apply_triggers(time: float) -> void:
 					triggered_delta_position.y += tr.c
 				else:
 					temp_delta_position.y += tr.c * new_progress
-					print("temp delta: %f" % [tr.c * new_progress])
 
 
 			Trigger.TYPE.Rotate:
