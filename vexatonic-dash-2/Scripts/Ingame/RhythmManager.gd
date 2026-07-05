@@ -210,6 +210,8 @@ func place_connector(p_color:int, start_time: float, end_time: float, lane: int,
 
 func place_suregi_connector(p_color: int, start_time: float, end_time: float, lane: int, first: bool, parent:Node2D, p_pos:Vector2):
 	var connector
+	if (end_time - start_time <= 0):
+		return
 	connector = SUREGI_CONNECTOR_SCENE.instantiate() as Node2D
 	connector.set_connector_data(p_color, start_time, end_time, Lane.find_lane(levelData.lanes, lane), first)
 	parent.add_child(connector)
