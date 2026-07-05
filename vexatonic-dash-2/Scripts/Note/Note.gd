@@ -21,20 +21,6 @@ var is_marker
 var end_judged := false
 
 #=============== NoteData 값 가져오기 =======================
-func get_time() -> float:
-	return data.time
-
-func get_color() -> int:
-	return data.color
-
-func get_type() -> int:
-	return data.type
-
-func get_end_time() -> float:
-	return data.end_time
-
-func get_lane() -> int:
-	return data.lane
 
 func set_data(p_data: NoteData):
 	if (is_marker):

@@ -63,17 +63,17 @@ func print_data():
 		print("time: %f and height: %f" % [kf.kf.x, kf.kf.y])
 	print("Note Count:%d" % notes.size())
 	for note: Note in notes:
-		print("Note: time %f, color %d, type %d" % [note.get_time(), note.get_color(), note.get_type()])
+		print("Note: time %f, color %d, type %d" % [note.get_data().time, note.get_data().color, note.get_data().type])
 
 func check_note_error() -> bool:
 	var lane_start = keyframes[0].kf.x
 	var lane_end = keyframes[-1].kf.x
 
 	for note: Note in notes:
-		if (note.get_time() < lane_start or note.get_time() > lane_end):
+		if (note.get_data().time < lane_start or note.get_data().time > lane_end):
 			push_error("ERROR: 레인 시작 전 또는 종료 후에 노트가 있습니다.")
 			return true
-		if (note.get_type() == 1 and note.get_end_time() > lane_end):
+		if (note.get_data().type == 1 and note.get_end_time() > lane_end):
 			push_error("ERROR: 롱노트의 끝점이 레인 끝 이후입니다")
 			return true
 	return false

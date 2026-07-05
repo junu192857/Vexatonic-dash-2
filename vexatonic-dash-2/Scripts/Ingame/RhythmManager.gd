@@ -223,18 +223,18 @@ func place_initial_connector(lane: Lane):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 			else:
-				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index, false,\
+				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 		else:
-			if (lane.keyframes[0].kf.x < lane.notes[0].get_time()):
+			if (lane.keyframes[0].kf.x < lane.notes[0].get_data().time):
 				if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 				else:
-					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_time() - Setting.time_per_note_width / 2, lane.lane_index,\
+					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
@@ -242,7 +242,7 @@ func place_initial_connector(lane: Lane):
 func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
-		var last_note_time = lane.notes[-1].get_end_time() #find last note or marker
+		var last_note_time = lane.notes[-1].get_data().end_time #find last note or marker
 		if lane.keyframes[-1].kf.x  > last_note_time + Setting.time_per_note_width / 2:
 			var connector_time = last_note_time + Setting.time_per_note_width / 2
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
