@@ -1,4 +1,4 @@
-extends Node
+extends TextureRect
 class_name SongHolder
 
 # Called when the node enters the scene tree for the first time.

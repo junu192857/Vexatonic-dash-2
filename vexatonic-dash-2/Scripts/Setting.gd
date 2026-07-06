@@ -27,7 +27,7 @@ enum SCORE_DISPLAY {Increasing, Decreasing}
 enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
 
 static var score_display = SCORE_DISPLAY.Decreasing
-static var gamemode = GAMEMODE.Normal_Character
+static var gamemode = GAMEMODE.Suregi
 static var sound_offset: float = 0
 static var judge_offset: float = -20
 static var selected_difficulty: int = 1
