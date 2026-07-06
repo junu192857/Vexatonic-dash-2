@@ -1,11 +1,11 @@
 extends TextureRect
 class_name SettingHolder
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+@onready var speedValue: Label = $SpeedValue
+@onready var soundOffsetValue: Label = $SoundOffsetValue2
+@onready var judgeOffsetValue: Label = $JudgeOffsetValue
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func refresh():
+	speedValue.text = str(Setting.speed)
+	soundOffsetValue.text = str(Setting.sound_offset)
+	judgeOffsetValue.text = str(Setting.judge_offset)

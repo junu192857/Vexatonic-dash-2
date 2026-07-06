@@ -26,6 +26,7 @@ static func parse_metadata(chart_dir:String, metadata: LevelMetaData):
 		var parts = line.split(" ")
 		match parts[0]:
 			"NAME":   metadata.name = parts[1]
+			"ARTIST": metadata.artist = parts[1]
 			"MUSIC":  metadata.music_path = parts[1]
 			"LEVEL":  metadata.difficulty = [int(parts[1]), int(parts[2]), int(parts[3])]
 			"LENGTH": metadata.length = int(parts[1])

@@ -1,14 +1,12 @@
 extends TextureRect
 class_name SongHolder
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+@onready var artistName: Label = $ArtistName
+@onready var songName: Label = $SongName
+@onready var levelNumber: Label = $LevelNumber
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-func set_song_metadata():
-	pass
+func set_song_metadata(metadata: LevelMetaData):
+	artistName.text = metadata.artist
+	songName.text = metadata.name
+	var diff = Setting.selected_difficulty
+	levelNumber.text = str(metadata.difficulty[diff]) if metadata.difficulty.size() > diff else "-"
