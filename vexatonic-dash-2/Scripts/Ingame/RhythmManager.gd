@@ -54,8 +54,8 @@ func _ready() -> void:
 	
 	cameraManager.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
-	print("MUSIC_PATH: " + levelData.music_path)
-	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.music_path)
+	print("MUSIC_PATH: " + levelData.metadata.music_path)
+	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.metadata.music_path)
 	musicPlayer.stream = stream
 	
 	

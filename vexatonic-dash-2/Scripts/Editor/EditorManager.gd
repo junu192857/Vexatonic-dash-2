@@ -66,15 +66,15 @@ func initiate_editor():
 	settingPanel.visible = true
 
 	_update_sorted_bpm_triggers()
-	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.length), 6.0)
+	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.metadata.length), 6.0)
 
 func set_initial_value():
 	levelData = LevelData.new()
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
 
-	levelData.music_path = music_path.get_file()
-	levelData.length = music_time * 1000
+	levelData.metadata.music_path = music_path.get_file()
+	levelData.metadata.length = music_time * 1000
 	
 	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, -500.0)
 	levelData.triggers.append(initial_bpm_trigger)
@@ -159,13 +159,13 @@ func place_bar_lines():
 	for i in range(sorted_bpm.size()):
 		var bpm_start_time = sorted_bpm[i].start
 		var bpm = sorted_bpm[i].c
-		var bpm_end_time = levelData.length if i + 1 >= sorted_bpm.size() else min(sorted_bpm[i + 1].start, levelData.length)
+		var bpm_end_time = levelData.metadata.length if i + 1 >= sorted_bpm.size() else min(sorted_bpm[i + 1].start, levelData.metadata.length)
 
 
 		if bpm_start_time < 0:
 			push_error("time cannot be negative")
 			return
-		if bpm_start_time > levelData.length:
+		if bpm_start_time > levelData.metadata.length:
 			return
 		
 		var beat_duration = 60000.0 / bpm
@@ -1270,7 +1270,7 @@ func open_save_panel():
 	if (chart_loaded):
 		savePanel.get_node("OnlyForNewSave").visible = false
 		savePanel.get_node("OnlyForLoaded").visible = true
-		savePanel.get_node("OnlyForLoaded/Label").text = "Do you want to save %s %s?" % [levelData.name, Setting.DIFFICULTY_NAMES[save_difficulty]]
+		savePanel.get_node("OnlyForLoaded/Label").text = "Do you want to save %s %s?" % [levelData.metadata.name, Setting.DIFFICULTY_NAMES[save_difficulty]]
 
 func quit_save_panel():
 	savePanel.visible = false
@@ -1295,12 +1295,12 @@ func save_chart():
 			push_error("ERROR: METADATA.txt를 열 수 없습니다.")
 			return
 		meta_file.store_line("NAME " + folder_name)
-		meta_file.store_line("MUSIC " + levelData.music_path)
+		meta_file.store_line("MUSIC " + levelData.metadata.music_path)
 		meta_file.store_line("LEVEL 1 2 3")
-		meta_file.store_line("LENGTH %d" % levelData.length)
+		meta_file.store_line("LENGTH %d" % levelData.metadata.length)
 	
 		# 음악 파일 저장
-		DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.music_path)
+		DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
 		
 		var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
 		chart_path = dir_path + "/" + difficulty_name + ".txt"
@@ -1380,9 +1380,9 @@ func select_chart(path: String):
 	musicPlayer.stream = stream
 	
 	levelData = LevelData.new()
-	levelData.name = path.get_base_dir().get_file()
-	levelData.music_path = music_path.get_file()
-	levelData.length = stream.get_length() * 1000
+	levelData.metadata.name = path.get_base_dir().get_file()
+	levelData.metadata.music_path = music_path.get_file()
+	levelData.metadata.length = stream.get_length() * 1000
 	
 	
 	match chart_path.get_file():
@@ -1400,9 +1400,9 @@ func select_chart(path: String):
 		loadPanel.get_node("LoadButton").visible = false
 		return
 			
-	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
-	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.music_path
-	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.length / 1000)
+	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.metadata.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
+	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.metadata.music_path
+	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.metadata.length / 1000)
 	loadPanel.get_node("LoadButton").visible = true
 	
 

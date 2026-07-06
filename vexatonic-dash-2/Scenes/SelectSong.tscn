@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c5hopjpuog4j4" path="res://Scripts/SelectSong/SelectManager.gd" id="1_03mcv"]
 [ext_resource type="Script" uid="uid://bocovfv3c0cfm" path="res://Scripts/SelectSong/InputManager.gd" id="2_lgpy4"]
+[ext_resource type="Script" uid="uid://pgxarv2aqaf0" path="res://Scripts/SelectSong/SongHolder.gd" id="2_uvoqn"]
 
 [node name="SelectSong" type="Node2D" unique_id=1796845870]
 script = ExtResource("1_03mcv")
@@ -32,27 +33,6 @@ anchor_top = -0.1
 anchor_right = 0.75
 anchor_bottom = 1.1
 
-[node name="LeftSongHolder" type="Panel" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=299492897]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.15
-anchor_right = 0.25
-anchor_bottom = 1.0
-
-[node name="RightSongHolder" type="Panel" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=745850717]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.75
-anchor_right = 1.15
-anchor_bottom = 1.0
-
-[node name="MiddleSongHolder" type="Panel" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1710371488]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.3
-anchor_right = 0.7
-anchor_bottom = 1.0
-
 [node name="SongConnector1" type="Panel" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1559871564]
 layout_mode = 1
 anchors_preset = -1
@@ -63,6 +43,30 @@ anchor_bottom = 1.1
 offset_left = -0.120025635
 offset_right = -0.080078125
 offset_bottom = -0.049987793
+
+[node name="LeftSongHolder" type="Panel" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=299492897]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.15
+anchor_right = 0.25
+anchor_bottom = 1.0
+script = ExtResource("2_uvoqn")
+
+[node name="RightSongHolder" type="Panel" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=745850717]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 1.15
+anchor_bottom = 1.0
+script = ExtResource("2_uvoqn")
+
+[node name="MiddleSongHolder" type="Panel" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1710371488]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_right = 0.7
+anchor_bottom = 1.0
+script = ExtResource("2_uvoqn")
 
 [node name="SongDataHolder" type="Control" parent="CanvasLayer/Control" unique_id=1382802090]
 layout_mode = 1

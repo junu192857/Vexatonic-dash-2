@@ -5,7 +5,15 @@ class_name ChartParser
 static func parse(chart_dir: String, difficulty: int) -> LevelData:
 	var data = LevelData.new()
 	
-	# METADATA 파싱
+	parse_metadata(chart_dir, data.metadata)
+	
+	# 채보 파싱
+	var chart_path = chart_dir + "/" + Setting.DIFFICULTY_NAMES[difficulty] + ".txt"
+	parse_chart(chart_path, data, false)
+	
+	return data
+
+static func parse_metadata(chart_dir:String, metadata: LevelMetaData):
 	var meta_file = FileAccess.open(chart_dir + "/METADATA.txt", FileAccess.READ)
 	if meta_file == null:
 		push_error("ERROR: METADATA.txt를 열 수 없습니다.: " + chart_dir)
@@ -17,16 +25,10 @@ static func parse(chart_dir: String, difficulty: int) -> LevelData:
 			continue
 		var parts = line.split(" ")
 		match parts[0]:
-			"NAME":   data.name = parts[1]
-			"MUSIC":  data.music_path = parts[1]
-			"LEVEL":  data.difficulty = [int(parts[1]), int(parts[2]), int(parts[3])]
-			"LENGTH": data.length = int(parts[1])
-	
-	# 채보 파싱
-	var chart_path = chart_dir + "/" + Setting.DIFFICULTY_NAMES[difficulty] + ".txt"
-	parse_chart(chart_path, data, false)
-	
-	return data
+			"NAME":   metadata.name = parts[1]
+			"MUSIC":  metadata.music_path = parts[1]
+			"LEVEL":  metadata.difficulty = [int(parts[1]), int(parts[2]), int(parts[3])]
+			"LENGTH": metadata.length = int(parts[1])
 
 static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 	var chart_file = FileAccess.open(chart_path, FileAccess.READ)
