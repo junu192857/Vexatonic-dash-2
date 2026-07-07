@@ -19,7 +19,10 @@ func _ready() -> void:
 	inputManager.move_right.connect(_on_move_right)
 	inputManager.change_difficulty.connect(_on_change_difficulty)
 	inputManager.game_start.connect(_on_game_start)
-
+	inputManager.setting_select_down.connect(func(): settingHolder.select_next())
+	inputManager.setting_select_up.connect(func(): settingHolder.select_prev())
+	inputManager.setting_decrease.connect(func(): settingHolder.change_value(false))
+	inputManager.setting_increase.connect(func(): settingHolder.change_value(true))
 	_scan_charts()
 	if song_list.is_empty():
 		return

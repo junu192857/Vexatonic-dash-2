@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://pgxarv2aqaf0" path="res://Scripts/SelectSong/SongHolder.gd" id="2_uvoqn"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
 [ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
-[ext_resource type="Script" uid="uid://c4ftuyjsig7p7" path="res://Scenes/SettingHolder.gd" id="5_mdyll"]
+[ext_resource type="Script" uid="uid://c4ftuyjsig7p7" path="res://Scripts/SelectSong/SettingHolder.gd" id="5_mdyll"]
 
 [node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("leftSongHolder", "middleSongHolder", "rightSongHolder", "songDataHolder", "settingHolder")]
 script = ExtResource("1_03mcv")

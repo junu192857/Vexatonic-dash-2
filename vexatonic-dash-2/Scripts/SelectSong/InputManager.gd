@@ -23,7 +23,7 @@ func _input(event: InputEvent):
 			setting_select_down.emit()
 		elif event.keycode == KEY_UP and event.pressed:
 			setting_select_up.emit()
-		elif event.keycode == KEY_LEFT:
+		elif event.keycode == KEY_LEFT and event.pressed:
 			setting_decrease.emit()
-		elif event.keycode == KEY_RIGHT:
+		elif event.keycode == KEY_RIGHT and event.pressed:
 			setting_increase.emit()
