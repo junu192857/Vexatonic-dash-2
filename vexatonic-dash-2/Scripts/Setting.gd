@@ -31,6 +31,7 @@ static var gamemode = GAMEMODE.Suregi
 static var sound_offset: float = 0
 static var judge_offset: float = -20
 static var selected_difficulty: int = 1
+static var selected_chart_dir: String = ""
 
 # ==================== 관련 함수 ============================
 

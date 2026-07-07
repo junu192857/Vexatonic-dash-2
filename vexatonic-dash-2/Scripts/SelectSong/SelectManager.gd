@@ -7,6 +7,7 @@ extends Node2D
 @export var settingHolder: SettingHolder
 @onready var difficultyRect: ColorRect = $CanvasLayer/Control/DifficultyRect
 @onready var inputManager = $InputManager
+@onready var startButton: Button = $CanvasLayer/Control/StartButton
 
 const CHARTS_DIR = "res://Charts"
 const DIFFICULTY_COLORS = [Color(0.5, 0.85, 0.3), Color(1.0, 0.55, 0.1), Color(0.6, 0.2, 0.9)]
@@ -98,18 +99,38 @@ func _on_move_left():
 	current_index = (current_index - 1 + song_list.size()) % song_list.size()
 	_refresh_holders()
 	_refresh_song_data()
+	_refresh_start_button()
 
 func _on_move_right():
 	current_index = (current_index + 1) % song_list.size()
 	_refresh_holders()
 	_refresh_song_data()
+	_refresh_start_button()
 
 func _on_change_difficulty():
 	Setting.selected_difficulty = (Setting.selected_difficulty + 1) % 3
 	_refresh_all()
+	_refresh_start_button()
 
 func _on_game_start():
+	if not startButton.disabled:
+		var meta = _get_metadata(0)
+		Setting.selected_chart_dir = CHARTS_DIR + "/" + meta.name
+		get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
+		
+func _can_start() -> bool:
 	var meta = _get_metadata(0)
-	# RhythmManager가 level_path를 어떻게 받는지에 맞춰 저장
-	# (현재 RhythmManager는 var level_path로 하드코딩되어 있으므로 추후 연동 필요)
-	get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
+	var chart_dir = CHARTS_DIR + "/" + meta.name
+	var diff_name = Setting.DIFFICULTY_NAMES[Setting.selected_difficulty]
+	var chart_path = chart_dir + "/" + diff_name + ".txt"
+	var music_path = chart_dir + "/" + meta.music_path
+	if not FileAccess.file_exists(chart_path):
+		return false
+	if not FileAccess.file_exists(music_path):
+		return false
+	if _count_notes(chart_path) == 0:
+		return false
+	return true
+
+func _refresh_start_button():
+	startButton.disabled = not _can_start()

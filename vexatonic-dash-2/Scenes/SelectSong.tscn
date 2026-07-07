@@ -539,5 +539,31 @@ theme_override_font_sizes/font_size = 43
 text = "Easy"
 horizontal_alignment = 1
 
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/DifficultyRect" unique_id=179376584]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.69100004
+anchor_top = 0.277
+anchor_right = 0.92700005
+anchor_bottom = 0.80500007
+offset_left = -0.008010864
+offset_top = -0.032274246
+offset_right = 0.023986816
+offset_bottom = 0.029800415
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/DifficultyRect/ReferenceRect" unique_id=2037029140]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Tab"
+horizontal_alignment = 1
+
 [node name="InputManager" type="Node2D" parent="." unique_id=1806121724]
 script = ExtResource("2_lgpy4")

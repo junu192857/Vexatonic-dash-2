@@ -24,7 +24,7 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
-var level_path = "res://Charts/Melodiniq"
+var level_path: String
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -32,6 +32,8 @@ func _ready() -> void:
 	print("START")
 	$InputHandler.note_pressed.connect(_on_pressed)
 	$InputHandler.note_released.connect(_on_released)
+	
+	level_path = Setting.selected_chart_dir
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))

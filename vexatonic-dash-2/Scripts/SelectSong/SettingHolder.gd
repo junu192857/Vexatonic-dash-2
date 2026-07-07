@@ -13,8 +13,8 @@ var selected: SettingItem = SettingItem.Speed
 
 func refresh():
 	speedValue.text = "%.1f" % Setting.speed
-	soundOffsetValue.text = str(Setting.sound_offset)
-	judgeOffsetValue.text = str(Setting.judge_offset)
+	soundOffsetValue.text = "%d" % Setting.sound_offset
+	judgeOffsetValue.text = "%d" % Setting.judge_offset
 	_update_selection_color()
 
 func select_next():
