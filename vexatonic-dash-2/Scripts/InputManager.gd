@@ -56,22 +56,22 @@ func _input(event):
 			KEY_SHIFT:
 				toggled_shift.emit(event.pressed)
 			KEY_A:
-				if event.pressed: pressed_a.emit()
+				if event.pressed and not event.is_echo(): pressed_a.emit()
 				elif event.is_released(): released_a.emit()
 			KEY_S:
-				if event.pressed: pressed_s.emit()
+				if event.pressed and not event.is_echo(): pressed_s.emit()
 				elif event.is_released(): released_s.emit()
 			KEY_D:
-				if event.pressed: pressed_d.emit()
+				if event.pressed and not event.is_echo(): pressed_d.emit()
 				elif event.is_released(): released_d.emit()
 			KEY_J:
-				if event.pressed: pressed_j.emit()
+				if event.pressed and not event.is_echo(): pressed_j.emit()
 				elif event.is_released(): released_j.emit()
 			KEY_K:
-				if event.pressed: pressed_k.emit()
+				if event.pressed and not event.is_echo(): pressed_k.emit()
 				elif event.is_released(): released_k.emit()
 			KEY_L:
-				if event.pressed: pressed_l.emit()
+				if event.pressed and not event.is_echo(): pressed_l.emit()
 				elif event.is_released(): released_l.emit()
 
 	if event is InputEventMouseButton:
