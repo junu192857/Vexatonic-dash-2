@@ -1,0 +1,672 @@
+From 4f769486ae0ebdab72ecb0f8f9110299cb960396 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 7 Jul 2026 14:04:43 +0000
+Subject: [PATCH 1/2] Add unified InputManager autoload and MainMenu keyboard
+ navigation
+
+- Create Scripts/InputManager.gd combining all signals from InputHandler,
+  EditorInputHandler, and SelectSong/InputManager into a single Autoload
+- Add menu_select_up, menu_select_down, menu_confirm signals for MainMenu
+- Register InputManager as Autoload in project.godot
+- MainMenuButton: remove disabled manipulation from activate/deactivate
+- MainMenuManager: activate index 0 on ready, up/down arrows cycle selection,
+  Enter emits pressed on the selected button
+- RhythmManager, SelectManager, EditorManager: switch from local input nodes
+  to InputManager autoload
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011uBepdouMRHABrZz6pfU68
+---
+ vexatonic-dash-2/Scenes/MainMenuButton.gd     |   2 -
+ .../Scripts/Editor/EditorManager.gd           |  32 +++---
+ .../Scripts/Ingame/RhythmManager.gd           |   4 +-
+ vexatonic-dash-2/Scripts/InputManager.gd      | 102 ++++++++++++++++++
+ .../Scripts/MainMenu/MainMenuManager.gd       |  22 ++++
+ .../Scripts/SelectSong/SelectManager.gd       |  17 ++-
+ vexatonic-dash-2/project.godot                |   1 +
+ 7 files changed, 151 insertions(+), 29 deletions(-)
+ create mode 100644 vexatonic-dash-2/Scripts/InputManager.gd
+
+diff --git a/vexatonic-dash-2/Scenes/MainMenuButton.gd b/vexatonic-dash-2/Scenes/MainMenuButton.gd
+index a83160c..f734dbe 100644
+--- a/vexatonic-dash-2/Scenes/MainMenuButton.gd
++++ b/vexatonic-dash-2/Scenes/MainMenuButton.gd
+@@ -1,9 +1,7 @@
+ extends Button
+ 
+ func activate():
+-	disabled = false
+ 	$ReferenceRect.visible = true
+ 
+ func deactivate():
+-	disabled = true
+ 	$ReferenceRect.visible = false
+diff --git a/vexatonic-dash-2/Scripts/Editor/EditorManager.gd b/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
+index b60180a..839b2f9 100644
+--- a/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
++++ b/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
+@@ -10,7 +10,7 @@ var sorted_bpm: Array
+ @export var ZOOM_TRIGGER_SCENE: PackedScene
+ @export var BPM_TRIGGER_SCENE: PackedScene
+ 
+-@onready var inputHandler = $EditorInputHandler
++
+ @onready var camera = $Camera2D
+ @onready var musicPlayer = $AudioStreamPlayer
+ 
+@@ -25,14 +25,14 @@ var sorted_bpm: Array
+ var editor_ready = false
+ #Editor에서 Setting.speed는 1인 것으로 가정
+ func _ready():
+-	inputHandler.move_camera.connect(_on_move_camera)
+-	inputHandler.zoom_camera.connect(_on_zoom_camera)
+-	inputHandler.move_preview.connect(_on_move_preview)
+-	inputHandler.put_note.connect(_on_put_note)
+-	inputHandler.delete_something.connect(_on_delete_something)
+-	inputHandler.toggle_shifting.connect(_on_toggle_shifting)
+-	inputHandler.move_to_last_note.connect(_on_move_to_last_note)
+-	inputHandler.move_camera_horizontally.connect(_on_move_horizontally)
++	InputManager.move_camera.connect(_on_move_camera)
++	InputManager.zoom_camera.connect(_on_zoom_camera)
++	InputManager.move_preview.connect(_on_move_preview)
++	InputManager.put_note.connect(_on_put_note)
++	InputManager.delete_something.connect(_on_delete_something)
++	InputManager.toggle_shifting.connect(_on_toggle_shifting)
++	InputManager.move_to_last_note.connect(_on_move_to_last_note)
++	InputManager.move_camera_horizontally.connect(_on_move_horizontally)
+ 	noteSelectorPanel.visible = false
+ 	settingPanel.visible = false
+ 	
+@@ -257,19 +257,19 @@ func _on_select_note(selected: int):
+ 		return
+ 	if selected in NoteSelection.values():
+ 		selected_note = selected as NoteSelection
+-		if inputHandler.put_note.is_connected(_on_put_note):
+-			inputHandler.put_note.disconnect(_on_put_note)
+-		if inputHandler.put_note.is_connected(_on_modify):
+-			inputHandler.put_note.disconnect(_on_modify)
++		if InputManager.put_note.is_connected(_on_put_note):
++			InputManager.put_note.disconnect(_on_put_note)
++		if InputManager.put_note.is_connected(_on_modify):
++			InputManager.put_note.disconnect(_on_modify)
+ 		
+ 		# selected < 20이면 레인/노트, selected > 20이면 modify
+ 		if (selected in colored_notes):
+ 			selected_color = selected % 10 - 1
+-			inputHandler.put_note.connect(_on_put_note)
++			InputManager.put_note.connect(_on_put_note)
+ 		elif (selected in modify): 
+-			inputHandler.put_note.connect(_on_modify)
++			InputManager.put_note.connect(_on_modify)
+ 		elif (selected in trigger):
+-			inputHandler.put_note.connect(_on_put_note)
++			InputManager.put_note.connect(_on_put_note)
+ 		current_state = EditorState.Ready
+ 		if (preview != null):
+ 			preview.queue_free()
+diff --git a/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd b/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
+index 56aeb28..aaf0bb7 100644
+--- a/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
++++ b/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
+@@ -30,8 +30,8 @@ var level_path: String
+ func _ready() -> void:
+ 	# ==== Parsing & Lanes, NoteDatas 정렬
+ 	print("START")
+-	$InputHandler.note_pressed.connect(_on_pressed)
+-	$InputHandler.note_released.connect(_on_released)
++	InputManager.note_pressed.connect(_on_pressed)
++	InputManager.note_released.connect(_on_released)
+ 	
+ 	level_path = Setting.selected_chart_dir
+ 	
+diff --git a/vexatonic-dash-2/Scripts/InputManager.gd b/vexatonic-dash-2/Scripts/InputManager.gd
+new file mode 100644
+index 0000000..33ad8a9
+--- /dev/null
++++ b/vexatonic-dash-2/Scripts/InputManager.gd
+@@ -0,0 +1,102 @@
++extends Node
++
++# Ingame
++signal note_pressed(note_color: int, is_left: bool)
++signal note_released(note_color: int, is_left: bool)
++
++# Editor
++signal move_camera(delta: Vector2)
++signal zoom_camera(zoom: bool)
++signal move_preview()
++signal put_note()
++signal delete_something()
++signal toggle_shifting(pressed: bool)
++signal move_to_last_note()
++signal move_camera_horizontally(is_left: bool)
++
++# SelectSong
++signal change_difficulty
++signal move_left
++signal move_right
++signal game_start
++signal setting_select_down
++signal setting_select_up
++signal setting_decrease
++signal setting_increase
++
++# MainMenu
++signal menu_select_up
++signal menu_select_down
++signal menu_confirm
++
++enum NoteColor { RED = 0, BLUE = 1, YELLOW = 2 }
++
++const KEY_MAP = [
++	["a", NoteColor.RED, true],
++	["l", NoteColor.RED, false],
++	["s", NoteColor.BLUE, true],
++	["k", NoteColor.BLUE, false],
++	["d", NoteColor.YELLOW, true],
++	["j", NoteColor.YELLOW, false],
++]
++
++var dragging = false
++var drag_start: Vector2
++
++func _input(event):
++	if event is InputEventMouseButton:
++		if event.button_index == MOUSE_BUTTON_RIGHT:
++			dragging = event.pressed
++			drag_start = event.position
++		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
++			zoom_camera.emit(true)
++		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
++			zoom_camera.emit(false)
++		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
++			put_note.emit()
++
++	if event is InputEventMouseMotion:
++		if dragging:
++			var delta = event.position - drag_start
++			drag_start = event.position
++			move_camera.emit(delta)
++		else:
++			move_preview.emit()
++
++	if event is InputEventKey:
++		if event.keycode == KEY_DELETE and event.pressed:
++			delete_something.emit()
++		if event.keycode == KEY_SHIFT:
++			toggle_shifting.emit(event.pressed)
++		if event.keycode == KEY_F and event.pressed:
++			move_to_last_note.emit()
++		if event.keycode == KEY_TAB and event.pressed:
++			change_difficulty.emit()
++		if event.keycode == KEY_ENTER and event.pressed:
++			game_start.emit()
++			menu_confirm.emit()
++		if event.keycode == KEY_DOWN and event.pressed:
++			setting_select_down.emit()
++			menu_select_down.emit()
++		if event.keycode == KEY_UP and event.pressed:
++			setting_select_up.emit()
++			menu_select_up.emit()
++		if event.keycode == KEY_LEFT and event.pressed:
++			setting_decrease.emit()
++		if event.keycode == KEY_RIGHT and event.pressed:
++			setting_increase.emit()
++		if event.keycode == KEY_A and event.pressed:
++			move_left.emit()
++			move_camera_horizontally.emit(true)
++		if event.keycode == KEY_D and event.pressed:
++			move_right.emit()
++			move_camera_horizontally.emit(false)
++
++	for entry in KEY_MAP:
++		var action = entry[0]
++		var color = entry[1]
++		var is_left = entry[2]
++		if event.is_action_pressed(action):
++			note_pressed.emit(color, is_left)
++		elif event.is_action_released(action):
++			note_released.emit(color, is_left)
+diff --git a/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd b/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd
+index 1c21173..44c15ab 100644
+--- a/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd
++++ b/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd
+@@ -9,6 +9,28 @@ func _ready():
+ 	button_array.append($CanvasLayer/Control/SettingButton)
+ 	button_array.append($CanvasLayer/Control/GameEndButton)
+ 	index = 0
++	_refresh_selection()
++	InputManager.menu_select_up.connect(_on_menu_select_up)
++	InputManager.menu_select_down.connect(_on_menu_select_down)
++	InputManager.menu_confirm.connect(_on_menu_confirm)
++
++func _refresh_selection():
++	for i in range(button_array.size()):
++		if i == index:
++			button_array[i].activate()
++		else:
++			button_array[i].deactivate()
++
++func _on_menu_select_up():
++	index = (index - 1 + button_array.size()) % button_array.size()
++	_refresh_selection()
++
++func _on_menu_select_down():
++	index = (index + 1) % button_array.size()
++	_refresh_selection()
++
++func _on_menu_confirm():
++	button_array[index].emit_signal("pressed")
+ 
+ func _on_game_start():
+ 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
+diff --git a/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd b/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd
+index 1177a11..2751622 100644
+--- a/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd
++++ b/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd
+@@ -6,7 +6,6 @@ extends Node2D
+ @export var songDataHolder: SongDataHolder
+ @export var settingHolder: SettingHolder
+ @onready var difficultyRect: ColorRect = $CanvasLayer/Control/DifficultyRect
+-@onready var inputManager = $InputManager
+ @onready var startButton: Button = $CanvasLayer/Control/StartButton
+ 
+ const CHARTS_DIR = "res://Charts"
+@@ -16,14 +15,14 @@ var song_list: Array[LevelMetaData] = []
+ var current_index: int = 0
+ 
+ func _ready() -> void:
+-	inputManager.move_left.connect(_on_move_left)
+-	inputManager.move_right.connect(_on_move_right)
+-	inputManager.change_difficulty.connect(_on_change_difficulty)
+-	inputManager.game_start.connect(_on_game_start)
+-	inputManager.setting_select_down.connect(func(): settingHolder.select_next())
+-	inputManager.setting_select_up.connect(func(): settingHolder.select_prev())
+-	inputManager.setting_decrease.connect(func(): settingHolder.change_value(false))
+-	inputManager.setting_increase.connect(func(): settingHolder.change_value(true))
++	InputManager.move_left.connect(_on_move_left)
++	InputManager.move_right.connect(_on_move_right)
++	InputManager.change_difficulty.connect(_on_change_difficulty)
++	InputManager.game_start.connect(_on_game_start)
++	InputManager.setting_select_down.connect(func(): settingHolder.select_next())
++	InputManager.setting_select_up.connect(func(): settingHolder.select_prev())
++	InputManager.setting_decrease.connect(func(): settingHolder.change_value(false))
++	InputManager.setting_increase.connect(func(): settingHolder.change_value(true))
+ 	_scan_charts()
+ 	if song_list.is_empty():
+ 		return
+diff --git a/vexatonic-dash-2/project.godot b/vexatonic-dash-2/project.godot
+index ab873f8..1ea42b0 100644
+--- a/vexatonic-dash-2/project.godot
++++ b/vexatonic-dash-2/project.godot
+@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
+ [autoload]
+ 
+ SettingLoader="*uid://hqkfmofjf5hs"
++InputManager="*res://Scripts/InputManager.gd"
+ 
+ [debug]
+ 
+-- 
+2.43.0
+
+
+From fb91974ee5d28de00ad0b445491c1d6164962f49 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 7 Jul 2026 14:15:11 +0000
+Subject: [PATCH 2/2] Refactor InputManager to key-based signals
+
+Each signal represents a key press, not a function.
+Consumers connect to key signals and handle their own logic.
+EditorManager now owns dragging state internally.
+---
+ .../Scripts/Editor/EditorManager.gd           |  56 +++---
+ .../Scripts/Ingame/RhythmManager.gd           |  14 +-
+ vexatonic-dash-2/Scripts/InputManager.gd      | 171 ++++++++----------
+ .../Scripts/MainMenu/MainMenuManager.gd       |   6 +-
+ .../Scripts/SelectSong/SelectManager.gd       |  16 +-
+ 5 files changed, 136 insertions(+), 127 deletions(-)
+
+diff --git a/vexatonic-dash-2/Scripts/Editor/EditorManager.gd b/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
+index 839b2f9..e77f5ec 100644
+--- a/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
++++ b/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
+@@ -25,14 +25,16 @@ var sorted_bpm: Array
+ var editor_ready = false
+ #Editor에서 Setting.speed는 1인 것으로 가정
+ func _ready():
+-	InputManager.move_camera.connect(_on_move_camera)
+-	InputManager.zoom_camera.connect(_on_zoom_camera)
+-	InputManager.move_preview.connect(_on_move_preview)
+-	InputManager.put_note.connect(_on_put_note)
+-	InputManager.delete_something.connect(_on_delete_something)
+-	InputManager.toggle_shifting.connect(_on_toggle_shifting)
+-	InputManager.move_to_last_note.connect(_on_move_to_last_note)
+-	InputManager.move_camera_horizontally.connect(_on_move_horizontally)
++	InputManager.mouse_left_pressed.connect(_on_put_note)
++	InputManager.mouse_right_toggled.connect(_on_right_toggled)
++	InputManager.mouse_scrolled_up.connect(func(): _on_zoom_camera(true))
++	InputManager.mouse_scrolled_down.connect(func(): _on_zoom_camera(false))
++	InputManager.mouse_moved.connect(_on_mouse_moved)
++	InputManager.pressed_delete.connect(_on_delete_something)
++	InputManager.toggled_shift.connect(_on_toggle_shifting)
++	InputManager.pressed_f.connect(_on_move_to_last_note)
++	InputManager.pressed_a.connect(func(): _on_move_horizontally(true))
++	InputManager.pressed_d.connect(func(): _on_move_horizontally(false))
+ 	noteSelectorPanel.visible = false
+ 	settingPanel.visible = false
+ 	
+@@ -113,11 +115,21 @@ var dragging = false
+ var drag_start: Vector2
+ var camera_zoom_level: int = 1
+ 
+-func _on_move_camera(delta: Vector2):
+-	if !editor_ready or modifying_trigger:
+-		return
+-	camera.position -= delta
+-	realign_lines_by_move()
++func _on_right_toggled(pressed: bool):
++	dragging = pressed
++	if pressed:
++		drag_start = get_global_mouse_position()
++
++func _on_mouse_moved(position: Vector2):
++	if dragging:
++		var delta = position - drag_start
++		drag_start = position
++		if !editor_ready or modifying_trigger:
++			return
++		camera.position -= delta
++		realign_lines_by_move()
++	else:
++		_on_move_preview()
+ 
+ func _on_zoom_camera(zoom: bool):
+ 	if !editor_ready or modifying_trigger:
+@@ -257,19 +269,19 @@ func _on_select_note(selected: int):
+ 		return
+ 	if selected in NoteSelection.values():
+ 		selected_note = selected as NoteSelection
+-		if InputManager.put_note.is_connected(_on_put_note):
+-			InputManager.put_note.disconnect(_on_put_note)
+-		if InputManager.put_note.is_connected(_on_modify):
+-			InputManager.put_note.disconnect(_on_modify)
+-		
++		if InputManager.mouse_left_pressed.is_connected(_on_put_note):
++			InputManager.mouse_left_pressed.disconnect(_on_put_note)
++		if InputManager.mouse_left_pressed.is_connected(_on_modify):
++			InputManager.mouse_left_pressed.disconnect(_on_modify)
++
+ 		# selected < 20이면 레인/노트, selected > 20이면 modify
+ 		if (selected in colored_notes):
+ 			selected_color = selected % 10 - 1
+-			InputManager.put_note.connect(_on_put_note)
+-		elif (selected in modify): 
+-			InputManager.put_note.connect(_on_modify)
++			InputManager.mouse_left_pressed.connect(_on_put_note)
++		elif (selected in modify):
++			InputManager.mouse_left_pressed.connect(_on_modify)
+ 		elif (selected in trigger):
+-			InputManager.put_note.connect(_on_put_note)
++			InputManager.mouse_left_pressed.connect(_on_put_note)
+ 		current_state = EditorState.Ready
+ 		if (preview != null):
+ 			preview.queue_free()
+diff --git a/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd b/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
+index aaf0bb7..c2ff89c 100644
+--- a/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
++++ b/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
+@@ -30,8 +30,18 @@ var level_path: String
+ func _ready() -> void:
+ 	# ==== Parsing & Lanes, NoteDatas 정렬
+ 	print("START")
+-	InputManager.note_pressed.connect(_on_pressed)
+-	InputManager.note_released.connect(_on_released)
++	InputManager.pressed_a.connect(func(): _on_pressed(0, true))
++	InputManager.released_a.connect(func(): _on_released(0, true))
++	InputManager.pressed_l.connect(func(): _on_pressed(0, false))
++	InputManager.released_l.connect(func(): _on_released(0, false))
++	InputManager.pressed_s.connect(func(): _on_pressed(1, true))
++	InputManager.released_s.connect(func(): _on_released(1, true))
++	InputManager.pressed_k.connect(func(): _on_pressed(1, false))
++	InputManager.released_k.connect(func(): _on_released(1, false))
++	InputManager.pressed_d.connect(func(): _on_pressed(2, true))
++	InputManager.released_d.connect(func(): _on_released(2, true))
++	InputManager.pressed_j.connect(func(): _on_pressed(2, false))
++	InputManager.released_j.connect(func(): _on_released(2, false))
+ 	
+ 	level_path = Setting.selected_chart_dir
+ 	
+diff --git a/vexatonic-dash-2/Scripts/InputManager.gd b/vexatonic-dash-2/Scripts/InputManager.gd
+index 33ad8a9..c2121f3 100644
+--- a/vexatonic-dash-2/Scripts/InputManager.gd
++++ b/vexatonic-dash-2/Scripts/InputManager.gd
+@@ -1,102 +1,89 @@
+ extends Node
+ 
+-# Ingame
+-signal note_pressed(note_color: int, is_left: bool)
+-signal note_released(note_color: int, is_left: bool)
++# Directional keys
++signal pressed_up
++signal pressed_down
++signal pressed_left
++signal pressed_right
+ 
+-# Editor
+-signal move_camera(delta: Vector2)
+-signal zoom_camera(zoom: bool)
+-signal move_preview()
+-signal put_note()
+-signal delete_something()
+-signal toggle_shifting(pressed: bool)
+-signal move_to_last_note()
+-signal move_camera_horizontally(is_left: bool)
++# Action keys
++signal pressed_enter
++signal pressed_tab
++signal pressed_delete
++signal pressed_f
++signal toggled_shift(pressed: bool)
+ 
+-# SelectSong
+-signal change_difficulty
+-signal move_left
+-signal move_right
+-signal game_start
+-signal setting_select_down
+-signal setting_select_up
+-signal setting_decrease
+-signal setting_increase
++# Note / movement keys (with release)
++signal pressed_a
++signal released_a
++signal pressed_s
++signal released_s
++signal pressed_d
++signal released_d
++signal pressed_j
++signal released_j
++signal pressed_k
++signal released_k
++signal pressed_l
++signal released_l
+ 
+-# MainMenu
+-signal menu_select_up
+-signal menu_select_down
+-signal menu_confirm
+-
+-enum NoteColor { RED = 0, BLUE = 1, YELLOW = 2 }
+-
+-const KEY_MAP = [
+-	["a", NoteColor.RED, true],
+-	["l", NoteColor.RED, false],
+-	["s", NoteColor.BLUE, true],
+-	["k", NoteColor.BLUE, false],
+-	["d", NoteColor.YELLOW, true],
+-	["j", NoteColor.YELLOW, false],
+-]
+-
+-var dragging = false
+-var drag_start: Vector2
++# Mouse
++signal mouse_left_pressed
++signal mouse_right_toggled(pressed: bool)
++signal mouse_scrolled_up
++signal mouse_scrolled_down
++signal mouse_moved(position: Vector2)
+ 
+ func _input(event):
++	if event is InputEventKey:
++		match event.keycode:
++			KEY_UP:
++				if event.pressed: pressed_up.emit()
++			KEY_DOWN:
++				if event.pressed: pressed_down.emit()
++			KEY_LEFT:
++				if event.pressed: pressed_left.emit()
++			KEY_RIGHT:
++				if event.pressed: pressed_right.emit()
++			KEY_ENTER:
++				if event.pressed: pressed_enter.emit()
++			KEY_TAB:
++				if event.pressed: pressed_tab.emit()
++			KEY_DELETE:
++				if event.pressed: pressed_delete.emit()
++			KEY_F:
++				if event.pressed: pressed_f.emit()
++			KEY_SHIFT:
++				toggled_shift.emit(event.pressed)
++			KEY_A:
++				if event.pressed: pressed_a.emit()
++				elif event.is_released(): released_a.emit()
++			KEY_S:
++				if event.pressed: pressed_s.emit()
++				elif event.is_released(): released_s.emit()
++			KEY_D:
++				if event.pressed: pressed_d.emit()
++				elif event.is_released(): released_d.emit()
++			KEY_J:
++				if event.pressed: pressed_j.emit()
++				elif event.is_released(): released_j.emit()
++			KEY_K:
++				if event.pressed: pressed_k.emit()
++				elif event.is_released(): released_k.emit()
++			KEY_L:
++				if event.pressed: pressed_l.emit()
++				elif event.is_released(): released_l.emit()
++
+ 	if event is InputEventMouseButton:
+-		if event.button_index == MOUSE_BUTTON_RIGHT:
+-			dragging = event.pressed
+-			drag_start = event.position
+-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+-			zoom_camera.emit(true)
+-		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+-			zoom_camera.emit(false)
+-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+-			put_note.emit()
++		match event.button_index:
++			MOUSE_BUTTON_LEFT:
++				if event.pressed: mouse_left_pressed.emit()
++			MOUSE_BUTTON_RIGHT:
++				mouse_right_toggled.emit(event.pressed)
++			MOUSE_BUTTON_WHEEL_UP:
++				mouse_scrolled_up.emit()
++			MOUSE_BUTTON_WHEEL_DOWN:
++				mouse_scrolled_down.emit()
+ 
+ 	if event is InputEventMouseMotion:
+-		if dragging:
+-			var delta = event.position - drag_start
+-			drag_start = event.position
+-			move_camera.emit(delta)
+-		else:
+-			move_preview.emit()
+-
+-	if event is InputEventKey:
+-		if event.keycode == KEY_DELETE and event.pressed:
+-			delete_something.emit()
+-		if event.keycode == KEY_SHIFT:
+-			toggle_shifting.emit(event.pressed)
+-		if event.keycode == KEY_F and event.pressed:
+-			move_to_last_note.emit()
+-		if event.keycode == KEY_TAB and event.pressed:
+-			change_difficulty.emit()
+-		if event.keycode == KEY_ENTER and event.pressed:
+-			game_start.emit()
+-			menu_confirm.emit()
+-		if event.keycode == KEY_DOWN and event.pressed:
+-			setting_select_down.emit()
+-			menu_select_down.emit()
+-		if event.keycode == KEY_UP and event.pressed:
+-			setting_select_up.emit()
+-			menu_select_up.emit()
+-		if event.keycode == KEY_LEFT and event.pressed:
+-			setting_decrease.emit()
+-		if event.keycode == KEY_RIGHT and event.pressed:
+-			setting_increase.emit()
+-		if event.keycode == KEY_A and event.pressed:
+-			move_left.emit()
+-			move_camera_horizontally.emit(true)
+-		if event.keycode == KEY_D and event.pressed:
+-			move_right.emit()
+-			move_camera_horizontally.emit(false)
+-
+-	for entry in KEY_MAP:
+-		var action = entry[0]
+-		var color = entry[1]
+-		var is_left = entry[2]
+-		if event.is_action_pressed(action):
+-			note_pressed.emit(color, is_left)
+-		elif event.is_action_released(action):
+-			note_released.emit(color, is_left)
++		mouse_moved.emit(event.position)
+diff --git a/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd b/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd
+index 44c15ab..481987e 100644
+--- a/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd
++++ b/vexatonic-dash-2/Scripts/MainMenu/MainMenuManager.gd
+@@ -10,9 +10,9 @@ func _ready():
+ 	button_array.append($CanvasLayer/Control/GameEndButton)
+ 	index = 0
+ 	_refresh_selection()
+-	InputManager.menu_select_up.connect(_on_menu_select_up)
+-	InputManager.menu_select_down.connect(_on_menu_select_down)
+-	InputManager.menu_confirm.connect(_on_menu_confirm)
++	InputManager.pressed_up.connect(_on_menu_select_up)
++	InputManager.pressed_down.connect(_on_menu_select_down)
++	InputManager.pressed_enter.connect(_on_menu_confirm)
+ 
+ func _refresh_selection():
+ 	for i in range(button_array.size()):
+diff --git a/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd b/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd
+index 2751622..0be6149 100644
+--- a/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd
++++ b/vexatonic-dash-2/Scripts/SelectSong/SelectManager.gd
+@@ -15,14 +15,14 @@ var song_list: Array[LevelMetaData] = []
+ var current_index: int = 0
+ 
+ func _ready() -> void:
+-	InputManager.move_left.connect(_on_move_left)
+-	InputManager.move_right.connect(_on_move_right)
+-	InputManager.change_difficulty.connect(_on_change_difficulty)
+-	InputManager.game_start.connect(_on_game_start)
+-	InputManager.setting_select_down.connect(func(): settingHolder.select_next())
+-	InputManager.setting_select_up.connect(func(): settingHolder.select_prev())
+-	InputManager.setting_decrease.connect(func(): settingHolder.change_value(false))
+-	InputManager.setting_increase.connect(func(): settingHolder.change_value(true))
++	InputManager.pressed_a.connect(_on_move_left)
++	InputManager.pressed_d.connect(_on_move_right)
++	InputManager.pressed_tab.connect(_on_change_difficulty)
++	InputManager.pressed_enter.connect(_on_game_start)
++	InputManager.pressed_down.connect(func(): settingHolder.select_next())
++	InputManager.pressed_up.connect(func(): settingHolder.select_prev())
++	InputManager.pressed_left.connect(func(): settingHolder.change_value(false))
++	InputManager.pressed_right.connect(func(): settingHolder.change_value(true))
+ 	_scan_charts()
+ 	if song_list.is_empty():
+ 		return
+-- 
+2.43.0
+

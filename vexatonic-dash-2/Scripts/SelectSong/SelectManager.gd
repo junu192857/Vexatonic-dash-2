@@ -6,7 +6,6 @@ extends Node2D
 @export var songDataHolder: SongDataHolder
 @export var settingHolder: SettingHolder
 @onready var difficultyRect: ColorRect = $CanvasLayer/Control/DifficultyRect
-@onready var inputManager = $InputManager
 @onready var startButton: Button = $CanvasLayer/Control/StartButton
 
 const CHARTS_DIR = "res://Charts"
@@ -16,14 +15,14 @@ var song_list: Array[LevelMetaData] = []
 var current_index: int = 0
 
 func _ready() -> void:
-	inputManager.move_left.connect(_on_move_left)
-	inputManager.move_right.connect(_on_move_right)
-	inputManager.change_difficulty.connect(_on_change_difficulty)
-	inputManager.game_start.connect(_on_game_start)
-	inputManager.setting_select_down.connect(func(): settingHolder.select_next())
-	inputManager.setting_select_up.connect(func(): settingHolder.select_prev())
-	inputManager.setting_decrease.connect(func(): settingHolder.change_value(false))
-	inputManager.setting_increase.connect(func(): settingHolder.change_value(true))
+	InputManager.pressed_a.connect(_on_move_left)
+	InputManager.pressed_d.connect(_on_move_right)
+	InputManager.pressed_tab.connect(_on_change_difficulty)
+	InputManager.pressed_enter.connect(_on_game_start)
+	InputManager.pressed_down.connect(func(): settingHolder.select_next())
+	InputManager.pressed_up.connect(func(): settingHolder.select_prev())
+	InputManager.pressed_left.connect(func(): settingHolder.change_value(false))
+	InputManager.pressed_right.connect(func(): settingHolder.change_value(true))
 	_scan_charts()
 	if song_list.is_empty():
 		return

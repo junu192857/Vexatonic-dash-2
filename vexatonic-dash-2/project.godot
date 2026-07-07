@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 SettingLoader="*uid://hqkfmofjf5hs"
+InputManager="*res://Scripts/InputManager.gd"
 
 [debug]
 

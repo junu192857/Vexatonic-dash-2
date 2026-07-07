@@ -1,7 +1,17 @@
 [gd_scene format=3 uid="uid://dhh0rmb85vmni"]
 
 [ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_jyp5g"]
-[ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scenes/MainMenuButton.gd" id="2_lexm1"]
+[ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="2_lexm1"]
+
+[sub_resource type="GDScript" id="GDScript_lexm1"]
+script/source = "extends Button
+
+func activate():
+	$ReferenceRect.visible = true
+
+func deactivate():
+	$ReferenceRect.visible = false
+"
 
 [node name="MainManu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("settingRect")]
 script = ExtResource("1_jyp5g")
@@ -25,7 +35,7 @@ anchor_top = 0.586
 anchor_right = 0.65
 anchor_bottom = 0.661
 text = "Game Start"
-script = ExtResource("2_lexm1")
+script = SubResource("GDScript_lexm1")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameStartButton" unique_id=1443724895]
 layout_mode = 1
@@ -50,6 +60,7 @@ offset_top = 0.39996338
 offset_right = 0.43981934
 offset_bottom = 0.39996338
 text = "Game End"
+script = ExtResource("2_lexm1")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameEndButton" unique_id=1731334888]
 visible = false
@@ -74,6 +85,7 @@ offset_top = -0.32006836
 offset_right = -0.16015625
 offset_bottom = -0.32006836
 text = "Setting"
+script = ExtResource("2_lexm1")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=1490791374]
 visible = false
@@ -100,7 +112,7 @@ offset_bottom = 0.35998535
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 120
 text = "Vexatonic
-         Dash 2"
+        Dash 2"
 horizontal_alignment = 1
 
 [node name="SettingRect" type="TextureRect" parent="CanvasLayer/Control" unique_id=129034698]

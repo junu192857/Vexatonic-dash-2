@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://b2otcnfrfthpg"]
 
 [ext_resource type="Script" uid="uid://c5hopjpuog4j4" path="res://Scripts/SelectSong/SelectManager.gd" id="1_03mcv"]
-[ext_resource type="Script" uid="uid://bocovfv3c0cfm" path="res://Scripts/SelectSong/InputManager.gd" id="2_lgpy4"]
 [ext_resource type="Script" uid="uid://pgxarv2aqaf0" path="res://Scripts/SelectSong/SongHolder.gd" id="2_uvoqn"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
 [ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
@@ -622,6 +621,3 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Tab"
 horizontal_alignment = 1
-
-[node name="InputManager" type="Node2D" parent="." unique_id=1806121724]
-script = ExtResource("2_lgpy4")

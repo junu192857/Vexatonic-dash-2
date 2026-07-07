@@ -30,8 +30,18 @@ var level_path: String
 func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
-	$InputHandler.note_pressed.connect(_on_pressed)
-	$InputHandler.note_released.connect(_on_released)
+	InputManager.pressed_a.connect(func(): _on_pressed(0, true))
+	InputManager.released_a.connect(func(): _on_released(0, true))
+	InputManager.pressed_l.connect(func(): _on_pressed(0, false))
+	InputManager.released_l.connect(func(): _on_released(0, false))
+	InputManager.pressed_s.connect(func(): _on_pressed(1, true))
+	InputManager.released_s.connect(func(): _on_released(1, true))
+	InputManager.pressed_k.connect(func(): _on_pressed(1, false))
+	InputManager.released_k.connect(func(): _on_released(1, false))
+	InputManager.pressed_d.connect(func(): _on_pressed(2, true))
+	InputManager.released_d.connect(func(): _on_released(2, true))
+	InputManager.pressed_j.connect(func(): _on_pressed(2, false))
+	InputManager.released_j.connect(func(): _on_released(2, false))
 	
 	level_path = Setting.selected_chart_dir
 	
