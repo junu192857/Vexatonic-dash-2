@@ -46,9 +46,9 @@ func _get_metadata(offset: int) -> LevelMetaData:
 	return song_list[(current_index + offset + size) % size]
 
 func _refresh_holders():
-	middleSongHolder.set_song_metadata(_get_metadata(0 % song_list.size()))
-	rightSongHolder.set_song_metadata(_get_metadata(1 % song_list.size()))
-	leftSongHolder.set_song_metadata(_get_metadata(-1 % song_list.size()))
+	middleSongHolder.set_song_metadata(_get_metadata(0))
+	rightSongHolder.set_song_metadata(_get_metadata(1))
+	leftSongHolder.set_song_metadata(_get_metadata(-1))
 
 func _refresh_difficulty():
 	var diff = Setting.selected_difficulty

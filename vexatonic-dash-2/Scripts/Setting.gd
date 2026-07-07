@@ -77,4 +77,6 @@ static func get_posx_from_time(time: float) -> float:
 	
 static func get_time_from_posx(posx_float: float) -> float:
 	return posx_float / (PX_PER_MS * speed)
-	
+
+static func change_difficulty():
+	selected_difficulty = (selected_difficulty + 1) % 3
