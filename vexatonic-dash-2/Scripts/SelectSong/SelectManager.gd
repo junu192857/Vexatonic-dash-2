@@ -26,7 +26,13 @@ func _ready() -> void:
 	_scan_charts()
 	if song_list.is_empty():
 		return
+	if Setting.selected_chart_dir != "":
+		for i in range(song_list.size()):
+			if CHARTS_DIR + "/" + song_list[i].name == Setting.selected_chart_dir:
+				current_index = i
+				break
 	_refresh_all()
+	_refresh_start_button()
 
 func _scan_charts():
 	var dir = DirAccess.open(CHARTS_DIR)
