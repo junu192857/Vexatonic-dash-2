@@ -166,22 +166,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SoundOffset" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1093273348]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.12100001
-anchor_top = 0.41000003
-anchor_right = 0.372
-anchor_bottom = 0.508
-offset_left = -0.39201355
-offset_top = 0.3199768
-offset_right = -78.54401
-offset_bottom = -0.184021
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 45
-text = "Sound_Offset"
-vertical_alignment = 1
-
 [node name="Speed" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1536584509]
 layout_mode = 1
 anchors_preset = -1
@@ -198,21 +182,72 @@ theme_override_font_sizes/font_size = 45
 text = "Speed"
 vertical_alignment = 1
 
-[node name="Speed2" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1927383521]
+[node name="SoundOffset" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1093273348]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.136
-anchor_top = 0.50200003
-anchor_right = 0.305
-anchor_bottom = 0.59900004
-offset_left = -16.672012
-offset_top = -0.2960205
-offset_right = -0.36001587
-offset_bottom = -0.15203857
+anchor_left = 0.12100001
+anchor_top = 0.41000003
+anchor_right = 0.372
+anchor_bottom = 0.508
+offset_left = -0.39201355
+offset_top = 0.3199768
+offset_right = -78.54401
+offset_bottom = -0.184021
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 45
+text = "Sound_Offset"
+vertical_alignment = 1
+
+[node name="JudgeOffset" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1927383521]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12200001
+anchor_top = 0.526
+anchor_right = 0.35900003
+anchor_bottom = 0.623
+offset_left = -0.54400635
+offset_top = 0.15197754
+offset_right = 0.43197632
+offset_bottom = 0.29599
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 45
 text = "Judge_Offset"
 vertical_alignment = 1
+
+[node name="Gamemode" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1123849619]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12200001
+anchor_top = 0.637
+anchor_right = 0.36800003
+anchor_bottom = 0.735
+offset_left = -0.54400635
+offset_top = 0.22399902
+offset_right = 0.063964844
+offset_bottom = -0.27999878
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 45
+text = "Gamemode"
+vertical_alignment = 1
+
+[node name="Information" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=655152082]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.11800001
+anchor_top = 0.818
+anchor_right = 0.882
+anchor_bottom = 0.95500004
+offset_left = -0.43600464
+offset_top = -0.06402588
+offset_right = 0.43597412
+offset_bottom = 0.15997314
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 28
+text = "이건 테스트 텍스트입니다.
+요기도 테스트 텍스트입니다."
+horizontal_alignment = 1
 
 [connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
