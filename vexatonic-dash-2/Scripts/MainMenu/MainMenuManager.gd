@@ -10,7 +10,7 @@ enum SettingItem { Speed, SoundOffset, JudgeOffset, Gamemode, ScoreDisplay }
 var setting_index: int = 0
 
 const SETTING_INFO = [
-	"게임의 속도를 설정합니다.",
+	"노트 속도를 설정합니다.",
 	"음악 싱크를 설정합니다.\nFast가 많다면 (+)방향, Late가 많다면 (-)방향으로 조절하세요.",
 	"판정 싱크를 설정합니다.\nFast가 많다면 (+)방향, Late가 많다면 (-)방향으로 조절하던가 말던가..",
 	"게임 모드를 설정합니다.",

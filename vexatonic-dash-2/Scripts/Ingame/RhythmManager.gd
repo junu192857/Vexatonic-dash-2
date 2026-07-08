@@ -8,10 +8,11 @@ var levelData: LevelData
 @onready var camera = $CameraManager/Camera2D
 @onready var line = $CharacterHolder/Line
 @onready var lineSprite = $CharacterHolder/Line/Sprite2D
-
+@onready var character_holder:Node2D = $CharacterHolder
 
 var characters: Array[Character]
-@export var character_holder: Node2D
+@export var rightCover: ColorRect
+@export var leftCover: ColorRect
 
 var time: float
 var music_started = false
@@ -70,11 +71,10 @@ func _ready() -> void:
 	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.metadata.music_path)
 	musicPlayer.stream = stream
 	
-	
-	#print(levelData.noteDatas.size())
-	for lane:Lane in levelData.lanes:
-		#lane.print_data()
-		pass
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+		rightCover.visible = true
+		leftCover.visible = true
+		
 	
 	# 초기 캐릭터 및 판정선 생성
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
