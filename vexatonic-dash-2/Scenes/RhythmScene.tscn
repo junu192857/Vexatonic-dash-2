@@ -18,11 +18,11 @@ metadata/_edit_vertical_guides_ = [-111.0]
 [node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("character_holder")]
 script = ExtResource("2_wib5u")
 CHARACTER_SCENE = ExtResource("3_wib5u")
-character_holder = NodePath("CharacterHolder")
 NOTE_SCENE = ExtResource("3_4pq8y")
 LONG_NOTE_SCENE = ExtResource("4_4pq8y")
 CONNECTOR_SCENE = ExtResource("4_wjq5j")
 SUREGI_CONNECTOR_SCENE = ExtResource("6_ublex")
+character_holder = NodePath("CharacterHolder")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
 

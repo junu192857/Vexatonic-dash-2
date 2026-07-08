@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Vexatonic Dash 2"
-run/main_scene="uid://l50nt5bpgqai"
+run/main_scene="uid://dhh0rmb85vmni"
 config/features=PackedStringArray("4.7", "Mobile")
 run/low_processor_mode=true
 config/icon="res://icon.svg"
