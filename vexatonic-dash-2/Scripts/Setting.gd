@@ -65,11 +65,11 @@ static func load() -> void:
 	var cfg = ConfigFile.new()
 	if cfg.load(SETTINGS_PATH) != OK:
 		return
-	speed         = cfg.get_value(SECTION, "speed",         speed)
-	score_display = cfg.get_value(SECTION, "score_display", score_display)
-	gamemode      = cfg.get_value(SECTION, "gamemode",      gamemode)
-	sound_offset  = cfg.get_value(SECTION, "sound_offset",  sound_offset)
-	judge_offset  = cfg.get_value(SECTION, "judge_offset",  judge_offset)
+	speed         = cfg.get_value(SECTION, "speed",         1.0)
+	score_display = cfg.get_value(SECTION, "score_display", SCORE_DISPLAY.Increasing)
+	gamemode      = cfg.get_value(SECTION, "gamemode",      GAMEMODE.Normal_Character)
+	sound_offset  = cfg.get_value(SECTION, "sound_offset",  0)
+	judge_offset  = cfg.get_value(SECTION, "judge_offset",  0)
 
 static func time_per_note_width():
 	return NOTE_WIDTH / (PX_PER_MS * speed)
