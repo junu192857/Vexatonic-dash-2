@@ -54,7 +54,7 @@ func _refresh_selection():
 
 func _refresh_setting_selection():
 	for i in range(value_nodes.size()):
-		value_nodes[i].add_theme_color_override("font_color", Color(1, 1, 0.3) if i == setting_index else Color(0, 0, 0))
+		value_nodes[i].add_theme_color_override("font_color", Color(1.0, 0.275, 0.133, 1.0) if i == setting_index else Color(0, 0, 0))
 	information.text = SETTING_INFO[setting_index]
 
 # =================== 메인 메뉴 입력 ===================

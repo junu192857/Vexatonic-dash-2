@@ -122,7 +122,6 @@ text = "Vexatonic"
 horizontal_alignment = 1
 
 [node name="SettingRect" type="TextureRect" parent="CanvasLayer/Control" unique_id=129034698]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.2
@@ -155,7 +154,7 @@ theme_override_font_sizes/font_size = 45
 text = "Speed"
 vertical_alignment = 1
 
-[node name="Value" type="LineEdit" parent="CanvasLayer/Control/SettingRect/CategoryLabels/Speed" unique_id=372275594]
+[node name="Value" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels/Speed" unique_id=1286598850]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 3.4410002
@@ -165,9 +164,10 @@ anchor_bottom = 1.0
 offset_left = -0.05102539
 offset_top = 0.0069994926
 offset_right = -0.026062012
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "2.0"
-alignment = 1
+horizontal_alignment = 1
 
 [node name="SoundOffset" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1093273348]
 layout_mode = 1
@@ -185,7 +185,7 @@ theme_override_font_sizes/font_size = 45
 text = "Sound_Offset"
 vertical_alignment = 1
 
-[node name="Value" type="LineEdit" parent="CanvasLayer/Control/SettingRect/CategoryLabels/SoundOffset" unique_id=595558007]
+[node name="Value" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels/SoundOffset" unique_id=289775166]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 2.503
@@ -195,9 +195,10 @@ anchor_bottom = 1.0
 offset_left = 0.12994385
 offset_top = 0.0069994926
 offset_right = 0.009887695
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "30"
-alignment = 1
+horizontal_alignment = 1
 
 [node name="JudgeOffset" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1927383521]
 layout_mode = 1
@@ -215,7 +216,7 @@ theme_override_font_sizes/font_size = 45
 text = "Judge_Offset"
 vertical_alignment = 1
 
-[node name="Value" type="LineEdit" parent="CanvasLayer/Control/SettingRect/CategoryLabels/JudgeOffset" unique_id=1525291859]
+[node name="Value" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels/JudgeOffset" unique_id=1398801485]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 2.6460001
@@ -226,9 +227,10 @@ offset_left = -0.003967285
 offset_top = -0.008000016
 offset_right = 0.021972656
 offset_bottom = -6.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "30"
-alignment = 1
+horizontal_alignment = 1
 
 [node name="Gamemode" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1123849619]
 layout_mode = 1
@@ -246,19 +248,21 @@ theme_override_font_sizes/font_size = 45
 text = "Gamemode"
 vertical_alignment = 1
 
-[node name="Value" type="LineEdit" parent="CanvasLayer/Control/SettingRect/CategoryLabels/Gamemode" unique_id=2122391447]
+[node name="Value" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels/Gamemode" unique_id=380475803]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 2.5670002
-anchor_right = 3.094
-anchor_bottom = 0.82500005
-offset_left = -0.028015137
-offset_top = -4.0
-offset_right = 0.13586426
-offset_bottom = 0.024997711
+anchor_left = 2.5700002
+anchor_top = 0.063
+anchor_right = 3.098
+anchor_bottom = 1.0
+offset_left = 0.11993408
+offset_top = 0.030999899
+offset_right = -0.00012207031
+offset_bottom = -3.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "TypeA"
-alignment = 1
+horizontal_alignment = 1
 
 [node name="ScoreDisplay" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=1818688522]
 layout_mode = 1
@@ -276,7 +280,7 @@ theme_override_font_sizes/font_size = 45
 text = "Score Display"
 vertical_alignment = 1
 
-[node name="Value" type="LineEdit" parent="CanvasLayer/Control/SettingRect/CategoryLabels/ScoreDisplay" unique_id=984021269]
+[node name="Value" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels/ScoreDisplay" unique_id=328366716]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 2.4310002
@@ -287,9 +291,10 @@ offset_left = 0.010009766
 offset_top = 0.012989998
 offset_right = 0.010070801
 offset_bottom = -1.0000076
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "Increase"
-alignment = 1
+horizontal_alignment = 1
 
 [node name="Information" type="Label" parent="CanvasLayer/Control/SettingRect/CategoryLabels" unique_id=655152082]
 layout_mode = 1
@@ -299,14 +304,12 @@ anchor_top = 0.86300004
 anchor_right = 0.88500005
 anchor_bottom = 1.0
 offset_left = -0.2400055
-offset_top = -0.22399902
+offset_top = -3.223999
 offset_right = -0.52008057
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 28
-text = "이건 테스트 텍스트입니다.
-요기도 테스트 텍스트입니다."
 horizontal_alignment = 1
 vertical_alignment = 1
 
