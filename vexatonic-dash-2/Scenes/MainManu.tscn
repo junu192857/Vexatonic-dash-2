@@ -4,16 +4,6 @@
 [ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="2_lexm1"]
 [ext_resource type="Texture2D" uid="uid://lqnydpuw4b0t" path="res://Textures/WhiteLine.jpg" id="3_304aa"]
 
-[sub_resource type="GDScript" id="GDScript_lexm1"]
-script/source = "extends Button
-
-func activate():
-	$ReferenceRect.visible = true
-
-func deactivate():
-	$ReferenceRect.visible = false
-"
-
 [node name="MainManu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("settingRect")]
 script = ExtResource("1_jyp5g")
 settingRect = NodePath("CanvasLayer/Control/SettingRect")
@@ -36,7 +26,7 @@ anchor_top = 0.586
 anchor_right = 0.65
 anchor_bottom = 0.661
 text = "Game Start"
-script = SubResource("GDScript_lexm1")
+script = ExtResource("2_lexm1")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameStartButton" unique_id=1443724895]
 layout_mode = 1
@@ -365,3 +355,4 @@ text = "게임플레이"
 
 [connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
+[connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
