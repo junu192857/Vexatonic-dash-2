@@ -7,6 +7,8 @@ const PLAY_DATA_PATH = "user://play_data.cfg"
 enum ComboLamp { None = 0, FullCombo = 1, FullVexatonic = 2 }
 enum Rank { None = 0, D = 1, C = 2, B = 3, A = 4, AA = 5, AAA = 6, S = 7, SS = 8, SSS = 9, V = 10 }
 
+
+
 var score: float = 0
 var score_per_note: float = 0
 var combo: int
@@ -14,11 +16,15 @@ var total_long_length: float
 var total_long_length_current: float
 var pressed_long_length: float = 0.0
 var pressed_note_count: int = 0
+var total_note_calls: int = 0
 var vexatonic_count: int = 0
+var sparklic_count: int = 0
+var wild_count: int = 0
+var miss_count: int = 0
 var _combo_lamp: ComboLamp = ComboLamp.FullVexatonic
 
 signal status_updated(judgement: int, score: float, combo: int, note: Note, fastslow: Note.Fastslow)
-
+signal all_notes_cleared
 
 func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
 	match judgement:
@@ -29,14 +35,17 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 		1: #Sparklic
 			score += 0.9 * score_per_note
 			combo += 1
+			sparklic_count += 1
 			if _combo_lamp == ComboLamp.FullVexatonic:
 				_combo_lamp = ComboLamp.FullCombo
 		2: #Wild
 			score += 0.5 * score_per_note
 			combo = 0
+			wild_count += 1
 			_combo_lamp = ComboLamp.None
 		3: #miss
 			combo = 0
+			miss_count += 1
 			_combo_lamp = ComboLamp.None
 		_:
 			push_error("Invalid judgement")
@@ -57,6 +66,9 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 			var perfect_score = pressed_note_count * score_per_note + calculate_longNote_score(total_long_length_current)
 			status_updated.emit(judgement, 1000000 - (perfect_score - current_score), combo, note, fastslow)
 	
+	if total_note_calls > 0 and pressed_note_count >= total_note_calls:
+		all_notes_cleared.emit()
+		
 
 func set_total_notes(noteDatas: Array[NoteData]):
 	var single_count = noteDatas.filter(func(n): return n.type == 0).size()
@@ -67,7 +79,8 @@ func set_total_notes(noteDatas: Array[NoteData]):
 	if (single_count + long_count != noteDatas.size()):
 		push_error("Note count do not match")
 	
-	score_per_note = MAX_NOTE_SCORE / (single_count + 2 * long_count)
+	total_note_calls = single_count + 2 * long_count
+	score_per_note = MAX_NOTE_SCORE / total_note_calls
 	
 func calculate_longNote_score(pressed: float):
 	var ratio = pressed / total_long_length
@@ -116,3 +129,18 @@ func on_song_end(chart_path: String) -> void:
 		cfg.set_value(s, "rank", int(rank))
 
 	cfg.save(PLAY_DATA_PATH)
+
+func get_result_data() -> Dictionary:
+	var final_score = roundi(score + calculate_longNote_score(pressed_long_length))
+	var paint_ratio = pressed_long_length / total_long_length if total_long_length > 0 else 1.0
+	return {
+		"score": final_score,
+		"vexatonic": vexatonic_count,
+		"sparklic": sparklic_count,
+		"wild": wild_count,
+		"miss": miss_count,
+		"paint_ratio": paint_ratio,
+		"full_paint": roundi(calculate_longNote_score(pressed_long_length)) == 10000,
+		"combo_lamp": _combo_lamp,
+		"rank": _get_rank(final_score),
+	}
