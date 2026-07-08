@@ -26,5 +26,9 @@ func _on_status_update(judgement: int, score: float, combo: int, note: Note, fas
 	tween.tween_callback(judgement_text.queue_free)
 
 func get_note_position(note: Note):
-	return get_viewport().get_canvas_transform() * note.global_position
-	
+	var note_pos = get_viewport().get_canvas_transform() * note.global_position
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+		note_pos.y = get_viewport().get_visible_rect().size.y * 0.65
+	else:
+		note_pos.x = get_viewport().get_visible_rect().size.x * 0.2
+	return note_pos  # 마지막 canvas_transform 제거

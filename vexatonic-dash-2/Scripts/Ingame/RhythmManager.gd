@@ -24,14 +24,26 @@ var lane_index: int
 var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
-var level_path = "res://Charts/Melodiniq"
+var level_path: String
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
 	print("START")
-	$InputHandler.note_pressed.connect(_on_pressed)
-	$InputHandler.note_released.connect(_on_released)
+	InputManager.pressed_a.connect(func(): _on_pressed(0, true))
+	InputManager.released_a.connect(func(): _on_released(0, true))
+	InputManager.pressed_l.connect(func(): _on_pressed(0, false))
+	InputManager.released_l.connect(func(): _on_released(0, false))
+	InputManager.pressed_s.connect(func(): _on_pressed(1, true))
+	InputManager.released_s.connect(func(): _on_released(1, true))
+	InputManager.pressed_k.connect(func(): _on_pressed(1, false))
+	InputManager.released_k.connect(func(): _on_released(1, false))
+	InputManager.pressed_d.connect(func(): _on_pressed(2, true))
+	InputManager.released_d.connect(func(): _on_released(2, true))
+	InputManager.pressed_j.connect(func(): _on_pressed(2, false))
+	InputManager.released_j.connect(func(): _on_released(2, false))
+	
+	level_path = Setting.selected_chart_dir
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
@@ -54,8 +66,8 @@ func _ready() -> void:
 	
 	cameraManager.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
-	print("MUSIC_PATH: " + levelData.music_path)
-	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.music_path)
+	print("MUSIC_PATH: " + levelData.metadata.music_path)
+	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.metadata.music_path)
 	musicPlayer.stream = stream
 	
 	
@@ -147,10 +159,10 @@ func render_chart():
 		assign_note(cur_note)
 		if (previous_time >= 0 and previous_lane == noteData.lane):
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-				var connector = place_suregi_connector(previous_note.data.color, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
+				var connector = place_suregi_connector(previous_note.data.color, previous_time + Setting.time_per_note_width() / 2, noteData.time - Setting.time_per_note_width() / 2, \
 							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 			else:
-				var connector = place_connector(-1, previous_time + Setting.time_per_note_width / 2, noteData.time - Setting.time_per_note_width / 2, \
+				var connector = place_connector(-1, previous_time + Setting.time_per_note_width() / 2, noteData.time - Setting.time_per_note_width() / 2, \
 							previous_lane, true, previous_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 	
 		previous_time = noteData.time
@@ -160,8 +172,8 @@ func render_chart():
 		if (noteData.type == 1): #LongNote
 			var end_pos_x = Setting.get_posx_from_time(noteData.end_time)
 			var marker = place_note(noteData, end_pos_x, true, cur_note)
-			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width / 2, \
-							noteData.end_time - Setting.time_per_note_width / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
+			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width() / 2, \
+							noteData.end_time - Setting.time_per_note_width() / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 			(cur_note as LongNote).set_target_connector(connector as Connector)
 			previous_time = noteData.end_time
 			previous_note = marker;
@@ -224,18 +236,18 @@ func place_initial_connector(lane: Lane):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index, false,\
+				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 			else:
-				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index, false,\
+				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
 									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 		else:
 			if (lane.keyframes[0].kf.x < lane.notes[0].get_data().time):
 				if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index,\
+					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 				else:
-					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width / 2, lane.lane_index,\
+					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index,\
 										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
 	#TODO: 노트가 없는 initial lane에 대해 대응하기.
 
@@ -244,8 +256,8 @@ func place_final_connector(lane: Lane):
 	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
 		var last_note_time = lane.notes[-1].get_data().end_time #find last note or marker
-		if lane.keyframes[-1].kf.x  > last_note_time + Setting.time_per_note_width / 2:
-			var connector_time = last_note_time + Setting.time_per_note_width / 2
+		if lane.keyframes[-1].kf.x  > last_note_time + Setting.time_per_note_width() / 2:
+			var connector_time = last_note_time + Setting.time_per_note_width() / 2
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
 				var final_connector = place_suregi_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
 								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))

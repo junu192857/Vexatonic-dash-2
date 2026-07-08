@@ -10,7 +10,7 @@ var sorted_bpm: Array
 @export var ZOOM_TRIGGER_SCENE: PackedScene
 @export var BPM_TRIGGER_SCENE: PackedScene
 
-@onready var inputHandler = $EditorInputHandler
+
 @onready var camera = $Camera2D
 @onready var musicPlayer = $AudioStreamPlayer
 
@@ -25,14 +25,16 @@ var sorted_bpm: Array
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
 func _ready():
-	inputHandler.move_camera.connect(_on_move_camera)
-	inputHandler.zoom_camera.connect(_on_zoom_camera)
-	inputHandler.move_preview.connect(_on_move_preview)
-	inputHandler.put_note.connect(_on_put_note)
-	inputHandler.delete_something.connect(_on_delete_something)
-	inputHandler.toggle_shifting.connect(_on_toggle_shifting)
-	inputHandler.move_to_last_note.connect(_on_move_to_last_note)
-	inputHandler.move_camera_horizontally.connect(_on_move_horizontally)
+	InputManager.mouse_left_pressed.connect(_on_put_note)
+	InputManager.mouse_right_toggled.connect(_on_right_toggled)
+	InputManager.mouse_scrolled_up.connect(func(): _on_zoom_camera(true))
+	InputManager.mouse_scrolled_down.connect(func(): _on_zoom_camera(false))
+	InputManager.mouse_moved.connect(_on_mouse_moved)
+	InputManager.pressed_delete.connect(_on_delete_something)
+	InputManager.toggled_shift.connect(_on_toggle_shifting)
+	InputManager.pressed_f.connect(_on_move_to_last_note)
+	InputManager.pressed_a.connect(func(): _on_move_horizontally(true))
+	InputManager.pressed_d.connect(func(): _on_move_horizontally(false))
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
@@ -66,15 +68,15 @@ func initiate_editor():
 	settingPanel.visible = true
 
 	_update_sorted_bpm_triggers()
-	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.length), 6.0)
+	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.metadata.length), 6.0)
 
 func set_initial_value():
 	levelData = LevelData.new()
 	var bpm = initialPanel.get_node("BPMBox").value
 	var music_time = initialPanel.get_node("MusicTimeBox").value
 
-	levelData.music_path = music_path.get_file()
-	levelData.length = music_time * 1000
+	levelData.metadata.music_path = music_path.get_file()
+	levelData.metadata.length = music_time * 1000
 	
 	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, -500.0)
 	levelData.triggers.append(initial_bpm_trigger)
@@ -113,11 +115,22 @@ var dragging = false
 var drag_start: Vector2
 var camera_zoom_level: int = 1
 
-func _on_move_camera(delta: Vector2):
-	if !editor_ready or modifying_trigger:
-		return
-	camera.position -= delta
-	realign_lines_by_move()
+func _on_right_toggled(pressed: bool):
+	dragging = pressed
+	if pressed:
+		drag_start = get_viewport().get_mouse_position()
+
+func _on_mouse_moved(position: Vector2):
+	if dragging:
+		var delta = position - drag_start
+		print(position, drag_start, delta)
+		if !editor_ready or modifying_trigger:
+			return
+		camera.position -= delta
+		drag_start = position
+		realign_lines_by_move()
+	else:
+		_on_move_preview()
 
 func _on_zoom_camera(zoom: bool):
 	if !editor_ready or modifying_trigger:
@@ -159,13 +172,13 @@ func place_bar_lines():
 	for i in range(sorted_bpm.size()):
 		var bpm_start_time = sorted_bpm[i].start
 		var bpm = sorted_bpm[i].c
-		var bpm_end_time = levelData.length if i + 1 >= sorted_bpm.size() else min(sorted_bpm[i + 1].start, levelData.length)
+		var bpm_end_time = levelData.metadata.length if i + 1 >= sorted_bpm.size() else min(sorted_bpm[i + 1].start, levelData.metadata.length)
 
 
 		if bpm_start_time < 0:
 			push_error("time cannot be negative")
 			return
-		if bpm_start_time > levelData.length:
+		if bpm_start_time > levelData.metadata.length:
 			return
 		
 		var beat_duration = 60000.0 / bpm
@@ -257,19 +270,19 @@ func _on_select_note(selected: int):
 		return
 	if selected in NoteSelection.values():
 		selected_note = selected as NoteSelection
-		if inputHandler.put_note.is_connected(_on_put_note):
-			inputHandler.put_note.disconnect(_on_put_note)
-		if inputHandler.put_note.is_connected(_on_modify):
-			inputHandler.put_note.disconnect(_on_modify)
-		
+		if InputManager.mouse_left_pressed.is_connected(_on_put_note):
+			InputManager.mouse_left_pressed.disconnect(_on_put_note)
+		if InputManager.mouse_left_pressed.is_connected(_on_modify):
+			InputManager.mouse_left_pressed.disconnect(_on_modify)
+
 		# selected < 20이면 레인/노트, selected > 20이면 modify
 		if (selected in colored_notes):
 			selected_color = selected % 10 - 1
-			inputHandler.put_note.connect(_on_put_note)
-		elif (selected in modify): 
-			inputHandler.put_note.connect(_on_modify)
+			InputManager.mouse_left_pressed.connect(_on_put_note)
+		elif (selected in modify):
+			InputManager.mouse_left_pressed.connect(_on_modify)
 		elif (selected in trigger):
-			inputHandler.put_note.connect(_on_put_note)
+			InputManager.mouse_left_pressed.connect(_on_put_note)
 		current_state = EditorState.Ready
 		if (preview != null):
 			preview.queue_free()
@@ -1270,7 +1283,7 @@ func open_save_panel():
 	if (chart_loaded):
 		savePanel.get_node("OnlyForNewSave").visible = false
 		savePanel.get_node("OnlyForLoaded").visible = true
-		savePanel.get_node("OnlyForLoaded/Label").text = "Do you want to save %s %s?" % [levelData.name, Setting.DIFFICULTY_NAMES[save_difficulty]]
+		savePanel.get_node("OnlyForLoaded/Label").text = "Do you want to save %s %s?" % [levelData.metadata.name, Setting.DIFFICULTY_NAMES[save_difficulty]]
 
 func quit_save_panel():
 	savePanel.visible = false
@@ -1295,12 +1308,12 @@ func save_chart():
 			push_error("ERROR: METADATA.txt를 열 수 없습니다.")
 			return
 		meta_file.store_line("NAME " + folder_name)
-		meta_file.store_line("MUSIC " + levelData.music_path)
+		meta_file.store_line("MUSIC " + levelData.metadata.music_path)
 		meta_file.store_line("LEVEL 1 2 3")
-		meta_file.store_line("LENGTH %d" % levelData.length)
+		meta_file.store_line("LENGTH %d" % levelData.metadata.length)
 	
 		# 음악 파일 저장
-		DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.music_path)
+		DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
 		
 		var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
 		chart_path = dir_path + "/" + difficulty_name + ".txt"
@@ -1380,9 +1393,9 @@ func select_chart(path: String):
 	musicPlayer.stream = stream
 	
 	levelData = LevelData.new()
-	levelData.name = path.get_base_dir().get_file()
-	levelData.music_path = music_path.get_file()
-	levelData.length = stream.get_length() * 1000
+	levelData.metadata.name = path.get_base_dir().get_file()
+	levelData.metadata.music_path = music_path.get_file()
+	levelData.metadata.length = stream.get_length() * 1000
 	
 	
 	match chart_path.get_file():
@@ -1400,9 +1413,9 @@ func select_chart(path: String):
 		loadPanel.get_node("LoadButton").visible = false
 		return
 			
-	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
-	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.music_path
-	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.length / 1000)
+	loadPanel.get_node("NameLabel").text = "Chart: " + levelData.metadata.name + " " + Setting.DIFFICULTY_NAMES[save_difficulty]
+	loadPanel.get_node("MusicLabel").text = "Song: " + levelData.metadata.music_path
+	loadPanel.get_node("LengthLabel").text = "Length: " + str(levelData.metadata.length / 1000)
 	loadPanel.get_node("LoadButton").visible = true
 	
 

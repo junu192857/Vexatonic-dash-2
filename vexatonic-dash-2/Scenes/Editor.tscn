@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://br567btcie3o3" path="res://Prefabs/EditorConnector.tscn" id="3_brgpd"]
 [ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="4_5v8xv"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
-[ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/Editor/EditorInputHandler.gd" id="5_dfuwn"]
 [ext_resource type="PackedScene" uid="uid://bul34fxxophy1" path="res://Prefabs/MoveTrigger.tscn" id="5_qexec"]
 [ext_resource type="PackedScene" uid="uid://cq60k3h6dbxia" path="res://Prefabs/ZoomTrigger.tscn" id="6_847jc"]
 [ext_resource type="PackedScene" uid="uid://cw8p2v3afm85j" path="res://Prefabs/BPMTrigger.tscn" id="7_847jc"]
@@ -29,9 +28,6 @@ BPM_TRIGGER_SCENE = ExtResource("7_847jc")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1330927414]
 texture = ExtResource("4_6ykgs")
-
-[node name="EditorInputHandler" type="Node2D" parent="." unique_id=1149392311]
-script = ExtResource("5_dfuwn")
 
 [node name="LineHolder" type="Node2D" parent="." unique_id=510790869]
 
@@ -741,9 +737,6 @@ grow_vertical = 2
 
 [connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
-[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button3" to="." method="set_difficulty" binds= [2]]
-[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button2" to="." method="set_difficulty" binds= [1]]
-[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button" to="." method="set_difficulty" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomUpButton" to="." method="_on_zoom_camera" binds= [true]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomDownButton" to="." method="_on_zoom_camera" binds= [false]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_note" binds= [13]]
