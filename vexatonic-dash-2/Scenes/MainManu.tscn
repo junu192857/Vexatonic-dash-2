@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_jyp5g"]
 [ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="2_lexm1"]
+[ext_resource type="Texture2D" uid="uid://lqnydpuw4b0t" path="res://Textures/WhiteLine.jpg" id="3_304aa"]
 
 [sub_resource type="GDScript" id="GDScript_lexm1"]
 script/source = "extends Button
@@ -99,30 +100,45 @@ border_color = Color(1, 1, 0, 1)
 border_width = 6.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Control" unique_id=23012843]
+[node name="NameLabel2" type="Label" parent="CanvasLayer/Control" unique_id=983177614]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.32500002
-anchor_top = 0.116000004
-anchor_right = 0.675
-anchor_bottom = 0.42400002
-offset_left = 0.49993896
-offset_right = -0.5
-offset_bottom = 0.35998535
+anchor_left = 0.42900002
+anchor_top = 0.25500003
+anchor_right = 0.68200004
+anchor_bottom = 0.425
+offset_left = -0.6800537
+offset_top = -0.4000244
+offset_right = -0.44006348
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 120
-text = "Vexatonic
-      Dash 2"
+text = "Dash 2"
+horizontal_alignment = 1
+
+[node name="NameLabel1" type="Label" parent="CanvasLayer/Control" unique_id=23012843]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.119
+anchor_right = 0.68
+anchor_bottom = 0.273
+offset_left = 0.39996338
+offset_top = -0.5200043
+offset_right = -0.5999756
+offset_bottom = 0.16000366
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 120
+text = "Vexatonic"
 horizontal_alignment = 1
 
 [node name="SettingRect" type="TextureRect" parent="CanvasLayer/Control" unique_id=129034698]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.2
 anchor_top = 0.2
 anchor_right = 0.8
 anchor_bottom = 0.8
+texture = ExtResource("3_304aa")
 
 [connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
