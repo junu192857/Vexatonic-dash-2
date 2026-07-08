@@ -15,14 +15,15 @@
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
 metadata/_edit_vertical_guides_ = [-111.0]
 
-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("character_holder")]
+[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("rightCover", "leftCover")]
 script = ExtResource("2_wib5u")
 CHARACTER_SCENE = ExtResource("3_wib5u")
+rightCover = NodePath("../CanvasLayer/Control/RightCover")
+leftCover = NodePath("../CanvasLayer/Control/LeftCover")
 NOTE_SCENE = ExtResource("3_4pq8y")
 LONG_NOTE_SCENE = ExtResource("4_4pq8y")
 CONNECTOR_SCENE = ExtResource("4_wjq5j")
 SUREGI_CONNECTOR_SCENE = ExtResource("6_ublex")
-character_holder = NodePath("CharacterHolder")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
 
@@ -55,6 +56,24 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=1761425525]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.781
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+
+[node name="LeftCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=439301575]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.21900001
+anchor_bottom = 1.0
+offset_right = -0.480011
+color = Color(0.47788018, 0.47788012, 0.47788012, 1)
 
 [node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
 layout_mode = 1
