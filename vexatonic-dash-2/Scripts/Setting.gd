@@ -71,7 +71,8 @@ static func load() -> void:
 	sound_offset  = cfg.get_value(SECTION, "sound_offset",  sound_offset)
 	judge_offset  = cfg.get_value(SECTION, "judge_offset",  judge_offset)
 
-static var time_per_note_width = NOTE_WIDTH / (PX_PER_MS * speed)
+static func time_per_note_width():
+	return NOTE_WIDTH / (PX_PER_MS * speed)
 
 static func get_posx_from_time(time: float) -> float:
 	return time * PX_PER_MS * speed

@@ -8,7 +8,7 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	lane = p_lane
 	var start_height
 	if p_lane != null:
-		start_height = p_lane.get_height(start_time - Setting.time_per_note_width) if first else \
+		start_height = p_lane.get_height(start_time - Setting.time_per_note_width()) if first else \
 					   p_lane.get_height(start_time)
 	
 	line.add_point(Vector2.ZERO)
