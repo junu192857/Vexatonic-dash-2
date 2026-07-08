@@ -122,6 +122,7 @@ text = "Vexatonic"
 horizontal_alignment = 1
 
 [node name="SettingRect" type="TextureRect" parent="CanvasLayer/Control" unique_id=129034698]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.2
@@ -307,6 +308,7 @@ theme_override_font_sizes/font_size = 28
 text = "이건 테스트 텍스트입니다.
 요기도 테스트 텍스트입니다."
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Label" type="Label" parent="CanvasLayer/Control/SettingRect" unique_id=1274389467]
 layout_mode = 1
@@ -353,6 +355,21 @@ offset_bottom = -0.12800598
 theme_override_font_sizes/font_size = 28
 text = "게임플레이"
 
+[node name="EndButton" type="Button" parent="CanvasLayer/Control/SettingRect" unique_id=993613619]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.78400004
+anchor_top = 0.049000002
+anchor_right = 0.95800006
+anchor_bottom = 0.133
+offset_left = -0.16802979
+offset_top = 0.24799919
+offset_right = 0.38391113
+offset_bottom = -9.183998
+theme_override_font_sizes/font_size = 33
+text = "Quit[Enter]"
+
 [connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
 [connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
+[connection signal="pressed" from="CanvasLayer/Control/SettingRect/EndButton" to="." method="close_setting"]

@@ -11,10 +11,16 @@ var setting_index: int = 0
 
 const SETTING_INFO = [
 	"게임의 속도를 설정합니다.",
-	"음악 싱크를 설정합니다.\nFast가 많다면 (+)방향, Late가 많다면 (-)방향으로 조절하십시오.",
-	"판정 싱크를 설정합니다.\nFast가 많다면 (+)방향, Late가 많다면 (-)방향으로 조절하십시오.",
-	"게임 모드를 설정합니다.\nTypeA: 캐릭터가 보입니다. TypeB: 판정선이 보입니다. TypeC: 노트가 위에서 내려옵니다. 판정선이 보입니다. 하얀색 플랫폼이 보이지 않습니다.",
+	"음악 싱크를 설정합니다.\nFast가 많다면 (+)방향, Late가 많다면 (-)방향으로 조절하세요.",
+	"판정 싱크를 설정합니다.\nFast가 많다면 (+)방향, Late가 많다면 (-)방향으로 조절하던가 말던가..",
+	"게임 모드를 설정합니다.",
 	"스코어 표시 방식을 설정합니다.",
+]
+
+const GAMEMODE_SETTING_INFO = [
+	"TypeA: 캐릭터가 보입니다.",
+	"TypeB: 판정선이 보입니다.",
+	"TypeC: 노트가 위에서 내려옵니다. 판정선이 보이고 하얀색 플랫폼이 보이지 않습니다."
 ]
 
 @onready var speed_value: LineEdit = $CanvasLayer/Control/SettingRect/CategoryLabels/Speed/Value
@@ -98,11 +104,15 @@ func _on_enter_setting():
 	_refresh_setting_selection()
 	settingRect.visible = true
 	setting_open = true
+	for button in button_array:
+		button.disabled = true
 
 func close_setting():
 	settingRect.visible = false
 	Setting.save()
 	setting_open = false
+	for button in button_array:
+		button.disabled = false
 
 func _load_setting_values():
 	speed_value.text = "%.1f" % Setting.speed
@@ -125,10 +135,12 @@ func _change_setting_value(increase: bool):
 		SettingItem.Gamemode:
 			var modes = [Setting.GAMEMODE.Normal_Character, Setting.GAMEMODE.Normal_Line, Setting.GAMEMODE.Suregi]
 			var cur = modes.find(Setting.gamemode)
+			var target = (cur + (1 if increase else -1) + modes.size()) % modes.size()
 			Setting.gamemode = modes[(cur + (1 if increase else -1) + modes.size()) % modes.size()]
 			gamemode_value.text = _gamemode_to_string(Setting.gamemode)
+			information.text = GAMEMODE_SETTING_INFO[target]
 		SettingItem.ScoreDisplay:
-			Setting.score_display = Setting.SCORE_DISPLAY.Increasing if increase else Setting.SCORE_DISPLAY.Decreasing
+			Setting.score_display = Setting.SCORE_DISPLAY.Increasing if Setting.score_display == Setting.SCORE_DISPLAY.Decreasing else Setting.SCORE_DISPLAY.Decreasing
 			score_display_value.text = _score_display_to_string(Setting.score_display)
 
 func _gamemode_to_string(mode) -> String:
