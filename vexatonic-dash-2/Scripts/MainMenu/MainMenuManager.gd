@@ -23,11 +23,11 @@ const GAMEMODE_SETTING_INFO = [
 	"TypeC: 노트가 위에서 내려옵니다. 판정선이 보이고 하얀색 플랫폼이 보이지 않습니다."
 ]
 
-@onready var speed_value: LineEdit = $CanvasLayer/Control/SettingRect/CategoryLabels/Speed/Value
-@onready var sound_offset_value: LineEdit = $CanvasLayer/Control/SettingRect/CategoryLabels/SoundOffset/Value
-@onready var judge_offset_value: LineEdit = $CanvasLayer/Control/SettingRect/CategoryLabels/JudgeOffset/Value
-@onready var gamemode_value: LineEdit = $CanvasLayer/Control/SettingRect/CategoryLabels/Gamemode/Value
-@onready var score_display_value: LineEdit = $CanvasLayer/Control/SettingRect/CategoryLabels/ScoreDisplay/Value
+@onready var speed_value: Label = $CanvasLayer/Control/SettingRect/CategoryLabels/Speed/Value
+@onready var sound_offset_value: Label = $CanvasLayer/Control/SettingRect/CategoryLabels/SoundOffset/Value
+@onready var judge_offset_value: Label = $CanvasLayer/Control/SettingRect/CategoryLabels/JudgeOffset/Value
+@onready var gamemode_value: Label = $CanvasLayer/Control/SettingRect/CategoryLabels/Gamemode/Value
+@onready var score_display_value: Label = $CanvasLayer/Control/SettingRect/CategoryLabels/ScoreDisplay/Value
 @onready var information: Label = $CanvasLayer/Control/SettingRect/CategoryLabels/Information
 
 var value_nodes: Array
