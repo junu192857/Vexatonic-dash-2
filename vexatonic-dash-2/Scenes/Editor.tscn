@@ -737,6 +737,9 @@ grow_vertical = 2
 
 [connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
 [connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
+[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button3" to="." method="set_difficulty" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button2" to="." method="set_difficulty" binds= [1]]
+[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button" to="." method="set_difficulty" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomUpButton" to="." method="_on_zoom_camera" binds= [true]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomDownButton" to="." method="_on_zoom_camera" binds= [false]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_note" binds= [13]]
