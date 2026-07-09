@@ -1292,11 +1292,11 @@ func quit_save_panel():
 func save_chart():
 	if (!chart_loaded):
 		if save_difficulty == -1:
-			savePanel.get_node("WarningLabel").text = "WARNING: Please set difficulty"
+			savePanel.get_node("OnlyForNewSave/WarningLabel").text = "WARNING: Please set difficulty"
 			return
 		var folder_name = savePanel.get_node("OnlyForNewSave/LineEdit").text
 		if folder_name.is_empty():
-			savePanel.get_node("WarningLabel").text = "WARNING: Please set level name"
+			savePanel.get_node("OnlyForNewSave/WarningLabel").text = "WARNING: Please set level name"
 			return
 		
 		var dir_path = "res://Charts/" + folder_name
