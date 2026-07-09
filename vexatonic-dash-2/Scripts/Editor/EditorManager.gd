@@ -27,14 +27,14 @@ var editor_ready = false
 func _ready():
 	InputManager.mouse_left_pressed.connect(_on_put_note)
 	InputManager.mouse_right_toggled.connect(_on_right_toggled)
-	InputManager.mouse_scrolled_up.connect(func(): _on_zoom_camera(true))
-	InputManager.mouse_scrolled_down.connect(func(): _on_zoom_camera(false))
+	InputManager.mouse_scrolled_up.connect(func(): if editor_ready: _on_zoom_camera(true))
+	InputManager.mouse_scrolled_down.connect(func(): if editor_ready: _on_zoom_camera(false))
 	InputManager.mouse_moved.connect(_on_mouse_moved)
 	InputManager.pressed_delete.connect(_on_delete_something)
 	InputManager.toggled_shift.connect(_on_toggle_shifting)
 	InputManager.pressed_f.connect(_on_move_to_last_note)
-	InputManager.pressed_a.connect(func(): _on_move_horizontally(true))
-	InputManager.pressed_d.connect(func(): _on_move_horizontally(false))
+	InputManager.pressed_a.connect(func(): if editor_ready: _on_move_horizontally(true))
+	InputManager.pressed_d.connect(func(): if editor_ready: _on_move_horizontally(false))
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
