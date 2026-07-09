@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b2otcnfrfthpg"]
 
 [ext_resource type="Script" uid="uid://c5hopjpuog4j4" path="res://Scripts/SelectSong/SelectManager.gd" id="1_03mcv"]
+[ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_mdyll"]
 [ext_resource type="Script" uid="uid://pgxarv2aqaf0" path="res://Scripts/SelectSong/SongHolder.gd" id="2_uvoqn"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
 [ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
@@ -13,6 +14,7 @@ middleSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/MiddleSongH
 rightSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightSongHolder")
 songDataHolder = NodePath("CanvasLayer/Control/SongDataHolder/Holder")
 settingHolder = NodePath("CanvasLayer/Control/SettingHolder")
+settingRectScene = ExtResource("2_mdyll")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1950427340]
 
@@ -694,3 +696,5 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Tab"
 horizontal_alignment = 1
+
+[connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
