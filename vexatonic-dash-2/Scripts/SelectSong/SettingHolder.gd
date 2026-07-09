@@ -11,11 +11,13 @@ const NORMAL_COLOR = Color(1.0, 1.0, 1.0)
 
 var selected: SettingItem = SettingItem.Speed
 
+
 func refresh():
 	speedValue.text = "%.1f" % Setting.speed
 	soundOffsetValue.text = "%d" % Setting.sound_offset
 	judgeOffsetValue.text = "%d" % Setting.judge_offset
 	_update_selection_color()
+	Setting.save()
 
 func select_next():
 	selected = (selected + 1) % 3

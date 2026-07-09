@@ -6,7 +6,13 @@ extends Node2D
 @export var songDataHolder: SongDataHolder
 @export var settingHolder: SettingHolder
 @onready var difficultyRect: ColorRect = $CanvasLayer/Control/DifficultyRect
+@onready var settingButton: Button = $CanvasLayer/Control/SettingButton
 @onready var startButton: Button = $CanvasLayer/Control/StartButton
+
+@export var settingRectScene: PackedScene
+var settingRect
+
+var setting_open: bool = false
 
 const CHARTS_DIR = "res://Charts"
 const DIFFICULTY_COLORS = [Color(0.5, 0.85, 0.3), Color(1.0, 0.55, 0.1), Color(0.6, 0.2, 0.9)]
@@ -19,10 +25,18 @@ func _ready() -> void:
 	InputManager.pressed_d.connect(_on_move_right)
 	InputManager.pressed_tab.connect(_on_change_difficulty)
 	InputManager.pressed_enter.connect(_on_game_start)
-	InputManager.pressed_down.connect(func(): settingHolder.select_next())
-	InputManager.pressed_up.connect(func(): settingHolder.select_prev())
-	InputManager.pressed_left.connect(func(): settingHolder.change_value(false))
-	InputManager.pressed_right.connect(func(): settingHolder.change_value(true))
+	InputManager.pressed_down.connect(func(): if not setting_open: settingHolder.select_next())
+	InputManager.pressed_up.connect(func(): if not setting_open: settingHolder.select_prev())
+	InputManager.pressed_left.connect(func(): if not setting_open: settingHolder.change_value(false))
+	InputManager.pressed_right.connect(func(): if not setting_open: settingHolder.change_value(true))
+	InputManager.pressed_f10.connect(_on_enter_setting)
+	
+	
+	settingRect = settingRectScene.instantiate()
+	$CanvasLayer/Control.add_child(settingRect)
+	settingRect.visible = false
+	settingRect.close_setting.connect(close_setting)
+	
 	_scan_charts()
 	if song_list.is_empty():
 		return
@@ -101,27 +115,34 @@ func _count_notes(chart_path: String) -> int:
 	return single + 2 * long
 
 func _on_move_left():
-	current_index = (current_index - 1 + song_list.size()) % song_list.size()
-	_refresh_holders()
-	_refresh_song_data()
-	_refresh_start_button()
+	if not setting_open:
+		current_index = (current_index - 1 + song_list.size()) % song_list.size()
+		_refresh_holders()
+		_refresh_song_data()
+		_refresh_start_button()
 
 func _on_move_right():
-	current_index = (current_index + 1) % song_list.size()
-	_refresh_holders()
-	_refresh_song_data()
-	_refresh_start_button()
+	if not setting_open:
+		current_index = (current_index + 1) % song_list.size()
+		_refresh_holders()
+		_refresh_song_data()
+		_refresh_start_button()
 
 func _on_change_difficulty():
-	Setting.selected_difficulty = (Setting.selected_difficulty + 1) % 3
-	_refresh_all()
-	_refresh_start_button()
+	if not setting_open:
+		Setting.selected_difficulty = (Setting.selected_difficulty + 1) % 3
+		_refresh_all()
+		_refresh_start_button()
 
 func _on_game_start():
-	if not startButton.disabled:
-		var meta = _get_metadata(0)
-		Setting.selected_chart_dir = CHARTS_DIR + "/" + meta.name
-		get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
+	if not setting_open:
+		if not startButton.disabled:
+			var meta = _get_metadata(0)
+			Setting.selected_chart_dir = CHARTS_DIR + "/" + meta.name
+			get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
+	else:
+		close_setting()
+		
 		
 func _can_start() -> bool:
 	var meta = _get_metadata(0)
@@ -139,3 +160,19 @@ func _can_start() -> bool:
 
 func _refresh_start_button():
 	startButton.disabled = not _can_start()
+	
+func _on_enter_setting():
+	settingButton.disabled = true
+	startButton.disabled = true
+	Setting.load()
+	settingRect._initialize()
+	settingRect.visible = true
+	setting_open = true
+
+func close_setting():
+	settingRect.visible = false
+	Setting.save()
+	setting_open = false
+	settingHolder.refresh()
+	settingButton.disabled = false
+	startButton.disabled = false

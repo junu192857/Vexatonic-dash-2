@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b2otcnfrfthpg"]
 
 [ext_resource type="Script" uid="uid://c5hopjpuog4j4" path="res://Scripts/SelectSong/SelectManager.gd" id="1_03mcv"]
+[ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_mdyll"]
 [ext_resource type="Script" uid="uid://pgxarv2aqaf0" path="res://Scripts/SelectSong/SongHolder.gd" id="2_uvoqn"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
 [ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
@@ -13,6 +14,7 @@ middleSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/MiddleSongH
 rightSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightSongHolder")
 songDataHolder = NodePath("CanvasLayer/Control/SongDataHolder/Holder")
 settingHolder = NodePath("CanvasLayer/Control/SettingHolder")
+settingRectScene = ExtResource("2_mdyll")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1950427340]
 
@@ -464,6 +466,50 @@ theme_override_font_sizes/font_size = 44
 text = "Full Vexatonic"
 horizontal_alignment = 1
 
+[node name="SettingButton" type="Button" parent="CanvasLayer/Control" unique_id=174885694]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.8
+anchor_top = 0.029000001
+anchor_right = 0.998
+anchor_bottom = 0.12900001
+offset_left = -4.0
+offset_top = -0.3200016
+offset_right = -0.16003418
+offset_bottom = -0.3199463
+theme_override_font_sizes/font_size = 66
+text = "Settings    "
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=730083471]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.776
+anchor_top = 0.231
+anchor_right = 0.96900004
+anchor_bottom = 0.859
+offset_left = 0.015930176
+offset_top = 0.051980972
+offset_right = 0.103881836
+offset_bottom = 0.03791046
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/SettingButton/ReferenceRect" unique_id=1508790947]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.5700073
+offset_right = 0.6800537
+offset_bottom = -0.49224854
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "F10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="StartButton" type="Button" parent="CanvasLayer/Control" unique_id=330670203]
 layout_mode = 1
 anchors_preset = -1
@@ -471,9 +517,38 @@ anchor_left = 0.8
 anchor_top = 0.85
 anchor_right = 1.0
 anchor_bottom = 0.95
-offset_right = -0.32006836
 theme_override_font_sizes/font_size = 66
 text = "Start!!!     "
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/StartButton" unique_id=1333744545]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.703
+anchor_top = 0.252
+anchor_right = 0.924
+anchor_bottom = 0.81500006
+offset_left = 0.047943115
+offset_top = -0.025997162
+offset_right = 0.18392944
+offset_bottom = -0.020004272
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/StartButton/ReferenceRect" unique_id=1953882938]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.5700073
+offset_right = 0.6800537
+offset_bottom = -0.49224854
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Enter"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SettingHolder" type="TextureRect" parent="CanvasLayer/Control" unique_id=350180774]
 layout_mode = 1
@@ -621,3 +696,5 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Tab"
 horizontal_alignment = 1
+
+[connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
