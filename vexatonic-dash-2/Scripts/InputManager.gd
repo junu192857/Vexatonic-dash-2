@@ -13,6 +13,7 @@ signal pressed_delete
 signal pressed_f
 signal toggled_shift(pressed: bool)
 signal pressed_f10
+signal toggled_c(pressed: bool)
 
 # Note / movement keys (with release)
 signal pressed_a
@@ -55,7 +56,9 @@ func _input(event):
 			KEY_F:
 				if event.pressed: pressed_f.emit()
 			KEY_SHIFT:
-				toggled_shift.emit(event.pressed)
+				toggled_shift.emit("shift", event.pressed)
+			KEY_C:
+				toggled_c.emit("c", event.pressed)
 			KEY_A:
 				if event.pressed and not event.is_echo(): pressed_a.emit()
 				elif event.is_released(): released_a.emit()
@@ -76,6 +79,7 @@ func _input(event):
 				elif event.is_released(): released_l.emit()
 			KEY_F10:
 				if event.pressed: pressed_f10.emit()
+
 
 	if event is InputEventMouseButton:
 		match event.button_index:
