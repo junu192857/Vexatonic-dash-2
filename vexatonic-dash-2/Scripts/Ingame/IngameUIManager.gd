@@ -54,7 +54,7 @@ func show_result(data: Dictionary) -> void:
 
 	if data["full_paint"]:
 		var paint_label = Label.new()
-		paint_label.text = "Full Paint"
+		paint_label.text = "Perfect Paint"
 		paint_label.add_theme_font_size_override("font_size", 60)
 		paint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		paint_label.set_anchors_preset(Control.PRESET_FULL_RECT)
