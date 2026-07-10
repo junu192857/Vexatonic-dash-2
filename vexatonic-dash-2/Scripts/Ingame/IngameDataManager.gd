@@ -63,8 +63,8 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 		Setting.SCORE_DISPLAY.Increasing:
 			status_updated.emit(judgement, current_score, combo, note, fastslow)
 		Setting.SCORE_DISPLAY.Decreasing:
-			var perfect_score = pressed_note_count * score_per_note + calculate_longNote_score(total_long_length_current)
-			status_updated.emit(judgement, 1000000 - (perfect_score - current_score), combo, note, fastslow)
+			var possible_score = get_possible_max(score, pressed_long_length)
+			status_updated.emit(judgement, possible_score, combo, note, fastslow)
 	
 	if total_note_calls > 0 and pressed_note_count >= total_note_calls:
 		all_notes_cleared.emit()
@@ -82,6 +82,10 @@ func set_total_notes(noteDatas: Array[NoteData]):
 	total_note_calls = single_count + 2 * long_count
 	score_per_note = (MAX_NOTE_SCORE + MAX_LONG_BONUS) / total_note_calls if long_count == 0 else MAX_NOTE_SCORE / total_note_calls
 	
+func get_possible_max(note_score: float, pressed: float):
+	return note_score + score_per_note * (total_note_calls - pressed_note_count) + \
+		   calculate_longNote_score(total_long_length - total_long_length_current + pressed)
+
 func calculate_longNote_score(pressed: float):
 	if (total_long_length == 0): return 0
 	var ratio = pressed / total_long_length
