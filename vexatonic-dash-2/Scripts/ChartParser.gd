@@ -23,12 +23,14 @@ static func parse_metadata(chart_dir:String, metadata: LevelMetaData):
 		var line = meta_file.get_line().strip_edges()
 		if line.is_empty() or line.begins_with("#"):
 			continue
-		var parts = line.split(" ")
+		var parts = line.split(" ", true, 1)
 		match parts[0]:
 			"NAME":   metadata.name = parts[1]
 			"ARTIST": metadata.artist = parts[1]
 			"MUSIC":  metadata.music_path = parts[1]
-			"LEVEL":  metadata.difficulty = [int(parts[1]), int(parts[2]), int(parts[3])]
+			"LEVEL":  
+				parts = line.split(" ")
+				metadata.difficulty = [int(parts[1]), int(parts[2]), int(parts[3])]
 			"LENGTH": metadata.length = int(parts[1])
 
 static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
