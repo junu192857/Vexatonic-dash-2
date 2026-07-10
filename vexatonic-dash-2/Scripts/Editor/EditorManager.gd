@@ -1289,6 +1289,11 @@ func quit_save_panel():
 	savePanel.visible = false
 	editor_ready = true
 
+func save_chart_automatically():
+	if (editor_ready):
+		print("Saved")
+		save_chart()
+
 func save_chart():
 	if (!chart_loaded):
 		if save_difficulty == -1:
