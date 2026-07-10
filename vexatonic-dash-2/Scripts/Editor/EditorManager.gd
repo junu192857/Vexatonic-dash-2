@@ -1290,7 +1290,7 @@ func quit_save_panel():
 	editor_ready = true
 
 func save_chart_automatically():
-	if (editor_ready):
+	if (editor_ready and chart_loaded):
 		print("Saved")
 		save_chart()
 
