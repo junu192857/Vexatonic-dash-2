@@ -80,14 +80,15 @@ func set_total_notes(noteDatas: Array[NoteData]):
 		push_error("Note count do not match")
 	
 	total_note_calls = single_count + 2 * long_count
-	score_per_note = MAX_NOTE_SCORE / total_note_calls
+	score_per_note = (MAX_NOTE_SCORE + MAX_LONG_BONUS) / total_note_calls if long_count == 0 else MAX_NOTE_SCORE / total_note_calls
 	
 func calculate_longNote_score(pressed: float):
+	if (total_long_length == 0): return 0
 	var ratio = pressed / total_long_length
 	if (ratio < 0.9):
-		return ratio * 5000
+		return ratio * 0.5 * MAX_LONG_BONUS
 	else:
-		return 4500 + (ratio - 0.9) * 55000
+		return 0.45 * MAX_LONG_BONUS + (ratio - 0.9) * 5.5 * MAX_LONG_BONUS
 	
 func _get_rank(final_score_int: int) -> Rank:
 	if final_score_int >= 1000000:	return Rank.V
