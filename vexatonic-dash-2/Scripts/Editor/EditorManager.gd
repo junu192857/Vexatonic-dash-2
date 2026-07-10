@@ -482,7 +482,7 @@ func generate_preview(selected: int) -> Node2D:
 			if pressing_keys["shift"]:
 				y = lane_start_pos.y
 			elif pressing_keys["c"]:
-				y =  get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
+				y = get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
 			else: 
 				y = mouse_pos.y
 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, y))
