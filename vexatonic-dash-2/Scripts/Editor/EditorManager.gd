@@ -123,7 +123,6 @@ func _on_right_toggled(pressed: bool):
 func _on_mouse_moved(position: Vector2):
 	if dragging:
 		var delta = position - drag_start
-		print(position, drag_start, delta)
 		if !editor_ready or modifying_trigger:
 			return
 		camera.position -= delta
