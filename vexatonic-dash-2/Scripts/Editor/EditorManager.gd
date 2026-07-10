@@ -1305,20 +1305,22 @@ func save_chart():
 			return
 		
 		var dir_path = "res://Charts/" + folder_name
+		var dir_exists = DirAccess.dir_exists_absolute(dir_path)
 		DirAccess.make_dir_recursive_absolute(dir_path)
 		
-		# METADATA.txt 저장
-		var meta_file = FileAccess.open(dir_path + "/METADATA.txt", FileAccess.WRITE)
-		if meta_file == null:
-			push_error("ERROR: METADATA.txt를 열 수 없습니다.")
-			return
-		meta_file.store_line("NAME " + folder_name)
-		meta_file.store_line("MUSIC " + levelData.metadata.music_path)
-		meta_file.store_line("LEVEL 1 2 3")
-		meta_file.store_line("LENGTH %d" % levelData.metadata.length)
-	
-		# 음악 파일 저장
-		DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
+		if not dir_exists:
+			# METADATA.txt 저장
+			var meta_file = FileAccess.open(dir_path + "/METADATA.txt", FileAccess.WRITE)
+			if meta_file == null:
+				push_error("ERROR: METADATA.txt를 열 수 없습니다.")
+				return
+			meta_file.store_line("NAME " + folder_name)
+			meta_file.store_line("MUSIC " + levelData.metadata.music_path)
+			meta_file.store_line("LEVEL 1 2 3")
+			meta_file.store_line("LENGTH %d" % levelData.metadata.length)
+
+			# 음악 파일 저장
+			DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
 		
 		var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
 		chart_path = dir_path + "/" + difficulty_name + ".txt"
