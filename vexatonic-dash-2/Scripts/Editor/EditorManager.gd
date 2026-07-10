@@ -27,14 +27,14 @@ var editor_ready = false
 func _ready():
 	InputManager.mouse_left_pressed.connect(_on_put_note)
 	InputManager.mouse_right_toggled.connect(_on_right_toggled)
-	InputManager.mouse_scrolled_up.connect(func(): _on_zoom_camera(true))
-	InputManager.mouse_scrolled_down.connect(func(): _on_zoom_camera(false))
+	InputManager.mouse_scrolled_up.connect(func(): if editor_ready: _on_zoom_camera(true))
+	InputManager.mouse_scrolled_down.connect(func(): if editor_ready: _on_zoom_camera(false))
 	InputManager.mouse_moved.connect(_on_mouse_moved)
 	InputManager.pressed_delete.connect(_on_delete_something)
 	InputManager.toggled_shift.connect(_on_toggle_shifting)
 	InputManager.pressed_f.connect(_on_move_to_last_note)
-	InputManager.pressed_a.connect(func(): _on_move_horizontally(true))
-	InputManager.pressed_d.connect(func(): _on_move_horizontally(false))
+	InputManager.pressed_a.connect(func(): if editor_ready: _on_move_horizontally(true))
+	InputManager.pressed_d.connect(func(): if editor_ready: _on_move_horizontally(false))
 	noteSelectorPanel.visible = false
 	settingPanel.visible = false
 	
@@ -1289,31 +1289,38 @@ func quit_save_panel():
 	savePanel.visible = false
 	editor_ready = true
 
+func save_chart_automatically():
+	if (editor_ready and chart_loaded):
+		print("Saved")
+		save_chart()
+
 func save_chart():
 	if (!chart_loaded):
 		if save_difficulty == -1:
-			savePanel.get_node("WarningLabel").text = "WARNING: Please set difficulty"
+			savePanel.get_node("OnlyForNewSave/WarningLabel").text = "WARNING: Please set difficulty"
 			return
 		var folder_name = savePanel.get_node("OnlyForNewSave/LineEdit").text
 		if folder_name.is_empty():
-			savePanel.get_node("WarningLabel").text = "WARNING: Please set level name"
+			savePanel.get_node("OnlyForNewSave/WarningLabel").text = "WARNING: Please set level name"
 			return
 		
 		var dir_path = "res://Charts/" + folder_name
+		var dir_exists = DirAccess.dir_exists_absolute(dir_path)
 		DirAccess.make_dir_recursive_absolute(dir_path)
 		
-		# METADATA.txt 저장
-		var meta_file = FileAccess.open(dir_path + "/METADATA.txt", FileAccess.WRITE)
-		if meta_file == null:
-			push_error("ERROR: METADATA.txt를 열 수 없습니다.")
-			return
-		meta_file.store_line("NAME " + folder_name)
-		meta_file.store_line("MUSIC " + levelData.metadata.music_path)
-		meta_file.store_line("LEVEL 1 2 3")
-		meta_file.store_line("LENGTH %d" % levelData.metadata.length)
-	
-		# 음악 파일 저장
-		DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
+		if not dir_exists:
+			# METADATA.txt 저장
+			var meta_file = FileAccess.open(dir_path + "/METADATA.txt", FileAccess.WRITE)
+			if meta_file == null:
+				push_error("ERROR: METADATA.txt를 열 수 없습니다.")
+				return
+			meta_file.store_line("NAME " + folder_name)
+			meta_file.store_line("MUSIC " + levelData.metadata.music_path)
+			meta_file.store_line("LEVEL 1 2 3")
+			meta_file.store_line("LENGTH %d" % levelData.metadata.length)
+
+			# 음악 파일 저장
+			DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
 		
 		var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
 		chart_path = dir_path + "/" + difficulty_name + ".txt"
