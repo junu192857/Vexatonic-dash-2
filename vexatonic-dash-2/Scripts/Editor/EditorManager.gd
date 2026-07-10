@@ -22,6 +22,8 @@ var sorted_bpm: Array
 @onready var modifyPanel = $CanvasLayer/ModifyTriggerPanel
 @onready var ingameStatusHolder = $CanvasLayer/IngameStatusHolder
 
+var pressing_keys: Dictionary[String, bool] = {"shift": false, "c": false}
+
 var editor_ready = false
 #Editor에서 Setting.speed는 1인 것으로 가정
 func _ready():
@@ -31,7 +33,8 @@ func _ready():
 	InputManager.mouse_scrolled_down.connect(func(): if editor_ready: _on_zoom_camera(false))
 	InputManager.mouse_moved.connect(_on_mouse_moved)
 	InputManager.pressed_delete.connect(_on_delete_something)
-	InputManager.toggled_shift.connect(_on_toggle_shifting)
+	InputManager.toggled_shift.connect(_on_toggle_something)
+	InputManager.toggled_c.connect(_on_toggle_something)
 	InputManager.pressed_f.connect(_on_move_to_last_note)
 	InputManager.pressed_a.connect(func(): if editor_ready: _on_move_horizontally(true))
 	InputManager.pressed_d.connect(func(): if editor_ready: _on_move_horizontally(false))
@@ -123,7 +126,6 @@ func _on_right_toggled(pressed: bool):
 func _on_mouse_moved(position: Vector2):
 	if dragging:
 		var delta = position - drag_start
-		print(position, drag_start, delta)
 		if !editor_ready or modifying_trigger:
 			return
 		camera.position -= delta
@@ -260,7 +262,6 @@ var target_trigger: EditorTrigger
 var mouse_pos: Vector2
 var snapped_x: float
 var adjusted_y: float
-var shifting: bool
 
 var can_do_something
 var modifying_trigger: bool
@@ -351,7 +352,14 @@ func update_preview(selected: int):
 			if (lane_start_pos.x >= snapped_x):
 				cancel_put_something()
 			else:
-				preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
+				var y
+				if pressing_keys["shift"]:
+					y = lane_start_pos.y
+				elif pressing_keys["c"]:
+					y =  get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
+				else: 
+					y = mouse_pos.y
+				preview.set_data(lane_start_pos, Vector2(snapped_x, y))
 				can_do_something = true
 	elif selected in trigger:
 		if (current_state == EditorState.Ready):
@@ -470,7 +478,14 @@ func generate_preview(selected: int) -> Node2D:
 			my_preview = CONNECTOR_SCENE.instantiate()
 			#lane_start_pos와 현재 mouse_pos로 lane 찍기
 			add_child(my_preview)
-			my_preview.set_data(lane_start_pos, Vector2(snapped_x, lane_start_pos.y if shifting else mouse_pos.y))
+			var y
+			if pressing_keys["shift"]:
+				y = lane_start_pos.y
+			elif pressing_keys["c"]:
+				y = get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
+			else: 
+				y = mouse_pos.y
+			my_preview.set_data(lane_start_pos, Vector2(snapped_x, y))
 			my_preview.position = lane_start_pos
 	elif selected in trigger:
 		if (current_state == EditorState.Ready):
@@ -591,13 +606,15 @@ func generate_modify_preview():
 				#var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
 				var prev_x = Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x) if previous_connector else -INF
 				var next_x = Setting.get_posx_from_time(next_connector.end_keyframe.kf.x) if next_connector else INF
-				if not shifting:
-					adjusted_y = mouse_pos.y
-				else:
+				if pressing_keys["shift"]:
 					if previous_connector:
 						adjusted_y = previous_connector.start_keyframe.kf.y
 					elif next_connector:
 						adjusted_y = next_connector.end_keyframe.kf.y
+				elif pressing_keys["c"]:
+					adjusted_y = get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
+				else:
+					adjusted_y = mouse_pos.y
 				var new_keyframe = Keyframe.new(Setting.get_time_from_posx(snapped_x), adjusted_y)
 				new_keyframe.set_lane(target_lane.lane_index)
 				if snapped_x > prev_x + Setting.EPSILON and snapped_x < next_x - Setting.EPSILON:
@@ -646,7 +663,7 @@ func generate_modify_preview():
 					cancel_modify_trigger()
 					return
 				else:
-					if (target_trigger.type == Trigger.TYPE.BPM or not shifting):
+					if (target_trigger.type == Trigger.TYPE.BPM or not pressing_keys["shift"]):
 						target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
 						target_trigger.show_data()
 					else:
@@ -1674,12 +1691,12 @@ func move_only_parent(parent: Node2D, pos: Vector2):
 	for i in range(fixed_children.size()):
 		fixed_children[i].global_position = saved_positions[i]
 
-func _on_toggle_shifting(pressed: bool):
-	shifting = pressed
+func _on_toggle_something(key: String, pressed: bool):
+	pressing_keys[key] = pressed
 	if (!editor_ready or modifying_trigger):
 		return
 	_on_move_preview()
-	
+
 func _on_move_to_last_note():
 	if (!editor_ready or modifying_trigger):
 		return
