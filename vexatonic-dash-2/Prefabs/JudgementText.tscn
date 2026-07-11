@@ -5,7 +5,7 @@
 [sub_resource type="LabelSettings" id="LabelSettings_t54d0"]
 line_spacing = 0.0
 font_size = 25
-outline_size = 7
+outline_size = 4
 outline_color = Color(0, 0, 0, 1)
 
 [node name="JudgementScene" type="Control" unique_id=1702890444]
