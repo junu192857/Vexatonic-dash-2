@@ -23,7 +23,7 @@ var wild_count: int = 0
 var miss_count: int = 0
 var _combo_lamp: ComboLamp = ComboLamp.FullVexatonic
 
-signal status_updated(judgement: int, score: float, combo: int, note: Note, fastslow: Note.Fastslow)
+signal status_updated(status: GameStatus)
 signal all_notes_cleared
 
 func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
@@ -52,19 +52,22 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 			return
 	
 	pressed_note_count += 1
+	print("Combo lamp: %d" % _combo_lamp)
 	
 	if (is_long_end):
 		pressed_long_length += note.get_parent().total_pressed_time
 		total_long_length_current += note.get_data().end_time - note.get_data().time
 	
 	var current_score = score + calculate_longNote_score(pressed_long_length)
-	
+	var status
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
-			status_updated.emit(judgement, current_score, combo, note, fastslow)
+			status = GameStatus.new(judgement, current_score, combo, note, fastslow, _combo_lamp == ComboLamp.None)
+			status_updated.emit(status)
 		Setting.SCORE_DISPLAY.Decreasing:
 			var possible_score = get_possible_max(score, pressed_long_length)
-			status_updated.emit(judgement, possible_score, combo, note, fastslow)
+			status = GameStatus.new(judgement, possible_score, combo, note, fastslow, _combo_lamp == ComboLamp.None)
+			status_updated.emit(status)
 	
 	if total_note_calls > 0 and pressed_note_count >= total_note_calls:
 		all_notes_cleared.emit()
