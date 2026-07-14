@@ -1,5 +1,4 @@
 NAME Melodiniq
-ARTIST HELLO
 MUSIC Melodiniq.mp3
 LEVEL 5 9 14
 LENGTH 180190
