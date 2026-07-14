@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
 [ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
 [ext_resource type="Script" uid="uid://c4ftuyjsig7p7" path="res://Scripts/SelectSong/SettingHolder.gd" id="5_mdyll"]
+[ext_resource type="Script" uid="uid://vu1ylxgvkxim" path="res://Scripts/SelectSong/ScrollLabel.gd" id="5_wt3iw"]
 
 [node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("leftSongHolder", "middleSongHolder", "rightSongHolder", "songDataHolder", "settingHolder")]
 script = ExtResource("1_03mcv")
@@ -139,20 +140,6 @@ offset_bottom = 0.009994507
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
 
-[node name="SongName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1889389553]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.069000006
-anchor_top = 0.133
-anchor_right = 0.551
-anchor_bottom = 0.46300003
-offset_left = 0.0079956055
-offset_top = 0.09000015
-offset_right = -0.16799927
-offset_bottom = -0.010009766
-theme_override_font_sizes/font_size = 57
-text = "SongName"
-
 [node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1107589057]
 layout_mode = 1
 anchors_preset = -1
@@ -183,6 +170,34 @@ theme_override_font_sizes/font_size = 56
 text = "Level"
 horizontal_alignment = 1
 
+[node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1058927506]
+custom_minimum_size = Vector2(400, 80)
+custom_maximum_size = Vector2(400, 80)
+layout_mode = 1
+anchor_left = 0.057000004
+anchor_top = 0.163
+anchor_right = 0.578
+anchor_bottom = 0.45900002
+offset_left = 0.22399902
+offset_top = -0.010002136
+offset_right = 0.0960083
+offset_bottom = 0.069992065
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_wt3iw")
+
+[node name="Label1" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder/SongName" unique_id=1426737880]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 57
+
+[node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder/SongName" unique_id=85162456]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 57
+
 [node name="MiddleSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1490555348]
 layout_mode = 1
 anchors_preset = -1
@@ -206,20 +221,6 @@ offset_right = -0.12802124
 offset_bottom = 0.009994507
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
-
-[node name="SongName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=1056657985]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.069000006
-anchor_top = 0.133
-anchor_right = 0.551
-anchor_bottom = 0.46300003
-offset_left = 0.0079956055
-offset_top = 0.09000015
-offset_right = -0.16799927
-offset_bottom = -0.010009766
-theme_override_font_sizes/font_size = 57
-text = "SongName"
 
 [node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=1214240176]
 layout_mode = 1
@@ -251,6 +252,34 @@ theme_override_font_sizes/font_size = 56
 text = "Level"
 horizontal_alignment = 1
 
+[node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=1039738498]
+custom_minimum_size = Vector2(400, 80)
+custom_maximum_size = Vector2(400, 80)
+layout_mode = 1
+anchor_left = 0.057000004
+anchor_top = 0.163
+anchor_right = 0.578
+anchor_bottom = 0.45900002
+offset_left = 0.22399902
+offset_top = -0.010002136
+offset_right = 0.0960083
+offset_bottom = 0.069992065
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_wt3iw")
+
+[node name="Label1" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder/SongName" unique_id=1056657985]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 57
+
+[node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder/SongName" unique_id=587421603]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 57
+
 [node name="LeftSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1649229551]
 layout_mode = 1
 anchors_preset = -1
@@ -274,20 +303,6 @@ offset_right = -0.12802124
 offset_bottom = 0.009994507
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
-
-[node name="SongName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=819261192]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.069000006
-anchor_top = 0.133
-anchor_right = 0.551
-anchor_bottom = 0.46300003
-offset_left = 0.0079956055
-offset_top = 0.09000015
-offset_right = -0.16799927
-offset_bottom = -0.010009766
-theme_override_font_sizes/font_size = 57
-text = "SongName"
 
 [node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=38239312]
 layout_mode = 1
@@ -318,6 +333,34 @@ offset_bottom = -0.12000275
 theme_override_font_sizes/font_size = 56
 text = "Level"
 horizontal_alignment = 1
+
+[node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=1581496288]
+custom_minimum_size = Vector2(400, 80)
+custom_maximum_size = Vector2(400, 80)
+layout_mode = 1
+anchor_left = 0.057000004
+anchor_top = 0.163
+anchor_right = 0.578
+anchor_bottom = 0.45900002
+offset_left = 0.22399902
+offset_top = -0.010002136
+offset_right = 0.0960083
+offset_bottom = 0.069992065
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_wt3iw")
+
+[node name="Label1" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder/SongName" unique_id=807371016]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 57
+
+[node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder/SongName" unique_id=595855864]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 57
 
 [node name="SongDataHolder" type="Control" parent="CanvasLayer/Control" unique_id=1382802090]
 layout_mode = 1
