@@ -30,7 +30,7 @@ func _ready() -> void:
 	InputManager.pressed_left.connect(func(): if not setting_open: settingHolder.change_value(false))
 	InputManager.pressed_right.connect(func(): if not setting_open: settingHolder.change_value(true))
 	InputManager.pressed_f10.connect(_on_enter_setting)
-	
+	InputManager.pressed_esc.connect(_on_return_to_main)
 	
 	settingRect = settingRectScene.instantiate()
 	$CanvasLayer/Control.add_child(settingRect)
@@ -49,20 +49,18 @@ func _ready() -> void:
 	_refresh_start_button()
 
 func _scan_charts():
-	var dir = DirAccess.open(CHARTS_DIR)
-	if dir == null:
-		push_error("Cannot open Charts directory")
+	var index_file = FileAccess.open(CHARTS_DIR + "/index.txt", FileAccess.READ)
+	if index_file == null:
+		push_error("Cannot open Charts/index.txt")
 		return
-	dir.list_dir_begin()
-	var folder = dir.get_next()
-	while folder != "":
-		if dir.current_is_dir():
-			var metadata = LevelMetaData.new()
-			ChartParser.parse_metadata(CHARTS_DIR + "/" + folder, metadata)
-			if metadata.name != "":
-				song_list.append(metadata)
-		folder = dir.get_next()
-	dir.list_dir_end()
+	while not index_file.eof_reached():
+		var folder = index_file.get_line().strip_edges()
+		if folder.is_empty():
+			continue
+		var metadata = LevelMetaData.new()
+		ChartParser.parse_metadata(CHARTS_DIR + "/" + folder, metadata)
+		if metadata.name != "":
+			song_list.append(metadata)
 
 func _get_metadata(offset: int) -> LevelMetaData:
 	var size = song_list.size()
@@ -176,3 +174,6 @@ func close_setting():
 	settingHolder.refresh()
 	settingButton.disabled = false
 	startButton.disabled = false
+	
+func _on_return_to_main():
+	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")

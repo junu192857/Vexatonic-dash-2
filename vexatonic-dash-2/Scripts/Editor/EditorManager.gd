@@ -1338,7 +1338,13 @@ func save_chart():
 
 			# 음악 파일 저장
 			DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
-		
+			
+			# index.txt에 새 폴더 등록
+			var index_file = FileAccess.open("res://Charts/index.txt", FileAccess.READ_WRITE)
+			if index_file:
+				index_file.seek_end()
+				index_file.store_line(folder_name)
+			
 		var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
 		chart_path = dir_path + "/" + difficulty_name + ".txt"
 	
