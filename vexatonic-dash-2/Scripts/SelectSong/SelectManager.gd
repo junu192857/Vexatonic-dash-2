@@ -14,7 +14,7 @@ var settingRect
 
 var setting_open: bool = false
 
-const CHARTS_DIR = "res://Charts"
+const CHARTS_DIR = "user://Charts"
 const DIFFICULTY_COLORS = [Color(0.5, 0.85, 0.3), Color(1.0, 0.55, 0.1), Color(0.6, 0.2, 0.9)]
 
 var song_list: Array[LevelMetaData] = []
@@ -37,6 +37,7 @@ func _ready() -> void:
 	settingRect.visible = false
 	settingRect.close_setting.connect(close_setting)
 	
+	_ensure_user_charts()
 	_scan_charts()
 	if song_list.is_empty():
 		return
@@ -48,19 +49,64 @@ func _ready() -> void:
 	_refresh_all()
 	_refresh_start_button()
 
-func _scan_charts():
-	var index_file = FileAccess.open(CHARTS_DIR + "/index.txt", FileAccess.READ)
-	if index_file == null:
-		push_error("Cannot open Charts/index.txt")
+func _ensure_user_charts():
+	# user://Charts가 이미 있으면 건너뜀
+	if DirAccess.open("user://Charts") != null:
 		return
+	DirAccess.make_dir_recursive_absolute("user://Charts")
+
+	# res://Charts의 폴더 목록을 index.txt로 읽기
+	var index_file = FileAccess.open("res://Charts/index.txt", FileAccess.READ)
+	if index_file == null:
+		return
+
 	while not index_file.eof_reached():
 		var folder = index_file.get_line().strip_edges()
 		if folder.is_empty():
 			continue
-		var metadata = LevelMetaData.new()
-		ChartParser.parse_metadata(CHARTS_DIR + "/" + folder, metadata)
-		if metadata.name != "":
-			song_list.append(metadata)
+
+		var src = "res://Charts/" + folder
+		var dst = "user://Charts/" + folder
+		DirAccess.make_dir_recursive_absolute(dst)
+
+		# METADATA.txt 복사
+		_copy_file(src + "/METADATA.txt", dst + "/METADATA.txt")
+
+		# 난이도 파일 복사
+		for diff in Setting.DIFFICULTY_NAMES:
+			var fname = diff + ".txt"
+			if FileAccess.file_exists(src + "/" + fname):
+				_copy_file(src + "/" + fname, dst + "/" + fname)
+
+		# 음악 파일 복사 (METADATA에서 경로 읽기)
+		var meta = LevelMetaData.new()
+		ChartParser.parse_metadata(dst, meta)
+		if meta.music_path != "":
+			_copy_file(src + "/" + meta.music_path, dst + "/" + meta.music_path)
+
+func _copy_file(src: String, dst: String):
+	var data = FileAccess.get_file_as_bytes(src)
+	if data.size() == 0:
+		return
+	var f = FileAccess.open(dst, FileAccess.WRITE)
+	if f:
+		f.store_buffer(data)
+
+func _scan_charts():
+	var dir = DirAccess.open(CHARTS_DIR)
+	if dir == null:
+		push_error("Cannot open Charts directory")
+		return
+	dir.list_dir_begin()
+	var folder = dir.get_next()
+	while folder != "":
+		if dir.current_is_dir():
+			var metadata = LevelMetaData.new()
+			ChartParser.parse_metadata(CHARTS_DIR + "/" + folder, metadata)
+			if metadata.name != "":
+				song_list.append(metadata)
+		folder = dir.get_next()
+	dir.list_dir_end()
 
 func _get_metadata(offset: int) -> LevelMetaData:
 	var size = song_list.size()

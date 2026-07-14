@@ -1321,7 +1321,7 @@ func save_chart():
 			savePanel.get_node("OnlyForNewSave/WarningLabel").text = "WARNING: Please set level name"
 			return
 		
-		var dir_path = "res://Charts/" + folder_name
+		var dir_path = "user://Charts/" + folder_name
 		var dir_exists = DirAccess.dir_exists_absolute(dir_path)
 		DirAccess.make_dir_recursive_absolute(dir_path)
 		
@@ -1338,12 +1338,7 @@ func save_chart():
 
 			# 음악 파일 저장
 			DirAccess.copy_absolute(music_path, dir_path + "/" + levelData.metadata.music_path)
-			
-			# index.txt에 새 폴더 등록
-			var index_file = FileAccess.open("res://Charts/index.txt", FileAccess.READ_WRITE)
-			if index_file:
-				index_file.seek_end()
-				index_file.store_line(folder_name)
+		
 			
 		var difficulty_name = Setting.DIFFICULTY_NAMES[save_difficulty]
 		chart_path = dir_path + "/" + difficulty_name + ".txt"
