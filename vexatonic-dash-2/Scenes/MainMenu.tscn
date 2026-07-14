@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://dhh0rmb85vmni"]
 
-[ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_jyp5g"]
-[ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="2_lexm1"]
-[ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="3_304aa"]
+[ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_8saeu"]
+[ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_ghw46"]
+[ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="3_df05h"]
 
-[node name="MainManu" type="Node2D" unique_id=1665967289]
-script = ExtResource("1_jyp5g")
-settingRectScene = ExtResource("3_304aa")
+[node name="MainMenu" type="Node2D" unique_id=1665967289]
+script = ExtResource("1_8saeu")
+settingRectScene = ExtResource("2_ghw46")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013899153]
 
@@ -27,7 +27,7 @@ anchor_right = 0.65
 anchor_bottom = 0.661
 theme_override_font_sizes/font_size = 38
 text = "Game Start"
-script = ExtResource("2_lexm1")
+script = ExtResource("3_df05h")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameStartButton" unique_id=1443724895]
 layout_mode = 1
@@ -54,7 +54,7 @@ offset_right = 0.43981934
 offset_bottom = 0.39996338
 theme_override_font_sizes/font_size = 38
 text = "Game End"
-script = ExtResource("2_lexm1")
+script = ExtResource("3_df05h")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameEndButton" unique_id=1731334888]
 visible = false
@@ -81,7 +81,7 @@ offset_right = -0.16015625
 offset_bottom = -0.32006836
 theme_override_font_sizes/font_size = 38
 text = "Setting"
-script = ExtResource("2_lexm1")
+script = ExtResource("3_df05h")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=1490791374]
 visible = false
