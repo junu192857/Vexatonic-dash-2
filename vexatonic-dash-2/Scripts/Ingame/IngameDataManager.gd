@@ -23,7 +23,7 @@ var wild_count: int = 0
 var miss_count: int = 0
 var _combo_lamp: ComboLamp = ComboLamp.FullVexatonic
 
-signal status_updated(judgement: int, score: float, combo: int, note: Note, fastslow: Note.Fastslow)
+signal status_updated(status: GameStatus)
 signal all_notes_cleared
 
 func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
@@ -52,19 +52,22 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 			return
 	
 	pressed_note_count += 1
+	print("Combo lamp: %d" % _combo_lamp)
 	
 	if (is_long_end):
 		pressed_long_length += note.get_parent().total_pressed_time
 		total_long_length_current += note.get_data().end_time - note.get_data().time
 	
 	var current_score = score + calculate_longNote_score(pressed_long_length)
-	
+	var status
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
-			status_updated.emit(judgement, current_score, combo, note, fastslow)
+			status = GameStatus.new(judgement, current_score, combo, note, fastslow, _combo_lamp == ComboLamp.None)
+			status_updated.emit(status)
 		Setting.SCORE_DISPLAY.Decreasing:
-			var perfect_score = pressed_note_count * score_per_note + calculate_longNote_score(total_long_length_current)
-			status_updated.emit(judgement, 1000000 - (perfect_score - current_score), combo, note, fastslow)
+			var possible_score = get_possible_max(score, pressed_long_length)
+			status = GameStatus.new(judgement, possible_score, combo, note, fastslow, _combo_lamp == ComboLamp.None)
+			status_updated.emit(status)
 	
 	if total_note_calls > 0 and pressed_note_count >= total_note_calls:
 		all_notes_cleared.emit()
@@ -80,14 +83,19 @@ func set_total_notes(noteDatas: Array[NoteData]):
 		push_error("Note count do not match")
 	
 	total_note_calls = single_count + 2 * long_count
-	score_per_note = MAX_NOTE_SCORE / total_note_calls
+	score_per_note = (MAX_NOTE_SCORE + MAX_LONG_BONUS) / total_note_calls if long_count == 0 else MAX_NOTE_SCORE / total_note_calls
 	
+func get_possible_max(note_score: float, pressed: float):
+	return note_score + score_per_note * (total_note_calls - pressed_note_count) + \
+		   calculate_longNote_score(total_long_length - total_long_length_current + pressed)
+
 func calculate_longNote_score(pressed: float):
+	if (total_long_length == 0): return 0
 	var ratio = pressed / total_long_length
 	if (ratio < 0.9):
-		return ratio * 5000
+		return ratio * 0.5 * MAX_LONG_BONUS
 	else:
-		return 4500 + (ratio - 0.9) * 55000
+		return 0.45 * MAX_LONG_BONUS + (ratio - 0.9) * 5.5 * MAX_LONG_BONUS
 	
 func _get_rank(final_score_int: int) -> Rank:
 	if final_score_int >= 1000000:	return Rank.V

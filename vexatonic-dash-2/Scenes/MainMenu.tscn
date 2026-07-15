@@ -1,0 +1,132 @@
+[gd_scene format=3 uid="uid://dhh0rmb85vmni"]
+
+[ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_8saeu"]
+[ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_ghw46"]
+[ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="3_df05h"]
+
+[node name="MainMenu" type="Node2D" unique_id=1665967289]
+script = ExtResource("1_8saeu")
+settingRectScene = ExtResource("2_ghw46")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013899153]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=2129972978]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameStartButton" type="Button" parent="CanvasLayer/Control" unique_id=1664065325]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.586
+anchor_right = 0.65
+anchor_bottom = 0.661
+theme_override_font_sizes/font_size = 38
+text = "Game Start"
+script = ExtResource("3_df05h")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameStartButton" unique_id=1443724895]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(1, 1, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="GameEndButton" type="Button" parent="CanvasLayer/Control" unique_id=1244450197]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.82000005
+anchor_right = 0.65000004
+anchor_bottom = 0.89500004
+offset_left = 0.5999756
+offset_top = 0.39996338
+offset_right = 0.43981934
+offset_bottom = 0.39996338
+theme_override_font_sizes/font_size = 38
+text = "Game End"
+script = ExtResource("3_df05h")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameEndButton" unique_id=1731334888]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(1, 1, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="SettingButton" type="Button" parent="CanvasLayer/Control" unique_id=1151269989]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.70400006
+anchor_right = 0.65000004
+anchor_bottom = 0.77900004
+offset_top = -0.32006836
+offset_right = -0.16015625
+offset_bottom = -0.32006836
+theme_override_font_sizes/font_size = 38
+text = "Setting"
+script = ExtResource("3_df05h")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=1490791374]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(1, 1, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="NameLabel2" type="Label" parent="CanvasLayer/Control" unique_id=983177614]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.42900002
+anchor_top = 0.25500003
+anchor_right = 0.68200004
+anchor_bottom = 0.425
+offset_left = -0.6800537
+offset_top = -0.4000244
+offset_right = -0.44006348
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 120
+text = "Dash 2"
+horizontal_alignment = 1
+
+[node name="NameLabel1" type="Label" parent="CanvasLayer/Control" unique_id=23012843]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.119
+anchor_right = 0.68
+anchor_bottom = 0.273
+offset_left = 0.39996338
+offset_top = -0.5200043
+offset_right = -0.5999756
+offset_bottom = 0.16000366
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 120
+text = "Vexatonic"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
+[connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
+[connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]

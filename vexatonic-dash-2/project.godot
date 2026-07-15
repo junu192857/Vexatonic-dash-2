@@ -11,6 +11,8 @@ config_version=5
 [application]
 
 config/name="Vexatonic Dash 2"
+config/description="Vexatonic Dash Initial Demo Version"
+config/version="1.0.0"
 run/main_scene="uid://dhh0rmb85vmni"
 config/features=PackedStringArray("4.7", "Mobile")
 run/low_processor_mode=true
@@ -29,6 +31,8 @@ settings/gdscript/always_track_call_stacks=true
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/size/mode=3
+window/size/resizable=false
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep_width"
 
