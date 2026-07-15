@@ -11,7 +11,6 @@ func _ready():
 	button_array.append($CanvasLayer/Control/GameStartButton)
 	button_array.append($CanvasLayer/Control/SettingButton)
 	button_array.append($CanvasLayer/Control/GameEndButton)
-
 	index = 0
 	_refresh_selection()
 	InputManager.pressed_up.connect(_on_pressed_up)
