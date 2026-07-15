@@ -60,10 +60,6 @@ grow_vertical = 2
 [node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=1761425525]
 visible = false
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.781
-anchor_right = 1.0
-anchor_bottom = 1.0
 color = Color(0.47788018, 0.47788012, 0.47788012, 1)
 
 [node name="LeftCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=439301575]
@@ -82,7 +78,6 @@ anchor_top = 0.1
 anchor_right = 0.18
 anchor_bottom = 0.15
 offset_right = 0.3199768
-grow_horizontal = 0
 
 [node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
 layout_mode = 1
