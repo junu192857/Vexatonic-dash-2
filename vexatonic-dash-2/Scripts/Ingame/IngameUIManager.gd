@@ -3,6 +3,7 @@ extends Node
 @export var JUDGEMENT_TEXT: PackedScene
 @export var score_text: Label
 @export var canvasLayer: CanvasLayer
+@export var lampTextHolder: Control
 
 
 func _ready():
@@ -101,6 +102,15 @@ func show_result(data: Dictionary) -> void:
 	canvasLayer.add_child(hint)
 
 	InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT)
+
+func show_result_2(data: Dictionary) -> void:
+	var lamp = data["combo_lamp"]
+	start_clear_animation(lamp)
+#FV, FC, Game Clear 문구를 띄움
+func start_clear_animation(lamp: int):
+	var target_text = lampTextHolder.get_child(lamp)
+	if target_text:
+		target_text.visible = true
 
 func _on_result_confirm():
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
