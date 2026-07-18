@@ -5,7 +5,6 @@ extends Node
 @export var canvasLayer: CanvasLayer
 @export var lampTextHolder: Control
 
-var tween
 func _ready():
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
@@ -13,13 +12,14 @@ func _ready():
 		Setting.SCORE_DISPLAY.Decreasing:
 			score_text.text = "SCORE %07d" % 1000000
 	lampTextHolder.get_node("PerfectPaintText").modulate.a = 0
-	for text in lampTextHolder.get_children():
-		text.modulate.a = 0.0
-		text.visible = true
+	for i in range(3):
+		lampTextHolder.get_child(i).modulate.a = 0.0
+		lampTextHolder.get_child(i).visible = true
 	await get_tree().process_frame
-	for text in lampTextHolder.get_children():
-		text.visible = false	
-		text.modulate.a = 1.0
+	for i in range(3):
+		lampTextHolder.get_child(i).visible = false
+		lampTextHolder.get_child(i).modulate.a = 1.0
+
 
 
 func _on_status_update(status: GameStatus) -> void:
@@ -113,9 +113,15 @@ func show_result(data: Dictionary) -> void:
 	InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT)
 
 func show_result_2(data: Dictionary) -> void:
+	var tween = create_tween()
 	var lamp = data["combo_lamp"]
 	var target_text = lampTextHolder.get_child(lamp)
 	target_text.visible = true
+	
+	
+	if (data["perfect_paint"]):
+		tween.tween_interval(0.7)
+		tween.tween_property(lampTextHolder.get_node("PerfectPaintText"), "modulate:a", 1.0, 1.0).from(0.0)
 	
 func _on_result_confirm():
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
