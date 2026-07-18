@@ -51,8 +51,8 @@ func _ready() -> void:
 
 func _ensure_user_charts():
 	# user://Charts가 이미 있으면 건너뜀
-	if DirAccess.open("user://Charts") != null:
-		return
+	#if DirAccess.open("user://Charts") != null:
+	#	return
 	DirAccess.make_dir_recursive_absolute("user://Charts")
 
 	# res://Charts의 폴더 목록을 index.txt로 읽기

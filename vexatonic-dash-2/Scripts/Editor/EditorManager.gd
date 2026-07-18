@@ -1321,7 +1321,7 @@ func save_chart():
 			savePanel.get_node("OnlyForNewSave/WarningLabel").text = "WARNING: Please set level name"
 			return
 		
-		var dir_path = "user://Charts/" + folder_name
+		var dir_path = "res://Charts/" + folder_name
 		var dir_exists = DirAccess.dir_exists_absolute(dir_path)
 		DirAccess.make_dir_recursive_absolute(dir_path)
 		
