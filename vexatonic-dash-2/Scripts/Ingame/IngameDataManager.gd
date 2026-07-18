@@ -148,7 +148,7 @@ func get_result_data() -> Dictionary:
 		"wild": wild_count,
 		"miss": miss_count,
 		"paint_ratio": paint_ratio,
-		"full_paint": roundi(calculate_longNote_score(pressed_long_length)) == 10000,
+		"perfect_paint": roundi(calculate_longNote_score(pressed_long_length)) == 10000,
 		"combo_lamp": _combo_lamp,
 		"rank": _get_rank(final_score),
 	}

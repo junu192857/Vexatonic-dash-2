@@ -36,11 +36,12 @@ ignore_rotation = false
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
 
-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer")]
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
-score_text = NodePath("../../CanvasLayer/Control/Panel/ScoreText")
+score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
 canvasLayer = NodePath("../../CanvasLayer")
+lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
 
 [node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
 
@@ -57,13 +58,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=1761425525]
-visible = false
+[node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=591227501]
 layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.781
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.6398926
+offset_right = 0.15979004
 color = Color(0.47788018, 0.47788012, 0.47788012, 1)
 
 [node name="LeftCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=439301575]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.21900001
@@ -71,7 +76,7 @@ anchor_bottom = 1.0
 offset_right = -0.480011
 color = Color(0.47788018, 0.47788012, 0.47788012, 1)
 
-[node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+[node name="ScorePanel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.1
@@ -79,7 +84,7 @@ anchor_right = 0.18
 anchor_bottom = 0.15
 offset_right = 0.3199768
 
-[node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
+[node name="ScoreText" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=519592229]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
@@ -89,6 +94,96 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "SCORE 0000000"
+vertical_alignment = 1
+
+[node name="LampTextHolder" type="Control" parent="CanvasLayer/Control" unique_id=442854916]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameFinishedText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=722747667]
+visible = false
+clip_contents = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.3
+anchor_right = 0.85
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0.92156863, 0.87058824, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.99999994, 0.67400795, 0.36084798, 0.3137255)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
+text = "Game Finished"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FullComboText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=749141514]
+visible = false
+clip_contents = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.3
+anchor_right = 0.85
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0, 0.9019608, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.37576506, 0.7707434, 0.99999994, 0.3137255)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
+text = "FULL COMBO!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FullVexatonicText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=536036725]
+visible = false
+clip_contents = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.3
+anchor_right = 0.85
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(1, 0.25882354, 1, 1)
+theme_override_colors/font_shadow_color = Color(1, 0.6133026, 0.83044773, 0.3137255)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
+text = "FULL VEXATONIC!!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PerfectPaintText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=1974658059]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.5
+anchor_right = 0.7
+anchor_bottom = 0.6
+offset_left = 0.15997314
+offset_top = -10.0
+offset_right = -0.4000244
+offset_bottom = 0.32000732
+theme_override_font_sizes/font_size = 80
+text = "Perfect Paint"
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]

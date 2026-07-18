@@ -3,7 +3,7 @@ extends Node
 @export var JUDGEMENT_TEXT: PackedScene
 @export var score_text: Label
 @export var canvasLayer: CanvasLayer
-
+@export var lampTextHolder: Control
 
 func _ready():
 	match Setting.score_display:
@@ -11,6 +11,16 @@ func _ready():
 			score_text.text = "SCORE %07d" % 0
 		Setting.SCORE_DISPLAY.Decreasing:
 			score_text.text = "SCORE %07d" % 1000000
+	lampTextHolder.get_node("PerfectPaintText").modulate.a = 0
+	for i in range(3):
+		lampTextHolder.get_child(i).modulate.a = 0.0
+		lampTextHolder.get_child(i).visible = true
+	await get_tree().process_frame
+	for i in range(3):
+		lampTextHolder.get_child(i).visible = false
+		lampTextHolder.get_child(i).modulate.a = 1.0
+
+
 
 func _on_status_update(status: GameStatus) -> void:
 	var rounded = roundi(status.score)
@@ -52,7 +62,7 @@ func show_result(data: Dictionary) -> void:
 	header.position = Vector2(0, vp.y * 0.05)
 	canvasLayer.add_child(header)
 
-	if data["full_paint"]:
+	if data["perfect_paint"]:
 		var paint_label = Label.new()
 		paint_label.text = "Perfect Paint"
 		paint_label.add_theme_font_size_override("font_size", 60)
@@ -102,6 +112,17 @@ func show_result(data: Dictionary) -> void:
 
 	InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT)
 
+func show_result_2(data: Dictionary) -> void:
+	var tween = create_tween()
+	var lamp = data["combo_lamp"]
+	var target_text = lampTextHolder.get_child(lamp)
+	target_text.visible = true
+	
+	
+	if (data["perfect_paint"]):
+		tween.tween_interval(0.7)
+		tween.tween_property(lampTextHolder.get_node("PerfectPaintText"), "modulate:a", 1.0, 1.0).from(0.0)
+	
 func _on_result_confirm():
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 

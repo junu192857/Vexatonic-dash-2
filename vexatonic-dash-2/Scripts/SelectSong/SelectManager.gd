@@ -51,8 +51,8 @@ func _ready() -> void:
 
 func _ensure_user_charts():
 	# user://Charts가 이미 있으면 건너뜀
-	if DirAccess.open("user://Charts") != null:
-		return
+	#if DirAccess.open("user://Charts") != null:
+	#	return
 	DirAccess.make_dir_recursive_absolute("user://Charts")
 
 	# res://Charts의 폴더 목록을 index.txt로 읽기
@@ -93,20 +93,18 @@ func _copy_file(src: String, dst: String):
 		f.store_buffer(data)
 
 func _scan_charts():
-	var dir = DirAccess.open(CHARTS_DIR)
-	if dir == null:
-		push_error("Cannot open Charts directory")
+	var index_file = FileAccess.open("res://Charts/index.txt", FileAccess.READ)
+	if index_file == null:
+		push_error("Cannot open res://Charts/index.txt")
 		return
-	dir.list_dir_begin()
-	var folder = dir.get_next()
-	while folder != "":
-		if dir.current_is_dir():
-			var metadata = LevelMetaData.new()
-			ChartParser.parse_metadata(CHARTS_DIR + "/" + folder, metadata)
-			if metadata.name != "":
-				song_list.append(metadata)
-		folder = dir.get_next()
-	dir.list_dir_end()
+	while not index_file.eof_reached():
+		var folder = index_file.get_line().strip_edges()
+		if folder.is_empty():
+			continue
+		var metadata = LevelMetaData.new()
+		ChartParser.parse_metadata(CHARTS_DIR + "/" + folder, metadata)
+		if metadata.name != "":
+			song_list.append(metadata)
 
 func _get_metadata(offset: int) -> LevelMetaData:
 	var size = song_list.size()

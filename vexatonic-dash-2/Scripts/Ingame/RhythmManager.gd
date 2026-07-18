@@ -287,7 +287,7 @@ func end_game():
 	game_finished = true
 	$IngameDataManager.on_song_end(level_path)
 	var result = $IngameDataManager.get_result_data()
-	$IngameUIManager.show_result(result)
+	$IngameUIManager.show_result_2(result)
 
 
 
