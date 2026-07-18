@@ -5,13 +5,14 @@ extends Node
 @export var canvasLayer: CanvasLayer
 @export var lampTextHolder: Control
 
-
+var tween
 func _ready():
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
 			score_text.text = "SCORE %07d" % 0
 		Setting.SCORE_DISPLAY.Decreasing:
 			score_text.text = "SCORE %07d" % 1000000
+	lampTextHolder.get_node("PerfectPaintText").modulate.a = 0
 	for text in lampTextHolder.get_children():
 		text.modulate.a = 0.0
 		text.visible = true
@@ -19,6 +20,7 @@ func _ready():
 	for text in lampTextHolder.get_children():
 		text.visible = false	
 		text.modulate.a = 1.0
+
 
 func _on_status_update(status: GameStatus) -> void:
 	var rounded = roundi(status.score)
@@ -60,7 +62,7 @@ func show_result(data: Dictionary) -> void:
 	header.position = Vector2(0, vp.y * 0.05)
 	canvasLayer.add_child(header)
 
-	if data["full_paint"]:
+	if data["perfect_paint"]:
 		var paint_label = Label.new()
 		paint_label.text = "Perfect Paint"
 		paint_label.add_theme_font_size_override("font_size", 60)
