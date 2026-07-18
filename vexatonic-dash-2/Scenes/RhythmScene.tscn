@@ -104,66 +104,84 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GameFinishedText" type="RichTextLabel" parent="CanvasLayer/Control/LampTextHolder" unique_id=1744623301]
+[node name="GameFinishedText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=722747667]
 visible = false
+clip_contents = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15
-anchor_top = 0.4
+anchor_top = 0.3
 anchor_right = 0.85
-anchor_bottom = 0.6
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/default_color = Color(1, 1, 0, 1)
-theme_override_colors/font_shadow_color = Color(1, 0.6862745, 0, 0.3137255)
-theme_override_constants/shadow_outline_size = 10
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0.92156863, 0.87058824, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.99999994, 0.67400795, 0.36084798, 0.3137255)
 theme_override_constants/shadow_offset_x = 5
 theme_override_constants/shadow_offset_y = 5
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/normal_font_size = 150
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
 text = "Game Finished"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FullComboText" type="RichTextLabel" parent="CanvasLayer/Control/LampTextHolder" unique_id=1954628472]
+[node name="FullComboText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=749141514]
 visible = false
+clip_contents = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15
-anchor_top = 0.4
+anchor_top = 0.3
 anchor_right = 0.85
-anchor_bottom = 0.6
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/default_color = Color(0, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0.8765709, 0.76547396, 0.3137255)
-theme_override_constants/shadow_outline_size = 10
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0, 0.9019608, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.37576506, 0.7707434, 0.99999994, 0.3137255)
 theme_override_constants/shadow_offset_x = 5
 theme_override_constants/shadow_offset_y = 5
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/normal_font_size = 150
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
 text = "FULL COMBO!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FullVexatonicText" type="RichTextLabel" parent="CanvasLayer/Control/LampTextHolder" unique_id=2084509170]
-visible = false
+[node name="FullVexatonicText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=536036725]
+clip_contents = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15
-anchor_top = 0.4
+anchor_top = 0.3
 anchor_right = 0.85
-anchor_bottom = 0.6
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/default_color = Color(0.92941177, 0.15294118, 0.9490196, 1)
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(1, 0.25882354, 1, 1)
 theme_override_colors/font_shadow_color = Color(1, 0.6133026, 0.83044773, 0.3137255)
-theme_override_constants/shadow_outline_size = 10
 theme_override_constants/shadow_offset_x = 5
 theme_override_constants/shadow_offset_y = 5
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/normal_font_size = 150
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
 text = "FULL VEXATONIC!!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PerfectPaintText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=1974658059]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.5
+anchor_right = 0.7
+anchor_bottom = 0.6
+offset_left = 0.15997314
+offset_top = -10.0
+offset_right = -0.4000244
+offset_bottom = 0.32000732
+theme_override_font_sizes/font_size = 80
+text = "Perfect Paint"
 horizontal_alignment = 1
 vertical_alignment = 1
 

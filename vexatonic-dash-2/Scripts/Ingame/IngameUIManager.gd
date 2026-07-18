@@ -12,6 +12,13 @@ func _ready():
 			score_text.text = "SCORE %07d" % 0
 		Setting.SCORE_DISPLAY.Decreasing:
 			score_text.text = "SCORE %07d" % 1000000
+	for text in lampTextHolder.get_children():
+		text.modulate.a = 0.0
+		text.visible = true
+	await get_tree().process_frame
+	for text in lampTextHolder.get_children():
+		text.visible = false	
+		text.modulate.a = 1.0
 
 func _on_status_update(status: GameStatus) -> void:
 	var rounded = roundi(status.score)
@@ -105,13 +112,9 @@ func show_result(data: Dictionary) -> void:
 
 func show_result_2(data: Dictionary) -> void:
 	var lamp = data["combo_lamp"]
-	start_clear_animation(lamp)
-#FV, FC, Game Clear 문구를 띄움
-func start_clear_animation(lamp: int):
 	var target_text = lampTextHolder.get_child(lamp)
-	if target_text:
-		target_text.visible = true
-
+	target_text.visible = true
+	
 func _on_result_confirm():
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 
