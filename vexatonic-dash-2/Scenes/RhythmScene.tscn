@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/Ingame/IngameDataManager.gd" id="7_wjq5j"]
 [ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/Ingame/IngameUIManager.gd" id="8_pee8w"]
 [ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+[ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_ublex"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
 metadata/_edit_vertical_guides_ = [-111.0]
@@ -36,12 +37,13 @@ ignore_rotation = false
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
 
-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder")]
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
 score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
 canvasLayer = NodePath("../../CanvasLayer")
 lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
+resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
 
 [node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
 
@@ -185,5 +187,176 @@ theme_override_font_sizes/font_size = 80
 text = "Perfect Paint"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ResultPanelHolder" type="ColorRect" parent="CanvasLayer/Control" unique_id=2075620177]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.30980393, 0.30980393, 0.30980393, 0.54901963)
+
+[node name="ResultPanel" type="TextureRect" parent="CanvasLayer/Control/ResultPanelHolder" unique_id=1555465587]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.85
+texture = ExtResource("12_ublex")
+
+[node name="VexatonicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1630803552]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.46600002
+anchor_right = 0.27800003
+anchor_bottom = 0.546
+offset_top = 32.231995
+offset_right = 0.5039673
+offset_bottom = 32.231995
+theme_override_font_sizes/font_size = 36
+text = "Vexatonic"
+
+[node name="SparklicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1531845158]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.59800005
+anchor_right = 0.27800003
+anchor_bottom = 0.67800003
+offset_top = 0.2659912
+offset_right = 0.5039673
+offset_bottom = 0.2659607
+theme_override_font_sizes/font_size = 36
+text = "Sparklic"
+
+[node name="WildLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1998486912]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.68600005
+anchor_right = 0.27800003
+anchor_bottom = 0.76600003
+offset_top = -0.16400146
+offset_right = 0.5039673
+offset_bottom = -0.16400146
+theme_override_font_sizes/font_size = 36
+text = "Wild"
+
+[node name="MissLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=616339394]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.772
+anchor_right = 0.27800003
+anchor_bottom = 0.85200006
+offset_top = 0.10797119
+offset_right = 0.5039673
+offset_bottom = 0.10797119
+theme_override_font_sizes/font_size = 36
+text = "Miss"
+
+[node name="ScoreLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1297994137]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13
+anchor_top = 0.15
+anchor_right = 0.25
+anchor_bottom = 0.23
+offset_left = -0.4560089
+offset_top = 0.20799255
+offset_right = -0.25604248
+theme_override_font_sizes/font_size = 36
+text = "Score_"
+
+[node name="ScoreText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=295211680]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.23
+anchor_right = 0.47
+anchor_bottom = 0.39400002
+offset_left = 0.39198303
+offset_top = 0.31199646
+offset_right = 0.49597168
+offset_bottom = 0.18399048
+theme_override_font_sizes/font_size = 84
+text = "1,000,000"
+
+[node name="PaintText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1326012696]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.40100002
+anchor_right = 0.34500003
+anchor_bottom = 0.47200003
+offset_left = -0.45602417
+offset_top = 0.0059814453
+offset_right = 0.55999756
+offset_bottom = 0.16397095
+theme_override_font_sizes/font_size = 36
+text = "Paint 100.0%"
+
+[node name="VexatonicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=373429698]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.512
+anchor_right = 0.45900002
+anchor_bottom = 0.592
+offset_left = -0.5120239
+offset_top = -0.05999756
+offset_right = -0.0079956055
+offset_bottom = -0.060028076
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
+
+[node name="SparklicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1365964631]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.59800005
+anchor_right = 0.45900002
+anchor_bottom = 0.67800003
+offset_left = -0.5120239
+offset_top = 0.2659912
+offset_right = -0.0079956055
+offset_bottom = 0.2659607
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
+
+[node name="WildText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=26379827]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.68600005
+anchor_right = 0.45900002
+anchor_bottom = 0.76600003
+offset_left = -0.5120239
+offset_top = -0.16400146
+offset_right = -0.0079956055
+offset_bottom = -0.16400146
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
+
+[node name="MissText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1519663053]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.772
+anchor_right = 0.45900002
+anchor_bottom = 0.85200006
+offset_left = -0.5120239
+offset_top = 0.10797119
+offset_right = -0.0079956055
+offset_bottom = 0.10797119
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
