@@ -206,20 +206,28 @@ anchor_right = 0.8
 anchor_bottom = 0.85
 texture = ExtResource("12_ublex")
 
-[node name="VexatonicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1630803552]
+[node name="ConstantLabelHolder" type="Control" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1644102461]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VexatonicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1630803552]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.13000001
-anchor_top = 0.46600002
+anchor_top = 0.512
 anchor_right = 0.27800003
-anchor_bottom = 0.546
-offset_top = 32.231995
+anchor_bottom = 0.592
+offset_top = -0.05999756
 offset_right = 0.5039673
-offset_bottom = 32.231995
+offset_bottom = -0.060028076
 theme_override_font_sizes/font_size = 36
 text = "Vexatonic"
 
-[node name="SparklicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1531845158]
+[node name="SparklicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1531845158]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.13000001
@@ -232,7 +240,7 @@ offset_bottom = 0.2659607
 theme_override_font_sizes/font_size = 36
 text = "Sparklic"
 
-[node name="WildLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1998486912]
+[node name="WildLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1998486912]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.13000001
@@ -245,7 +253,7 @@ offset_bottom = -0.16400146
 theme_override_font_sizes/font_size = 36
 text = "Wild"
 
-[node name="MissLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=616339394]
+[node name="MissLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=616339394]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.13000001
@@ -258,27 +266,50 @@ offset_bottom = 0.10797119
 theme_override_font_sizes/font_size = 36
 text = "Miss"
 
-[node name="ScoreLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1297994137]
+[node name="ScoreLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1297994137]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.13
 anchor_top = 0.15
 anchor_right = 0.25
 anchor_bottom = 0.23
-offset_left = -0.4560089
+offset_left = -0.45603943
 offset_top = 0.20799255
-offset_right = -0.25604248
+offset_right = -0.256073
 theme_override_font_sizes/font_size = 36
 text = "Score_"
 
-[node name="ScoreText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=295211680]
+[node name="Button" type="Button" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=211443722]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.66
+anchor_top = 0.081
+anchor_right = 0.93900007
+anchor_bottom = 0.16700001
+offset_left = -0.32000732
+offset_top = 0.13800049
+offset_right = 0.27197266
+offset_bottom = -0.23400879
+theme_override_font_sizes/font_size = 30
+text = "Back To Main [Enter]"
+
+[node name="VariableLabelHolder" type="Control" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1882443207]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ScoreText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=295211680]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.13000001
 anchor_top = 0.23
 anchor_right = 0.47
 anchor_bottom = 0.39400002
-offset_left = 0.39198303
+offset_left = 0.39196777
 offset_top = 0.31199646
 offset_right = 0.49597168
 offset_bottom = 0.18399048
@@ -287,21 +318,21 @@ theme_override_font_sizes/font_size = 84
 text = "1,000,000"
 horizontal_alignment = 1
 
-[node name="PaintText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1326012696]
+[node name="PaintText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1326012696]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.13000001
 anchor_top = 0.40100002
 anchor_right = 0.34500003
 anchor_bottom = 0.47200003
-offset_left = -0.45602417
+offset_left = -0.4560547
 offset_top = 0.0059814453
-offset_right = 0.55999756
+offset_right = 0.55996704
 offset_bottom = 0.16397095
 theme_override_font_sizes/font_size = 36
 text = "Paint 100.0%"
 
-[node name="VexatonicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=373429698]
+[node name="VexatonicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=373429698]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.31100002
@@ -316,7 +347,7 @@ theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
 
-[node name="SparklicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1365964631]
+[node name="SparklicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1365964631]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.31100002
@@ -331,7 +362,7 @@ theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
 
-[node name="WildText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=26379827]
+[node name="WildText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=26379827]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.31100002
@@ -346,7 +377,7 @@ theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
 
-[node name="MissText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1519663053]
+[node name="MissText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1519663053]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.31100002
@@ -361,7 +392,7 @@ theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
 
-[node name="RankLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=627003622]
+[node name="RankLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=627003622]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.55600005
@@ -377,7 +408,7 @@ text = "AAA"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ComboLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=170314073]
+[node name="ComboLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=170314073]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.57500005
@@ -393,7 +424,7 @@ text = "FULL VEXATONIC"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PaintLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1465955481]
+[node name="PaintLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1465955481]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.57500005
@@ -409,19 +440,5 @@ text = "PERFECT PAINT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Button" type="Button" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=211443722]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.66
-anchor_top = 0.081
-anchor_right = 0.93900007
-anchor_bottom = 0.16700001
-offset_left = -0.32000732
-offset_top = 0.13800049
-offset_right = 0.27197266
-offset_bottom = -0.23400879
-theme_override_font_sizes/font_size = 30
-text = "Back To Main [Enter]"
-
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
-[connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]
+[connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]

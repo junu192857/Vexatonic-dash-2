@@ -6,6 +6,10 @@ extends Node
 @export var lampTextHolder: Control
 @export var resultPanelHolder: Control
 
+@onready var resultPanel = resultPanelHolder.get_node("ResultPanel")
+@onready var scoreText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/ScoreText")
+@onready var paintText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/PaintText")
+
 func _ready():
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
@@ -17,6 +21,8 @@ func _ready():
 func refresh_UI():
 	resultPanelHolder.visible = false
 	lampTextHolder.get_node("PerfectPaintText").modulate.a = 0
+	for label in resultPanelHolder.get_node("ResultPanel/VariableLabelHolder").get_children():
+		label.modulate.a = 0.0
 	for i in range(3):
 		lampTextHolder.get_child(i).modulate.a = 0.0
 		lampTextHolder.get_child(i).visible = true
