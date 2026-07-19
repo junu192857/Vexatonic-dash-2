@@ -4,6 +4,19 @@ extends Node
 @export var score_text: Label
 @export var canvasLayer: CanvasLayer
 @export var lampTextHolder: Control
+@export var resultPanelHolder: Control
+
+@onready var resultPanel = resultPanelHolder.get_node("ResultPanel")
+@onready var scoreText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/ScoreText")
+@onready var paintText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/PaintText")
+@onready var vexatonicText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/VexatonicText")
+@onready var sparklicText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/SparklicText")
+@onready var wildText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/WildText")
+@onready var missText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/MissText")
+@onready var rankLabel = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/RankLabel")
+@onready var comboLampText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/ComboLampText")
+@onready var paintLampText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/PaintLampText")
+
 
 func _ready():
 	match Setting.score_display:
@@ -11,7 +24,13 @@ func _ready():
 			score_text.text = "SCORE %07d" % 0
 		Setting.SCORE_DISPLAY.Decreasing:
 			score_text.text = "SCORE %07d" % 1000000
+	refresh_UI()
+
+func refresh_UI():
+	resultPanelHolder.visible = false
 	lampTextHolder.get_node("PerfectPaintText").modulate.a = 0
+	for label in resultPanelHolder.get_node("ResultPanel/VariableLabelHolder").get_children():
+		label.modulate.a = 0.0
 	for i in range(3):
 		lampTextHolder.get_child(i).modulate.a = 0.0
 		lampTextHolder.get_child(i).visible = true
@@ -19,7 +38,6 @@ func _ready():
 	for i in range(3):
 		lampTextHolder.get_child(i).visible = false
 		lampTextHolder.get_child(i).modulate.a = 1.0
-
 
 
 func _on_status_update(status: GameStatus) -> void:
@@ -110,7 +128,7 @@ func show_result(data: Dictionary) -> void:
 	hint.position = Vector2(0, vp.y * 0.88)
 	canvasLayer.add_child(hint)
 
-	InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT)
+	
 
 func show_result_2(data: Dictionary) -> void:
 	var tween = create_tween()
@@ -118,10 +136,85 @@ func show_result_2(data: Dictionary) -> void:
 	var target_text = lampTextHolder.get_child(lamp)
 	target_text.visible = true
 	
-	
-	if (data["perfect_paint"]):
+	if data["perfect_paint"]:
 		tween.tween_interval(0.7)
 		tween.tween_property(lampTextHolder.get_node("PerfectPaintText"), "modulate:a", 1.0, 1.0).from(0.0)
+	
+	tween.tween_interval(2.0)
+
+  # 텍스트 값 설정 (modulate.a = 0 상태이므로 보이지 않음)
+	scoreText.text = "%07d" % data["score"]
+	rankLabel.text = RANK_NAMES[data["rank"]]
+	var paint_pct: String
+	if data["perfect_paint"]:
+		paint_pct = "100.0%"
+	else:
+		paint_pct = "%.1f%%" % (floor(data["paint_ratio"] * 1000.0) / 10.0)
+	paintText.text = "Paint  %s" % paint_pct
+	vexatonicText.text = "%04d" % data["vexatonic"]
+	sparklicText.text = "%04d" % data["sparklic"]
+	wildText.text = "%04d" % data["wild"]
+	missText.text = "%04d" % data["miss"]
+	if lamp == 2:
+		comboLampText.text = "FULL VEXATONIC"
+	elif lamp == 1:
+		comboLampText.text = "FULL COMBO"
+
+	  # resultPanel을 화면 오른쪽 밖으로 초기 배치
+	var vp_width = get_viewport().get_visible_rect().size.x
+	var orig_panel_x = resultPanel.position.x
+	resultPanel.position.x = orig_panel_x + vp_width
+
+	tween.tween_callback(func():
+		target_text.visible = false
+		lampTextHolder.get_node("PerfectPaintText").visible = false
+		resultPanelHolder.visible = true
+	)
+
+	  # 1. ResultPanel - 효과A: 오른쪽에서 날아옴
+	tween.tween_property(resultPanel, "position:x", orig_panel_x, 1.0) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+
+	  # 2. scoreText - 효과B: 크게 시작해서 줄어듦
+	tween.tween_callback(func(): scoreText.pivot_offset = scoreText.size / 2)
+	tween.tween_property(scoreText, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.parallel().tween_property(scoreText, "modulate:a", 1.0, 1.0).from(0.0)
+
+	  # 3. rankLabel - 효과B
+	tween.tween_callback(func(): rankLabel.pivot_offset = rankLabel.size / 2)
+	tween.tween_property(rankLabel, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.parallel().tween_property(rankLabel, "modulate:a", 1.0, 1.0).from(0.0)
+
+	  # 4. 세부 스탯 - 효과C: 아래에서 원래 위치로 올라옴 (순서대로)
+	var drop_offset = 30.0
+	for node in [paintText, vexatonicText, sparklicText, wildText, missText]:
+		var captured: Control = node
+		tween.tween_callback(func():
+			var sub = create_tween()
+			var orig_y = captured.position.y
+			sub.tween_property(captured, "position:y", orig_y, 0.5).from(orig_y + drop_offset) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+			sub.parallel().tween_property(captured, "modulate:a", 1.0, 0.5)
+		)
+		tween.tween_interval(0.5)
+
+	  # 5. comboLampText - 효과B (full combo 또는 full vexatonic일 때만)
+	if lamp >= 1:
+		tween.tween_callback(func(): comboLampText.pivot_offset = comboLampText.size / 2)
+		tween.tween_property(comboLampText, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
+		  .set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tween.parallel().tween_property(comboLampText, "modulate:a", 1.0, 1.0).from(0.0)
+
+	  # 6. paintLampText - 효과B (perfect paint일 때만)
+	if data["perfect_paint"]:
+		tween.tween_callback(func(): paintLampText.pivot_offset = paintLampText.size / 2)
+		tween.tween_property(paintLampText, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
+		  .set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tween.parallel().tween_property(paintLampText, "modulate:a", 1.0, 1.0).from(0.0)
+
+	tween.tween_callback(func(): InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT))
 	
 func _on_result_confirm():
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
