@@ -282,8 +282,10 @@ offset_left = 0.39198303
 offset_top = 0.31199646
 offset_right = 0.49597168
 offset_bottom = 0.18399048
+pivot_offset = Vector2(195.9, 57.5)
 theme_override_font_sizes/font_size = 84
 text = "1,000,000"
+horizontal_alignment = 1
 
 [node name="PaintText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1326012696]
 layout_mode = 1
@@ -359,4 +361,67 @@ theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
 
+[node name="RankLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=627003622]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.55600005
+anchor_top = 0.155
+anchor_right = 0.919
+anchor_bottom = 0.544
+offset_left = 0.48791504
+offset_top = 0.19000244
+offset_right = 0.31201172
+offset_bottom = 0.111968994
+theme_override_font_sizes/font_size = 200
+text = "AAA"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ComboLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=170314073]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.568
+anchor_right = 0.89800006
+anchor_bottom = 0.66700006
+offset_left = -0.4000244
+offset_top = 0.26397705
+offset_right = -0.49609375
+offset_bottom = -0.2340393
+theme_override_font_sizes/font_size = 42
+text = "FULL VEXATONIC"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PaintLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1465955481]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.70500004
+anchor_right = 0.89800006
+anchor_bottom = 0.80300003
+offset_left = -0.4000244
+offset_top = 0.08996582
+offset_right = -0.49609375
+offset_bottom = 0.29400635
+theme_override_font_sizes/font_size = 42
+text = "PERFECT PAINT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=211443722]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.66
+anchor_top = 0.081
+anchor_right = 0.93900007
+anchor_bottom = 0.16700001
+offset_left = -0.32000732
+offset_top = 0.13800049
+offset_right = 0.27197266
+offset_bottom = -0.23400879
+theme_override_font_sizes/font_size = 30
+text = "Back To Main [Enter]"
+
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
+[connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]

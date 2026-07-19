@@ -15,6 +15,7 @@ func _ready():
 	refresh_UI()
 
 func refresh_UI():
+	resultPanelHolder.visible = false
 	lampTextHolder.get_node("PerfectPaintText").modulate.a = 0
 	for i in range(3):
 		lampTextHolder.get_child(i).modulate.a = 0.0
@@ -113,7 +114,7 @@ func show_result(data: Dictionary) -> void:
 	hint.position = Vector2(0, vp.y * 0.88)
 	canvasLayer.add_child(hint)
 
-	InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT)
+	
 
 func show_result_2(data: Dictionary) -> void:
 	var tween = create_tween()
@@ -126,8 +127,11 @@ func show_result_2(data: Dictionary) -> void:
 		tween.tween_property(lampTextHolder.get_node("PerfectPaintText"), "modulate:a", 1.0, 1.0).from(0.0)
 	
 	tween.tween_interval(2.0)
+	target_text.visible = false
+	lampTextHolder.get_node("PerfectPaintText").visible = false
+	resultPanelHolder.visible = true
 	
-	
+	InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT)
 	
 func _on_result_confirm():
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
