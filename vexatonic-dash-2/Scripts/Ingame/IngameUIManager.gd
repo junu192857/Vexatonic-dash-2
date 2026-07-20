@@ -13,7 +13,7 @@ extends Node
 @onready var sparklicText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/SparklicText")
 @onready var wildText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/WildText")
 @onready var missText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/MissText")
-@onready var rankLabel = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/RankLabel")
+@onready var rankText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/RankText")
 @onready var comboLampText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/ComboLampText")
 @onready var paintLampText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/PaintLampText")
 
@@ -144,7 +144,7 @@ func show_result_2(data: Dictionary) -> void:
 
   # 텍스트 값 설정 (modulate.a = 0 상태이므로 보이지 않음)
 	scoreText.text = "%07d" % data["score"]
-	rankLabel.text = RANK_NAMES[data["rank"]]
+	rankText.text = RANK_NAMES[data["rank"]]
 	var paint_pct: String
 	if data["perfect_paint"]:
 		paint_pct = "100.0%"
@@ -182,10 +182,10 @@ func show_result_2(data: Dictionary) -> void:
 	tween.parallel().tween_property(scoreText, "modulate:a", 1.0, 1.0).from(0.0)
 
 	  # 3. rankLabel - 효과B
-	tween.tween_callback(func(): rankLabel.pivot_offset = rankLabel.size / 2)
-	tween.tween_property(rankLabel, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
-		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tween.parallel().tween_property(rankLabel, "modulate:a", 1.0, 1.0).from(0.0)
+	tween.tween_callback(func(): rankText.pivot_offset = rankText.size / 2)
+	tween.tween_property(rankText, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
+		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	tween.parallel().tween_property(rankText, "modulate:a", 1.0, 1.0).from(0.0)
 
 	  # 4. 세부 스탯 - 효과C: 아래에서 원래 위치로 올라옴 (순서대로)
 	var drop_offset = 30.0
