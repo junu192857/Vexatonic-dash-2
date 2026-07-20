@@ -194,11 +194,11 @@ func show_result_2(data: Dictionary) -> void:
 		tween.tween_callback(func():
 			var sub = create_tween()
 			var orig_y = captured.position.y
-			sub.tween_property(captured, "position:y", orig_y, 0.5).from(orig_y + drop_offset) \
+			sub.tween_property(captured, "position:y", orig_y, 0.3).from(orig_y + drop_offset) \
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-			sub.parallel().tween_property(captured, "modulate:a", 1.0, 0.5)
+			sub.parallel().tween_property(captured, "modulate:a", 1.0, 0.3)
 		)
-		tween.tween_interval(0.5)
+		tween.tween_interval(0.25)
 
 	  # 5. comboLampText - 효과B (full combo 또는 full vexatonic일 때만)
 	if lamp >= 1:
