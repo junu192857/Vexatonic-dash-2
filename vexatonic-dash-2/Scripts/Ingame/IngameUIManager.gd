@@ -13,7 +13,7 @@ extends Node
 @onready var sparklicText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/SparklicText")
 @onready var wildText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/WildText")
 @onready var missText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/MissText")
-@onready var rankLabel = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/RankLabel")
+@onready var rankText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/RankText")
 @onready var comboLampText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/ComboLampText")
 @onready var paintLampText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/PaintLampText")
 
@@ -55,81 +55,6 @@ func _on_status_update(status: GameStatus) -> void:
 
 const RANK_NAMES = ["", "D", "C", "B", "A", "AA", "AAA", "S", "SS", "SSS", "V"]
 
-func show_result(data: Dictionary) -> void:
-	var vp = get_viewport().get_visible_rect().size
-
-	var overlay = ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.7)
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	canvasLayer.add_child(overlay)
-
-	var lamp = data["combo_lamp"]
-	var header_text: String
-	if lamp == 2:
-		header_text = "Full Vexatonic!!"
-	elif lamp == 1:
-		header_text = "Full Combo!"
-	else:
-		header_text = "Game Finished"
-
-	var header = Label.new()
-	header.text = header_text
-	header.add_theme_font_size_override("font_size", 100)
-	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	header.set_anchors_preset(Control.PRESET_FULL_RECT)
-	header.position = Vector2(0, vp.y * 0.05)
-	canvasLayer.add_child(header)
-
-	if data["perfect_paint"]:
-		var paint_label = Label.new()
-		paint_label.text = "Perfect Paint"
-		paint_label.add_theme_font_size_override("font_size", 60)
-		paint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		paint_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-		paint_label.position = Vector2(0, vp.y * 0.2)
-		canvasLayer.add_child(paint_label)
-
-	var panel = PanelContainer.new()
-	panel.position = Vector2(vp.x * 0.3, vp.y * 0.3)
-	panel.size = Vector2(vp.x * 0.4, vp.y * 0.55)
-	canvasLayer.add_child(panel)
-
-	var vbox = VBoxContainer.new()
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_theme_constant_override("separation", 12)
-	panel.add_child(vbox)
-
-	var paint_pct = "%.1f%%" % (data["paint_ratio"] * 100.0)
-	var lines = [
-		"SCORE  %07d" % data["score"],
-		"RANK   %s" % RANK_NAMES[data["rank"]],
-		"",
-		"Vexatonic  %d" % data["vexatonic"],
-		"Sparklic   %d" % data["sparklic"],
-		"Wild       %d" % data["wild"],
-		"Miss       %d" % data["miss"],
-		"",
-		"Paint  %s" % paint_pct,
-	]
-	for line in lines:
-		var lbl = Label.new()
-		lbl.text = line
-		lbl.add_theme_font_size_override("font_size", 36)
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		vbox.add_child(lbl)
-
-	var hint = Label.new()
-	hint.text = "Press Enter to continue"
-	hint.add_theme_font_size_override("font_size", 28)
-	hint.modulate = Color(0.8, 0.8, 0.8)
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.set_anchors_preset(Control.PRESET_FULL_RECT)
-	hint.position = Vector2(0, vp.y * 0.88)
-	canvasLayer.add_child(hint)
-
-	
-
 func show_result_2(data: Dictionary) -> void:
 	var tween = create_tween()
 	var lamp = data["combo_lamp"]
@@ -144,7 +69,7 @@ func show_result_2(data: Dictionary) -> void:
 
   # 텍스트 값 설정 (modulate.a = 0 상태이므로 보이지 않음)
 	scoreText.text = "%07d" % data["score"]
-	rankLabel.text = RANK_NAMES[data["rank"]]
+	rankText.text = RANK_NAMES[data["rank"]]
 	var paint_pct: String
 	if data["perfect_paint"]:
 		paint_pct = "100.0%"
@@ -182,10 +107,10 @@ func show_result_2(data: Dictionary) -> void:
 	tween.parallel().tween_property(scoreText, "modulate:a", 1.0, 1.0).from(0.0)
 
 	  # 3. rankLabel - 효과B
-	tween.tween_callback(func(): rankLabel.pivot_offset = rankLabel.size / 2)
-	tween.tween_property(rankLabel, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
-		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tween.parallel().tween_property(rankLabel, "modulate:a", 1.0, 1.0).from(0.0)
+	tween.tween_callback(func(): rankText.pivot_offset = rankText.size / 2)
+	tween.tween_property(rankText, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
+		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	tween.parallel().tween_property(rankText, "modulate:a", 1.0, 1.0).from(0.0)
 
 	  # 4. 세부 스탯 - 효과C: 아래에서 원래 위치로 올라옴 (순서대로)
 	var drop_offset = 30.0
@@ -194,11 +119,11 @@ func show_result_2(data: Dictionary) -> void:
 		tween.tween_callback(func():
 			var sub = create_tween()
 			var orig_y = captured.position.y
-			sub.tween_property(captured, "position:y", orig_y, 0.5).from(orig_y + drop_offset) \
+			sub.tween_property(captured, "position:y", orig_y, 0.3).from(orig_y + drop_offset) \
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-			sub.parallel().tween_property(captured, "modulate:a", 1.0, 0.5)
+			sub.parallel().tween_property(captured, "modulate:a", 1.0, 0.3)
 		)
-		tween.tween_interval(0.5)
+		tween.tween_interval(0.25)
 
 	  # 5. comboLampText - 효과B (full combo 또는 full vexatonic일 때만)
 	if lamp >= 1:

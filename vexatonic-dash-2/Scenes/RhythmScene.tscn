@@ -293,6 +293,36 @@ offset_bottom = -0.23400879
 theme_override_font_sizes/font_size = 30
 text = "Back To Main [Enter]"
 
+[node name="ComboLampHolder" type="ReferenceRect" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=861257746]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.568
+anchor_right = 0.89800006
+anchor_bottom = 0.66700006
+offset_left = -0.4000244
+offset_top = 0.26397705
+offset_right = -0.49609375
+offset_bottom = -0.2340393
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="PaintLampHolder" type="ReferenceRect" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1415068328]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.70500004
+anchor_right = 0.89800006
+anchor_bottom = 0.80300003
+offset_left = -0.4000244
+offset_top = 0.08996582
+offset_right = -0.49609375
+offset_bottom = 0.29400635
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
 [node name="VariableLabelHolder" type="Control" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1882443207]
 layout_mode = 1
 anchors_preset = 15
@@ -391,7 +421,7 @@ theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
 
-[node name="RankLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=627003622]
+[node name="RankText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=627003622]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.55600005
