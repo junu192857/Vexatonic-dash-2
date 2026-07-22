@@ -7,9 +7,11 @@ extends Node2D
 
 var script_tween
 
+var script_printed: bool
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	script_printed = false
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
