@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="11_eggky"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_1uws4"]
 [ext_resource type="Script" uid="uid://en0omrumjk71" path="res://Scripts/Tutorial/TutorialManager.gd" id="12_xkm2r"]
+[ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="13_h4w16"]
 [ext_resource type="Texture2D" uid="uid://b3r6by2y1fado" path="res://Textures/Sayane_Live2D.png" id="14_hrv55"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
@@ -58,6 +59,10 @@ tutorialHolder = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder")
 live2d = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/Live2D")
 tutorial_script = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder/Script")
 tutorial_speaker = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/NameHolder/Speaker")
+
+[node name="TutorialBGMPlayer" type="AudioStreamPlayer" parent="RhythmManager/TutorialManager" unique_id=1700013039]
+stream = ExtResource("13_h4w16")
+parameters/looping = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
 

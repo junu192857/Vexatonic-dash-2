@@ -14,6 +14,7 @@ const SCRIPT_PATH = "res://Scripts/Tutorial/script.txt"
 const CHARS_PER_SECOND = 30.0
 
 func _ready() -> void:
+	$TutorialBGMPlayer.play()
 	_load_script()
 	tutorialHolder.visible = true
 	InputManager.mouse_left_pressed.connect(_on_click)
