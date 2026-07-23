@@ -527,6 +527,7 @@ offset_right = 0.41601563
 offset_bottom = -0.115997314
 theme_override_font_sizes/font_size = 36
 text = "Random Text"
+autowrap_mode = 2
 
 [node name="NameHolder" type="Panel" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=72554070]
 layout_mode = 1
