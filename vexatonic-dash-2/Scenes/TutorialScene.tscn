@@ -488,6 +488,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TutorialControl" type="Control" parent="CanvasLayer" unique_id=153344136]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

@@ -10,12 +10,18 @@ var script_lines: Array[String] = []
 var current_line: int = 0
 var is_typing: bool = false
 
-var phases: Array[Callable] = []
+var phases: Array[Callable] = [
+	start_explanation,
+	start_tutorial_play,
+	hide_live2D,
+	show_live2D
+]
 
 const SCRIPT_PATH = "res://Scripts/Tutorial/script.txt"
 const CHARS_PER_SECOND = 30.0
 
 func _ready() -> void:
+	await get_tree().process_frame
 	$TutorialBGMPlayer.play()
 	_load_script()
 	start_explanation()
@@ -35,8 +41,10 @@ func _show_line(index: int):
 		return
 	var line = script_lines[index]
 	var parts = line.split(" ")
-	if (line.split(" ")[0]) == "Phase":
-		pass
+	if (parts[0]) == "Phase":
+		current_line += 1
+		phases[int(parts[2])].call()
+		return
 	is_typing = true
 	typewrite(tutorial_script, line, line.length() / CHARS_PER_SECOND)
 	script_tween.tween_callback(func(): is_typing = false)
@@ -53,6 +61,7 @@ func typewrite(label: Label, text: String, duration: float = 1.0):
 	label.text = text
 	label.visible_characters = 0
 	script_tween = create_tween()
+	script_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	script_tween.tween_property(label, "visible_characters", text.length(), duration)
 
 func force_typewrite(label: Label):
@@ -68,7 +77,7 @@ func start_explanation():
 	tutorialHolder.visible = true
 	_show_line(current_line)
 
-func resume_tutorial_play():
+func start_tutorial_play():
 	if InputManager.mouse_left_pressed.is_connected(_on_click):
 		InputManager.mouse_left_pressed.disconnect(_on_click)
 	tutorialHolder.visible = false
@@ -76,6 +85,8 @@ func resume_tutorial_play():
 
 func hide_live2D():
 	tutorialHolder.get_node("Live2D").visible = false
+	_show_line(current_line)
 
 func show_live2D():
 	tutorialHolder.get_node("Live2D").visible = true
+	_show_line(current_line)
