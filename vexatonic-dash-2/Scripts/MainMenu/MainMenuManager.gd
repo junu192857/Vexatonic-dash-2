@@ -55,6 +55,7 @@ func _on_game_start():
 
 func _on_tutorial_start():
 	Setting.is_tutorial = true
+	Setting.speed = 1.0
 	Setting.gamemode = Setting.GAMEMODE.Normal_Character
 	get_tree().change_scene_to_file("res://Scenes/TutorialScene.tscn")
 

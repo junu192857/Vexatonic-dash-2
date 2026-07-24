@@ -505,7 +505,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Live2D" type="TextureRect" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=1782607335]
-visible = false
 layout_mode = 0
 offset_left = 765.0
 offset_top = 162.0
