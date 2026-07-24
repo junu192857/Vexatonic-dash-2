@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cgwfhjtpyshop"]
 
-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/Ingame/RhythmManager.gd" id="1_pujgt"]
+[ext_resource type="Script" uid="uid://2tgdpqlixult" path="res://Scripts/Tutorial/TRhythmManager.gd" id="1_h4w16"]
 [ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="2_xkm2r"]
 [ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_hrv55"]
 [ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_h4w16"]
@@ -20,7 +20,7 @@
 metadata/_edit_vertical_guides_ = [-111.0]
 
 [node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("rightCover", "leftCover")]
-script = ExtResource("1_pujgt")
+script = ExtResource("1_h4w16")
 CHARACTER_SCENE = ExtResource("2_xkm2r")
 rightCover = NodePath("../CanvasLayer/Control/RightCover")
 leftCover = NodePath("../CanvasLayer/Control/LeftCover")
