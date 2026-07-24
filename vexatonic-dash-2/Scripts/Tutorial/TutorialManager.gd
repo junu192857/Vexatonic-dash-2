@@ -10,15 +10,16 @@ var script_lines: Array[String] = []
 var current_line: int = 0
 var is_typing: bool = false
 
+var phases: Array[Callable] = []
+
 const SCRIPT_PATH = "res://Scripts/Tutorial/script.txt"
 const CHARS_PER_SECOND = 30.0
 
 func _ready() -> void:
 	$TutorialBGMPlayer.play()
 	_load_script()
-	tutorialHolder.visible = true
-	InputManager.mouse_left_pressed.connect(_on_click)
-	_show_line(current_line)
+	start_explanation()
+	
 
 func _load_script():
 	var file = FileAccess.open(SCRIPT_PATH, FileAccess.READ)
@@ -31,9 +32,11 @@ func _load_script():
 
 func _show_line(index: int):
 	if index >= script_lines.size():
-		tutorialHolder.visible = false
 		return
 	var line = script_lines[index]
+	var parts = line.split(" ")
+	if (line.split(" ")[0]) == "Phase":
+		pass
 	is_typing = true
 	typewrite(tutorial_script, line, line.length() / CHARS_PER_SECOND)
 	script_tween.tween_callback(func(): is_typing = false)
@@ -56,3 +59,23 @@ func force_typewrite(label: Label):
 	if script_tween and script_tween.is_valid():
 		script_tween.kill()
 	label.visible_characters = -1
+
+
+
+func start_explanation():
+	InputManager.mouse_left_pressed.connect(_on_click)
+	get_tree().paused = true
+	tutorialHolder.visible = true
+	_show_line(current_line)
+
+func resume_tutorial_play():
+	if InputManager.mouse_left_pressed.is_connected(_on_click):
+		InputManager.mouse_left_pressed.disconnect(_on_click)
+	tutorialHolder.visible = false
+	get_tree().paused = false
+
+func hide_live2D():
+	tutorialHolder.get_node("Live2D").visible = false
+
+func show_live2D():
+	tutorialHolder.get_node("Live2D").visible = true

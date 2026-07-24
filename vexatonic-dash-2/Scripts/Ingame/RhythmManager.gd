@@ -45,12 +45,12 @@ func _ready() -> void:
 	InputManager.released_j.connect(func(): _on_released(2, false))
 	
 	
-	level_path = Setting.selected_chart_dir
+	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
 	
-	levelData = ChartParser.parse(level_path, Setting.selected_difficulty)
+	levelData = ChartParser.parse(level_path, 0 if Setting.is_tutorial else Setting.selected_difficulty)
 	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	$IngameDataManager.all_notes_cleared.connect(end_game, CONNECT_ONE_SHOT)
 	Lane.sort_lanes(levelData.lanes)
@@ -285,9 +285,10 @@ func assign_note(note: Note):
 
 func end_game():
 	game_finished = true
-	$IngameDataManager.on_song_end(level_path)
-	var result = $IngameDataManager.get_result_data()
-	$IngameUIManager.show_result_2(result)
+	if (!Setting.is_tutorial):
+		$IngameDataManager.on_song_end(level_path)
+		var result = $IngameDataManager.get_result_data()
+		$IngameUIManager.show_result_2(result)
 
 
 

@@ -50,7 +50,13 @@ func _on_pressed_enter():
 # =================== 설정 창 ===================
 
 func _on_game_start():
+	Setting.is_tutorial = false
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
+
+func _on_tutorial_start():
+	Setting.is_tutorial = true
+	Setting.gamemode = Setting.GAMEMODE.Normal_Character
+	get_tree().change_scene_to_file("res://Scenes/TutorialScene.tscn")
 
 func _on_game_end():
 	get_tree().quit()
