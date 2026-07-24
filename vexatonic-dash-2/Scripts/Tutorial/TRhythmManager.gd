@@ -45,12 +45,13 @@ func _ready() -> void:
 	InputManager.released_j.connect(func(): _on_released(2, false))
 	
 	
-	level_path = Setting.selected_chart_dir
+	level_path = "res://Charts/Tutorial"
+	Setting.gamemode = Setting.GAMEMODE.Normal_Character
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
 	
-	levelData = ChartParser.parse(level_path, Setting.selected_difficulty)
+	levelData = ChartParser.parse(level_path, 0)
 	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	$IngameDataManager.all_notes_cleared.connect(end_game, CONNECT_ONE_SHOT)
 	Lane.sort_lanes(levelData.lanes)
@@ -88,6 +89,8 @@ func _ready() -> void:
 	
 	
 	time_start_tick = Time.get_ticks_msec()
+	
+	get_tree().paused = true
 
 func place_character(lane: Lane):
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):

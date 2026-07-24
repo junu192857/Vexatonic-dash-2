@@ -520,6 +520,7 @@ anchor_bottom = 0.9
 texture = ExtResource("12_1uws4")
 
 [node name="Script" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder" unique_id=1784256312]
+custom_minimum_size = Vector2(1209.368, 0)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.05
