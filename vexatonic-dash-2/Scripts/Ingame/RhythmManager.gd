@@ -15,6 +15,8 @@ var characters: Array[Character]
 @export var leftCover: ColorRect
 
 var time: float
+var need_refresh_tutorial: bool = true
+var started_tutorial: bool = false
 var music_started = false
 var game_finished = false
 var time_start_tick: float
@@ -45,12 +47,14 @@ func _ready() -> void:
 	InputManager.released_j.connect(func(): _on_released(2, false))
 	
 	
-	level_path = Setting.selected_chart_dir
+	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
+	if Setting.is_tutorial:
+		InputManager.process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	for i in range(3):
 		noteHolders.append(NoteHolder.new(i))
 	
-	levelData = ChartParser.parse(level_path, Setting.selected_difficulty)
+	levelData = ChartParser.parse(level_path, 0 if Setting.is_tutorial else Setting.selected_difficulty)
 	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	$IngameDataManager.all_notes_cleared.connect(end_game, CONNECT_ONE_SHOT)
 	Lane.sort_lanes(levelData.lanes)
@@ -103,6 +107,9 @@ func place_character(lane: Lane):
 func _physics_process(delta: float) -> void:
 	if (not game_finished):
 		if (not music_started):
+			if (Setting.is_tutorial and Time.get_ticks_msec() - time_start_tick > 1000.0 and need_refresh_tutorial):
+				time_start_tick = Time.get_ticks_msec()
+				need_refresh_tutorial = false
 			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
 			if time >= Setting.sound_offset:
 				musicPlayer.play()
@@ -127,6 +134,7 @@ func _physics_process(delta: float) -> void:
 			holder.update_visuals(time)
 
 		cameraManager.move(time)
+	print(time)
 	
 
 func sort_note_holders():

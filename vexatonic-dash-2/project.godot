@@ -38,7 +38,7 @@ window/stretch/aspect="keep_width"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/plugins/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 

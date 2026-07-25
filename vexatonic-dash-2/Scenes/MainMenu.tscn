@@ -127,6 +127,35 @@ theme_override_font_sizes/font_size = 120
 text = "Vexatonic"
 horizontal_alignment = 1
 
+[node name="SettingButton2" type="Button" parent="CanvasLayer/Control" unique_id=274277376]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.46300003
+anchor_right = 0.648
+anchor_bottom = 0.53800005
+offset_left = -3.4000244
+offset_top = -0.040039063
+offset_right = 0.27990723
+offset_bottom = -0.040039063
+theme_override_font_sizes/font_size = 38
+text = "Tutorial"
+script = ExtResource("3_df05h")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton2" unique_id=1013903416]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(1, 1, 0, 1)
+border_width = 6.0
+editor_only = false
+
 [connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
 [connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
+[connection signal="pressed" from="CanvasLayer/Control/SettingButton2" to="." method="_on_tutorial_start"]

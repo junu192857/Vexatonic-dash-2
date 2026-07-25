@@ -1,0 +1,580 @@
+[gd_scene format=3 uid="uid://cgwfhjtpyshop"]
+
+[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/Ingame/RhythmManager.gd" id="1_pujgt"]
+[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="2_xkm2r"]
+[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_hrv55"]
+[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_h4w16"]
+[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="5_f6dk7"]
+[ext_resource type="PackedScene" uid="uid://nkkobamofph3" path="res://Prefabs/SuregiConnector.tscn" id="6_qifqw"]
+[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Camera/CameraManager.gd" id="7_kxtmh"]
+[ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/Ingame/IngameDataManager.gd" id="8_fckvl"]
+[ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/Ingame/IngameUIManager.gd" id="9_gh30y"]
+[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="10_ymeo7"]
+[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="11_eggky"]
+[ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_1uws4"]
+[ext_resource type="Script" uid="uid://en0omrumjk71" path="res://Scripts/Tutorial/TutorialManager.gd" id="12_xkm2r"]
+[ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="13_h4w16"]
+[ext_resource type="Texture2D" uid="uid://b3r6by2y1fado" path="res://Textures/Sayane_Live2D.png" id="14_hrv55"]
+
+[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+metadata/_edit_vertical_guides_ = [-111.0]
+
+[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("rightCover", "leftCover")]
+script = ExtResource("1_pujgt")
+CHARACTER_SCENE = ExtResource("2_xkm2r")
+rightCover = NodePath("../CanvasLayer/Control/RightCover")
+leftCover = NodePath("../CanvasLayer/Control/LeftCover")
+NOTE_SCENE = ExtResource("3_hrv55")
+LONG_NOTE_SCENE = ExtResource("4_h4w16")
+CONNECTOR_SCENE = ExtResource("5_f6dk7")
+SUREGI_CONNECTOR_SCENE = ExtResource("6_qifqw")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+volume_db = -80.0
+
+[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+script = ExtResource("7_kxtmh")
+
+[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+ignore_rotation = false
+
+[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+script = ExtResource("8_fckvl")
+
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder")]
+script = ExtResource("9_gh30y")
+JUDGEMENT_TEXT = ExtResource("10_ymeo7")
+score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
+canvasLayer = NodePath("../../CanvasLayer")
+lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
+resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
+
+[node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
+
+[node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("11_eggky")]
+visible = false
+
+[node name="TutorialManager" type="Node2D" parent="RhythmManager" unique_id=1079243057 node_paths=PackedStringArray("tutorialHolder", "live2d", "tutorial_script", "enter_label", "tutorial_speaker")]
+script = ExtResource("12_xkm2r")
+tutorialHolder = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder")
+live2d = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/Live2D")
+tutorial_script = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder/Script")
+enter_label = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder/EnterLabel")
+tutorial_speaker = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/NameHolder/Speaker")
+
+[node name="TutorialBGMPlayer" type="AudioStreamPlayer" parent="RhythmManager/TutorialManager" unique_id=1700013039]
+process_mode = 3
+stream = ExtResource("13_h4w16")
+parameters/looping = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=591227501]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.781
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.6398926
+offset_right = 0.15979004
+color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+
+[node name="LeftCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=439301575]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.21900001
+anchor_bottom = 1.0
+offset_right = -0.480011
+color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+
+[node name="ScorePanel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.1
+anchor_right = 0.18
+anchor_bottom = 0.15
+offset_right = 0.3199768
+
+[node name="ScoreText" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=519592229]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_right = 0.9
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 40
+text = "SCORE 0000000"
+vertical_alignment = 1
+
+[node name="LampTextHolder" type="Control" parent="CanvasLayer/Control" unique_id=442854916]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameFinishedText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=722747667]
+visible = false
+clip_contents = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.3
+anchor_right = 0.85
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0.92156863, 0.87058824, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.99999994, 0.67400795, 0.36084798, 0.3137255)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
+text = "Game Finished"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FullComboText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=749141514]
+visible = false
+clip_contents = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.3
+anchor_right = 0.85
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0, 0.9019608, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.37576506, 0.7707434, 0.99999994, 0.3137255)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
+text = "FULL COMBO!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FullVexatonicText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=536036725]
+visible = false
+clip_contents = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.3
+anchor_right = 0.85
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(1, 0.25882354, 1, 1)
+theme_override_colors/font_shadow_color = Color(1, 0.6133026, 0.83044773, 0.3137255)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
+text = "FULL VEXATONIC!!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PerfectPaintText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=1974658059]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.5
+anchor_right = 0.7
+anchor_bottom = 0.6
+offset_left = 0.15997314
+offset_top = -10.0
+offset_right = -0.4000244
+offset_bottom = 0.32000732
+theme_override_font_sizes/font_size = 80
+text = "Perfect Paint"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultPanelHolder" type="ColorRect" parent="CanvasLayer/Control" unique_id=2075620177]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.30980393, 0.30980393, 0.30980393, 0.54901963)
+
+[node name="ResultPanel" type="TextureRect" parent="CanvasLayer/Control/ResultPanelHolder" unique_id=1555465587]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.85
+texture = ExtResource("12_1uws4")
+
+[node name="ConstantLabelHolder" type="Control" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1644102461]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VexatonicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1630803552]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.512
+anchor_right = 0.27800003
+anchor_bottom = 0.592
+offset_top = -0.05999756
+offset_right = 0.5039673
+offset_bottom = -0.060028076
+theme_override_font_sizes/font_size = 36
+text = "Vexatonic"
+
+[node name="SparklicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1531845158]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.59800005
+anchor_right = 0.27800003
+anchor_bottom = 0.67800003
+offset_top = 0.2659912
+offset_right = 0.5039673
+offset_bottom = 0.2659607
+theme_override_font_sizes/font_size = 36
+text = "Sparklic"
+
+[node name="WildLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1998486912]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.68600005
+anchor_right = 0.27800003
+anchor_bottom = 0.76600003
+offset_top = -0.16400146
+offset_right = 0.5039673
+offset_bottom = -0.16400146
+theme_override_font_sizes/font_size = 36
+text = "Wild"
+
+[node name="MissLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=616339394]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.772
+anchor_right = 0.27800003
+anchor_bottom = 0.85200006
+offset_top = 0.10797119
+offset_right = 0.5039673
+offset_bottom = 0.10797119
+theme_override_font_sizes/font_size = 36
+text = "Miss"
+
+[node name="ScoreLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1297994137]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13
+anchor_top = 0.15
+anchor_right = 0.25
+anchor_bottom = 0.23
+offset_left = -0.45603943
+offset_top = 0.20799255
+offset_right = -0.256073
+theme_override_font_sizes/font_size = 36
+text = "Score_"
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=211443722]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.66
+anchor_top = 0.081
+anchor_right = 0.93900007
+anchor_bottom = 0.16700001
+offset_left = -0.32000732
+offset_top = 0.13800049
+offset_right = 0.27197266
+offset_bottom = -0.23400879
+theme_override_font_sizes/font_size = 30
+text = "Back To Main [Enter]"
+
+[node name="ComboLampHolder" type="ReferenceRect" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=861257746]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.568
+anchor_right = 0.89800006
+anchor_bottom = 0.66700006
+offset_left = -0.4000244
+offset_top = 0.26397705
+offset_right = -0.49609375
+offset_bottom = -0.2340393
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="PaintLampHolder" type="ReferenceRect" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1415068328]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.70500004
+anchor_right = 0.89800006
+anchor_bottom = 0.80300003
+offset_left = -0.4000244
+offset_top = 0.08996582
+offset_right = -0.49609375
+offset_bottom = 0.29400635
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="VariableLabelHolder" type="Control" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel" unique_id=1882443207]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScoreText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=295211680]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.23
+anchor_right = 0.47
+anchor_bottom = 0.39400002
+offset_left = 0.39196777
+offset_top = 0.31199646
+offset_right = 0.49597168
+offset_bottom = 0.18399048
+pivot_offset = Vector2(195.9, 57.5)
+theme_override_font_sizes/font_size = 84
+text = "1,000,000"
+horizontal_alignment = 1
+
+[node name="PaintText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1326012696]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13000001
+anchor_top = 0.40100002
+anchor_right = 0.34500003
+anchor_bottom = 0.47200003
+offset_left = -0.4560547
+offset_top = 0.0059814453
+offset_right = 0.55996704
+offset_bottom = 0.16397095
+theme_override_font_sizes/font_size = 36
+text = "Paint 100.0%"
+
+[node name="VexatonicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=373429698]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.512
+anchor_right = 0.45900002
+anchor_bottom = 0.592
+offset_left = -0.5120239
+offset_top = -0.05999756
+offset_right = -0.0079956055
+offset_bottom = -0.060028076
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
+
+[node name="SparklicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1365964631]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.59800005
+anchor_right = 0.45900002
+anchor_bottom = 0.67800003
+offset_left = -0.5120239
+offset_top = 0.2659912
+offset_right = -0.0079956055
+offset_bottom = 0.2659607
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
+
+[node name="WildText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=26379827]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.68600005
+anchor_right = 0.45900002
+anchor_bottom = 0.76600003
+offset_left = -0.5120239
+offset_top = -0.16400146
+offset_right = -0.0079956055
+offset_bottom = -0.16400146
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
+
+[node name="MissText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1519663053]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.31100002
+anchor_top = 0.772
+anchor_right = 0.45900002
+anchor_bottom = 0.85200006
+offset_left = -0.5120239
+offset_top = 0.10797119
+offset_right = -0.0079956055
+offset_bottom = 0.10797119
+theme_override_font_sizes/font_size = 36
+text = "1000"
+horizontal_alignment = 2
+
+[node name="RankText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=627003622]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.55600005
+anchor_top = 0.155
+anchor_right = 0.919
+anchor_bottom = 0.544
+offset_left = 0.48791504
+offset_top = 0.19000244
+offset_right = 0.31201172
+offset_bottom = 0.111968994
+theme_override_font_sizes/font_size = 200
+text = "AAA"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ComboLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=170314073]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.568
+anchor_right = 0.89800006
+anchor_bottom = 0.66700006
+offset_left = -0.4000244
+offset_top = 0.26397705
+offset_right = -0.49609375
+offset_bottom = -0.2340393
+theme_override_font_sizes/font_size = 42
+text = "FULL VEXATONIC"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PaintLampText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1465955481]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.57500005
+anchor_top = 0.70500004
+anchor_right = 0.89800006
+anchor_bottom = 0.80300003
+offset_left = -0.4000244
+offset_top = 0.08996582
+offset_right = -0.49609375
+offset_bottom = 0.29400635
+theme_override_font_sizes/font_size = 42
+text = "PERFECT PAINT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TutorialControl" type="Control" parent="CanvasLayer" unique_id=153344136]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TutorialHolder" type="Panel" parent="CanvasLayer/TutorialControl" unique_id=1326941684]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Live2D" type="TextureRect" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=1782607335]
+layout_mode = 0
+offset_left = 765.0
+offset_top = 162.0
+offset_right = 1152.0
+offset_bottom = 807.0
+texture = ExtResource("14_hrv55")
+
+[node name="ScriptHolder" type="TextureRect" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=1566585080]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.6
+anchor_right = 0.85
+anchor_bottom = 0.9
+texture = ExtResource("12_1uws4")
+
+[node name="Script" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder" unique_id=1784256312]
+custom_minimum_size = Vector2(1209.368, 0)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.2
+anchor_right = 0.95
+anchor_bottom = 0.8
+offset_left = 0.6479988
+offset_top = 0.1159935
+offset_right = 0.41601563
+offset_bottom = -0.115997314
+theme_override_font_sizes/font_size = 36
+text = "Random Text"
+autowrap_mode = 2
+
+[node name="EnterLabel" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder" unique_id=503899387]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.81100005
+anchor_top = 0.827
+anchor_right = 0.97800004
+anchor_bottom = 0.93200004
+offset_left = 0.015991211
+offset_top = 0.052001953
+offset_right = 0.56799316
+offset_bottom = 0.031982422
+theme_override_font_sizes/font_size = 22
+text = "[L] 또는 [Enter]로 진행"
+
+[node name="NameHolder" type="Panel" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=72554070]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.16700001
+anchor_top = 0.568
+anchor_right = 0.31800002
+anchor_bottom = 0.63900006
+offset_left = -0.64001465
+offset_top = -0.44000244
+offset_right = 0.4399414
+offset_bottom = -0.12005615
+
+[node name="Speaker" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/NameHolder" unique_id=1735024158]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 49
+text = "사야네"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
+[connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]
