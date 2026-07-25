@@ -2,6 +2,10 @@ class_name Setting
 
 # ================== 상수 ==============================
 
+const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0), Color(1.0, 1.0, 0.4), Color(0.4, 1.0, 0.4)]
+const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0), Color(0.0, 0.0, 0.7), Color(0.8, 0.7, 0.0), Color(0.0, 0.6, 0.0)]
+const SELECTED_COLORS = [Color(1,0,1), Color(0,1,1), Color(1,1,0.7), Color(0,1,0.5)]
+
 static var PX_PER_MS = 0.5
 #단노트의 좌우 길이
 static var NOTE_WIDTH = 24

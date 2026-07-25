@@ -148,6 +148,7 @@ func sort_note_holders():
 @export var LONG_NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
 @export var SUREGI_CONNECTOR_SCENE: PackedScene
+@export var ARC_CONNECTOR_SCENE: PackedScene
 
 # render_chart() 후 생성된 Note, Connector, Marker의 관계
 #
@@ -186,7 +187,24 @@ func render_chart():
 							noteData.end_time - Setting.time_per_note_width() / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 			(cur_note as LongNote).set_target_connector(connector as Connector)
 			previous_time = noteData.end_time
-			previous_note = marker;
+			previous_note = marker
+		
+		elif (noteData.type == 2): #JumpNote
+			var end_pos_x = Setting.get_posx_from_time(noteData.end_time)
+			match Setting.gamemode:
+				Setting.GAMEMODE.Normal_Character:
+					var marker = place_note(noteData, end_pos_x, true, cur_note)
+					# TODO: ARC_CONNECTOR_SCENE으로 교체
+					place_connector(noteData.color, noteData.time + Setting.time_per_note_width() / 2, \
+					noteData.end_time - Setting.time_per_note_width() / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
+					previous_time = noteData.end_time
+					previous_note = marker
+				Setting.GAMEMODE.Normal_Line:
+					var marker = place_note(noteData, end_pos_x, true, cur_note)
+					previous_time = noteData.end_time
+					previous_note = marker
+				Setting.GAMEMODE.Suregi:
+					pass # previous_time/note를 점프 노트 시작으로 유지 → 다음 노트와 직선 연결
 			
 	for lane:Lane in levelData.lanes:
 		#lane.print_data()
