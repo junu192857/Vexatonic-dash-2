@@ -15,7 +15,8 @@ var characters: Array[Character]
 @export var leftCover: ColorRect
 
 var time: float
-var need_refresh: bool = true
+var need_refresh_tutorial: bool = true
+var started_tutorial: bool = false
 var music_started = false
 var game_finished = false
 var time_start_tick: float
@@ -106,12 +107,9 @@ func place_character(lane: Lane):
 func _physics_process(delta: float) -> void:
 	if (not game_finished):
 		if (not music_started):
-			if (Setting.is_tutorial and need_refresh):
-				var new_time_start_tick = Time.get_ticks_msec()
-				if new_time_start_tick - time_start_tick > 100.0:
-					time_start_tick = new_time_start_tick
-					need_refresh = false
-					print("need refresh set")
+			if (Setting.is_tutorial and Time.get_ticks_msec() - time_start_tick > 1000.0 and need_refresh_tutorial):
+				time_start_tick = Time.get_ticks_msec()
+				need_refresh_tutorial = false
 			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
 			if time >= Setting.sound_offset:
 				musicPlayer.play()
