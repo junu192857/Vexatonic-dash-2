@@ -41,9 +41,9 @@ func _show_line(index: int):
 		return
 	var line = script_lines[index]
 	var parts = line.split(" ")
-	if (parts[0]) == "Phase":
+	if (parts[0]) == "PHASE":
 		current_line += 1
-		phases[int(parts[2])].call()
+		phases[int(parts[1])].call()
 		return
 	is_typing = true
 	typewrite(tutorial_script, line, line.length() / CHARS_PER_SECOND)
