@@ -27,8 +27,11 @@ func set_data(p_data: NoteData):
 	else:
 		data = p_data
 
-func _ready() -> void:
-	sprite.modulate = Setting.UNPROCESSED_COLORS[data.color]
+func select_color():
+	if (data.type == 2 and is_marker):
+		sprite.modulate = Color(1,1,1)
+	else:
+		sprite.modulate = Setting.UNPROCESSED_COLORS[get_data().color]
 
 func process_input(p_color: int, pressed_ms: float) -> int:
 	print("Processing input: pressed time: %f, note time: %f" % [pressed_ms, data.time])

@@ -194,9 +194,7 @@ func render_chart():
 			match Setting.gamemode:
 				Setting.GAMEMODE.Normal_Character:
 					var marker = place_note(noteData, end_pos_x, true, cur_note)
-					# TODO: ARC_CONNECTOR_SCENE으로 교체
-					place_connector(noteData.color, noteData.time + Setting.time_per_note_width() / 2, \
-					noteData.end_time - Setting.time_per_note_width() / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
+					# TODO: ARC_CONNECTOR_SCENE으로 Connector 만들기
 					previous_time = noteData.end_time
 					previous_note = marker
 				Setting.GAMEMODE.Normal_Line:
@@ -213,12 +211,14 @@ func render_chart():
 		place_final_connector(lane)
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
-func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Note:
-	var note = (LONG_NOTE_SCENE if not is_marker and data.type == 1 else NOTE_SCENE).instantiate()
+func place_note(data:NoteData, pos_x: float, p_is_marker:bool, parent: Node2D) -> Note:
+	var note = (LONG_NOTE_SCENE if not p_is_marker and data.type == 1 else NOTE_SCENE).instantiate()
 	note.set_data(data)
+	note.is_marker = p_is_marker
 	var lane = Lane.find_lane(levelData.lanes, data.lane)
 	parent.add_child(note)
-	if !is_marker:
+	note.select_color()
+	if !p_is_marker:
 		note.global_position = Vector2(pos_x, lane.get_height(data.time))
 		if data.adjusted == 1:
 			note.set_line()
