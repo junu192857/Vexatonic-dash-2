@@ -53,11 +53,12 @@ resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
 [node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("11_eggky")]
 visible = false
 
-[node name="TutorialManager" type="Node2D" parent="RhythmManager" unique_id=1079243057 node_paths=PackedStringArray("tutorialHolder", "live2d", "tutorial_script", "tutorial_speaker")]
+[node name="TutorialManager" type="Node2D" parent="RhythmManager" unique_id=1079243057 node_paths=PackedStringArray("tutorialHolder", "live2d", "tutorial_script", "enter_label", "tutorial_speaker")]
 script = ExtResource("12_xkm2r")
 tutorialHolder = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder")
 live2d = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/Live2D")
 tutorial_script = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder/Script")
+enter_label = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder/EnterLabel")
 tutorial_speaker = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/NameHolder/Speaker")
 
 [node name="TutorialBGMPlayer" type="AudioStreamPlayer" parent="RhythmManager/TutorialManager" unique_id=1700013039]
@@ -537,6 +538,21 @@ theme_override_font_sizes/font_size = 36
 text = "Random Text"
 autowrap_mode = 2
 
+[node name="EnterLabel" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder" unique_id=503899387]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.90200007
+anchor_top = 0.81500006
+anchor_right = 0.96900004
+anchor_bottom = 0.92
+offset_left = -0.28808594
+offset_top = -0.060028076
+offset_right = 0.6639404
+offset_bottom = -0.08001709
+theme_override_font_sizes/font_size = 22
+text = "[Enter]"
+
 [node name="NameHolder" type="Panel" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=72554070]
 layout_mode = 1
 anchors_preset = -1
@@ -557,7 +573,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 49
-text = "Sayane"
+text = "사야네"
 horizontal_alignment = 1
 vertical_alignment = 1
 

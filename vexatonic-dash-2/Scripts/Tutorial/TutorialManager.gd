@@ -3,12 +3,18 @@ extends Node2D
 @export var tutorialHolder: Control
 @export var live2d: TextureRect
 @export var tutorial_script: Label
+@export var enter_label: Label
 @export var tutorial_speaker: Label
 
 var script_tween
 var script_lines: Array[String] = []
 var current_line: int = 0
-var is_typing: bool = false
+var is_typing: bool = false:
+	set(value):
+		enter_label.visible = !value
+
+const EXPLANATION_TRIGGERS = [182.0, 4545.0, 13273.0, 22000.0, 26000.0]
+var trigger_index: int = 0
 
 var phases: Array[Callable] = [
 	start_explanation,
@@ -25,7 +31,14 @@ func _ready() -> void:
 	$TutorialBGMPlayer.play()
 	_load_script()
 	start_explanation()
-	
+
+func _process(_delta: float) -> void:
+	if get_tree().paused or trigger_index >= EXPLANATION_TRIGGERS.size():
+		return
+	if get_parent().time >= EXPLANATION_TRIGGERS[trigger_index]:
+		trigger_index += 1
+		start_explanation()
+
 
 func _load_script():
 	var file = FileAccess.open(SCRIPT_PATH, FileAccess.READ)
