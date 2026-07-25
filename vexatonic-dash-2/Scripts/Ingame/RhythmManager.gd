@@ -45,13 +45,13 @@ func _ready() -> void:
 	InputManager.released_d.connect(func(): _on_released(2, true))
 	InputManager.pressed_j.connect(func(): _on_pressed(2, false))
 	InputManager.released_j.connect(func(): _on_released(2, false))
-	
+	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
 	
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
 	if Setting.is_tutorial:
 		InputManager.process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	for i in range(3):
+	for i in range(4):
 		noteHolders.append(NoteHolder.new(i))
 	
 	levelData = ChartParser.parse(level_path, 0 if Setting.is_tutorial else Setting.selected_difficulty)

@@ -7,6 +7,7 @@ signal pressed_left
 signal pressed_right
 
 # Action keys
+signal pressed_space
 signal pressed_enter
 signal pressed_tab
 signal pressed_delete
@@ -48,6 +49,8 @@ func _input(event):
 				if event.pressed: pressed_left.emit()
 			KEY_RIGHT:
 				if event.pressed: pressed_right.emit()
+			KEY_SPACE:
+				if event.pressed and not event.is_echo(): pressed_space.emit()
 			KEY_ENTER:
 				if event.pressed and not event.is_echo(): pressed_enter.emit()
 			KEY_TAB:
