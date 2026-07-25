@@ -246,11 +246,11 @@ func place_initial_connector(lane: Lane):
 			print("THIS IS INITIAL LANE")
 			#var initial_height = lane.keyframes[0].y
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-				place_suregi_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
-									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
+				place_suregi_connector(-1, -2 * COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
+									self, Vector2(Setting.get_posx_from_time(-2 * COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 			else:
-				place_connector(-1, -COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
-									self, Vector2(Setting.get_posx_from_time(-COUNTDOWN_TIME),lane.keyframes[0].kf.y))
+				place_connector(-1, -2* COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
+									self, Vector2(Setting.get_posx_from_time(-2 * COUNTDOWN_TIME),lane.keyframes[0].kf.y))
 		else:
 			if (lane.keyframes[0].kf.x < lane.notes[0].get_data().time):
 				if (Setting.gamemode == Setting.GAMEMODE.Suregi):

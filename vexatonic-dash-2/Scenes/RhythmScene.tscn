@@ -61,6 +61,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=591227501]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.781
@@ -71,6 +72,7 @@ offset_right = 0.15979004
 color = Color(0.47788018, 0.47788012, 0.47788012, 1)
 
 [node name="LeftCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=439301575]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.21900001

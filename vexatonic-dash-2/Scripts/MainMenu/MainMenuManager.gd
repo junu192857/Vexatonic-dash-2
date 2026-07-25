@@ -4,8 +4,9 @@ var button_array: Array
 var index: int
 @export var settingRectScene: PackedScene
 var settingRect
-
-var setting_open: bool = false
+@export var goTutorialPanel: TextureRect
+enum MainMenuState {Main, SettingOpen, EnteringTutorial }
+var state : MainMenuState
 
 func _ready():
 	button_array.append($CanvasLayer/Control/GameStartButton)
@@ -16,10 +17,12 @@ func _ready():
 	InputManager.pressed_up.connect(_on_pressed_up)
 	InputManager.pressed_down.connect(_on_pressed_down)
 	InputManager.pressed_enter.connect(_on_pressed_enter)
+	InputManager.pressed_esc.connect(_on_pressed_esc)
 	settingRect = settingRectScene.instantiate()
 	$CanvasLayer/Control.add_child(settingRect)
 	settingRect.visible = false
 	settingRect.close_setting.connect(close_setting)
+	state = MainMenuState.Main
 
 func _refresh_selection():
 	for i in range(button_array.size()):
@@ -32,26 +35,38 @@ func _refresh_selection():
 # =================== 메인 메뉴 입력 ===================
 
 func _on_pressed_up():
-	if not setting_open:
+	if state == MainMenuState.Main:
 		index = (index - 1 + button_array.size()) % button_array.size()
 		_refresh_selection()
 
 func _on_pressed_down():
-	if not setting_open:
+	if state == MainMenuState.Main:
 		index = (index + 1) % button_array.size()
 		_refresh_selection()
 
 func _on_pressed_enter():
-	if setting_open:
+	if state == MainMenuState.SettingOpen:
 		close_setting()
+	elif state == MainMenuState.EnteringTutorial:
+		_on_tutorial_start()
 	else:
 		button_array[index].emit_signal("pressed")
+
+func _on_pressed_esc():
+	if state == MainMenuState.SettingOpen:
+		close_setting()
+	elif state == MainMenuState.EnteringTutorial:
+		close_tutorial_warning()
+		_on_game_start()
 
 # =================== 설정 창 ===================
 
 func _on_game_start():
-	Setting.is_tutorial = false
-	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
+	if (!Setting.tutorial_played):
+		open_tutorial_warning()
+	else:
+		Setting.is_tutorial = false
+		get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 
 func _on_tutorial_start():
 	Setting.is_tutorial = true
@@ -66,13 +81,26 @@ func _on_enter_setting():
 	Setting.load()
 	settingRect._initialize()
 	settingRect.visible = true
-	setting_open = true
+	state = MainMenuState.SettingOpen
 	for button in button_array:
 		button.disabled = true
+
+func open_tutorial_warning():
+	Setting.tutorial_played = true
+	goTutorialPanel.visible = true
+	state = MainMenuState.EnteringTutorial
+	for button in button_array:
+		button.disabled = true
+
+func close_tutorial_warning():
+	goTutorialPanel.visible = false
+	state = MainMenuState.Main
+	for button in button_array:
+		button.disabled = false
 
 func close_setting():
 	settingRect.visible = false
 	Setting.save()
-	setting_open = false
+	state = MainMenuState.Main
 	for button in button_array:
 		button.disabled = false
