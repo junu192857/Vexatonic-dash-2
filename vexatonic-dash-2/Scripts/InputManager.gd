@@ -49,7 +49,7 @@ func _input(event):
 			KEY_RIGHT:
 				if event.pressed: pressed_right.emit()
 			KEY_ENTER:
-				if event.pressed: pressed_enter.emit()
+				if event.pressed and not event.is_echo(): pressed_enter.emit()
 			KEY_TAB:
 				if event.pressed: pressed_tab.emit()
 			KEY_DELETE:

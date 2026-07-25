@@ -9,11 +9,9 @@ extends Node2D
 var script_tween
 var script_lines: Array[String] = []
 var current_line: int = 0
-var is_typing: bool = false:
-	set(value):
-		enter_label.visible = !value
+var is_typing: bool = false
 
-const EXPLANATION_TRIGGERS = [182.0, 4545.0, 13273.0, 22000.0, 26000.0]
+const EXPLANATION_TRIGGERS = [182.0, 4545.0, 13273.0, 22000.0, 27000.0]
 var trigger_index: int = 0
 
 var phases: Array[Callable] = [
@@ -94,6 +92,8 @@ func force_typewrite(label: Label):
 
 func start_explanation():
 	InputManager.mouse_left_pressed.connect(_on_click)
+	InputManager.pressed_enter.connect(_on_click)
+	InputManager.pressed_l.connect(_on_click)
 	get_tree().paused = true
 	tutorialHolder.visible = true
 	_show_line(current_line)
@@ -101,6 +101,10 @@ func start_explanation():
 func start_tutorial_play():
 	if InputManager.mouse_left_pressed.is_connected(_on_click):
 		InputManager.mouse_left_pressed.disconnect(_on_click)
+	if InputManager.pressed_enter.is_connected(_on_click):
+		InputManager.pressed_enter.disconnect(_on_click)
+	if InputManager.pressed_l.is_connected(_on_click):
+		InputManager.pressed_l.disconnect(_on_click)
 	tutorialHolder.visible = false
 	get_tree().paused = false
 

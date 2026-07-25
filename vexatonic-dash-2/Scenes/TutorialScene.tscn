@@ -30,6 +30,7 @@ CONNECTOR_SCENE = ExtResource("5_f6dk7")
 SUREGI_CONNECTOR_SCENE = ExtResource("6_qifqw")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+volume_db = -80.0
 
 [node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
 script = ExtResource("7_kxtmh")
@@ -62,6 +63,7 @@ enter_label = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptH
 tutorial_speaker = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/NameHolder/Speaker")
 
 [node name="TutorialBGMPlayer" type="AudioStreamPlayer" parent="RhythmManager/TutorialManager" unique_id=1700013039]
+process_mode = 3
 stream = ExtResource("13_h4w16")
 parameters/looping = true
 
@@ -539,19 +541,18 @@ text = "Random Text"
 autowrap_mode = 2
 
 [node name="EnterLabel" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder" unique_id=503899387]
-visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.90200007
-anchor_top = 0.81500006
-anchor_right = 0.96900004
-anchor_bottom = 0.92
-offset_left = -0.28808594
-offset_top = -0.060028076
-offset_right = 0.6639404
-offset_bottom = -0.08001709
+anchor_left = 0.81100005
+anchor_top = 0.827
+anchor_right = 0.97800004
+anchor_bottom = 0.93200004
+offset_left = 0.015991211
+offset_top = 0.052001953
+offset_right = 0.56799316
+offset_bottom = 0.031982422
 theme_override_font_sizes/font_size = 22
-text = "[Enter]"
+text = "[L] 또는 [Enter]로 진행"
 
 [node name="NameHolder" type="Panel" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=72554070]
 layout_mode = 1
