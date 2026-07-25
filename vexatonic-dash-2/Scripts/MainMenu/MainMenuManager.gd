@@ -57,6 +57,7 @@ func _on_pressed_esc():
 		close_setting()
 	elif state == MainMenuState.EnteringTutorial:
 		close_tutorial_warning()
+		_on_game_start()
 
 # =================== 설정 창 ===================
 

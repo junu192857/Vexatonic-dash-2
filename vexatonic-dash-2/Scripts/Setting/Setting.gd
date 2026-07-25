@@ -65,7 +65,7 @@ static func load() -> void:
 	sound_offset  = cfg.get_value(SECTION, "sound_offset",  0)
 	judge_offset  = cfg.get_value(SECTION, "judge_offset",  0)
 	selected_difficulty = cfg.get_value(SECTION, "selected_difficulty", 0)
-	#tutorial_played = cfg.get_value(SECTION, "tutorial_played", false)
+	tutorial_played = cfg.get_value(SECTION, "tutorial_played", false)
 
 static func time_per_note_width():
 	return NOTE_WIDTH / (PX_PER_MS * speed)
