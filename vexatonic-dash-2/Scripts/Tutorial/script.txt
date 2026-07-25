@@ -46,7 +46,7 @@ PHASE 2 #hide_live2D
 PHASE 3 #show_live2D
 중간에 실수로 키를 떼더라도, 다시 누르면 뒷부분은 칠할 수 있으니까 끝까지 집중!
 PHASE 1 #start_tutorial_play
-PHASE A #show_live2D_and_change_texture_to_A
+PHASE 3 #show_live2D
 짜잔, 놀랐지?
 사실 놀랄 것도 아니긴 한가? 배관이란 게 정직하게 한 줄로만 설치될 리가 없잖아?
 아하하, 그 얘기가 아니었구나! 내가 두 명으로 보여서, 그게 신기한 거지?

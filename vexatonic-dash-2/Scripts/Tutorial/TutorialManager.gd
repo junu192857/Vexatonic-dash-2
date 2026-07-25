@@ -43,7 +43,15 @@ func _show_line(index: int):
 	var parts = line.split(" ")
 	if (parts[0]) == "PHASE":
 		current_line += 1
-		phases[int(parts[1])].call()
+		index = int(parts[1])
+		if (index < 4):
+			phases[index].call()
+		else:
+			match(index):
+				4:
+					change_live2D(0 if parts.size() < 3 else int(parts[2]))
+				_:
+					push_error("argument tarimasen for special phase")
 		return
 	is_typing = true
 	typewrite(tutorial_script, line, line.length() / CHARS_PER_SECOND)
@@ -90,3 +98,11 @@ func hide_live2D():
 func show_live2D():
 	tutorialHolder.get_node("Live2D").visible = true
 	_show_line(current_line)
+
+func change_live2D(index: int):
+	match(index):
+		0:
+			live2d.texture = load("res://Textures/Sayane_Live2D.png")
+		_:
+			pass
+	show_live2D()
