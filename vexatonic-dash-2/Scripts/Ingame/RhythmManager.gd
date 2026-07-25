@@ -96,10 +96,9 @@ func _ready() -> void:
 func place_character(lane: Lane):
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
 		return
-	#var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
 	var character = CHARACTER_SCENE.instantiate() as Character
-	#sayane.position = Vector2(initial_pos_x, -Setting.CHARACTER_POS_Y)
 	character.set_lane(lane)
+	lane.character = character
 	characters.append(character)
 	character_holder.add_child(character)
 
@@ -306,6 +305,8 @@ func assign_note(note: Note):
 	lane.add_note(note)
 	noteHolders[note.get_data().color].notes.append(note)
 	note.judgement_spread.connect($IngameDataManager.catch_judgement)
+	if (note.get_data().type == 2):
+		note.judgement_spread.connect(lane._on_jump_character)
 
 #============================== End Level ==================================
 
