@@ -69,7 +69,7 @@ func get_data() -> NoteData:
 
 # 롱노트 전용 메서드 스텁 — LongNote에서 오버라이드
 func get_marker() -> Note:
-	if (data.type != 1):
+	if (data.type not in [1, 2]):
 		return null
 	for child in get_children():
 		if child is Note:
