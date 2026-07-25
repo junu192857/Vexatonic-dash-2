@@ -19,7 +19,7 @@ static var INFINITE = 99999999
 
 static var EDITOR_LINE_WIDTH = 6.0
 
-# ==================== 플레이어 세팅 ========================
+# ==================== 플레이어 상태 관련 ========================
 
 static var speed = 2.0
 
@@ -31,9 +31,13 @@ static var gamemode = GAMEMODE.Suregi
 static var sound_offset: float = 0
 static var judge_offset: float = -20
 static var selected_difficulty: int = 1
-static var selected_chart_dir: String = ""
+static var tutorial_played = false
+
+# ==================== 싱글톤 목적 변수 =====================
 
 static var is_tutorial = false
+static var selected_chart_dir: String = ""
+
 # ==================== 관련 함수 ============================
 
 const SETTINGS_PATH = "user://settings.cfg"
@@ -47,6 +51,8 @@ static func save() -> void:
 	cfg.set_value(SECTION, "gamemode", gamemode)
 	cfg.set_value(SECTION, "sound_offset", sound_offset)
 	cfg.set_value(SECTION, "judge_offset", judge_offset)
+	cfg.set_value(SECTION, "selected_difficulty", selected_difficulty)
+	cfg.set_value(SECTION, "tutorial_played", tutorial_played)
 	cfg.save(SETTINGS_PATH)
 
 static func load() -> void:
@@ -58,6 +64,8 @@ static func load() -> void:
 	gamemode      = cfg.get_value(SECTION, "gamemode",      GAMEMODE.Normal_Character)
 	sound_offset  = cfg.get_value(SECTION, "sound_offset",  0)
 	judge_offset  = cfg.get_value(SECTION, "judge_offset",  0)
+	selected_difficulty = cfg.get_value(SECTION, "selected_difficulty", 0)
+	#tutorial_played = cfg.get_value(SECTION, "tutorial_played", false)
 
 static func time_per_note_width():
 	return NOTE_WIDTH / (PX_PER_MS * speed)
