@@ -320,6 +320,16 @@ offset_bottom = 251.0
 toggle_mode = true
 text = "Adjusted"
 
+[node name="Button12" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=2124973084]
+layout_mode = 0
+offset_left = 614.0
+offset_top = 160.0
+offset_right = 714.0
+offset_bottom = 260.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_dfuwn")
+text = "Jump"
+
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
 anchor_left = 0.25
@@ -763,6 +773,7 @@ script = ExtResource("9_847jc")
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button2" to="." method="_on_select_note" binds= [23]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/PlayMusicButton" to="." method="toggle_music"]
 [connection signal="toggled" from="CanvasLayer/NoteSelectorPanel/Button11" to="." method="_on_toggled_adjust"]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button12" to="." method="_on_select_note" binds= [14]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]

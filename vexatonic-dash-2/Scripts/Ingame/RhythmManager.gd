@@ -45,13 +45,13 @@ func _ready() -> void:
 	InputManager.released_d.connect(func(): _on_released(2, true))
 	InputManager.pressed_j.connect(func(): _on_pressed(2, false))
 	InputManager.released_j.connect(func(): _on_released(2, false))
-	
+	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
 	
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
 	if Setting.is_tutorial:
 		InputManager.process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	for i in range(3):
+	for i in range(4):
 		noteHolders.append(NoteHolder.new(i))
 	
 	levelData = ChartParser.parse(level_path, 0 if Setting.is_tutorial else Setting.selected_difficulty)
@@ -96,10 +96,9 @@ func _ready() -> void:
 func place_character(lane: Lane):
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
 		return
-	#var initial_pos_x = Setting.get_posx_from_time(-COUNTDOWN_TIME)
 	var character = CHARACTER_SCENE.instantiate() as Character
-	#sayane.position = Vector2(initial_pos_x, -Setting.CHARACTER_POS_Y)
 	character.set_lane(lane)
+	lane.character = character
 	characters.append(character)
 	character_holder.add_child(character)
 
@@ -134,13 +133,11 @@ func _physics_process(delta: float) -> void:
 			holder.update_visuals(time)
 
 		cameraManager.move(time)
-	print(time)
 	
 
 func sort_note_holders():
 	for holder in noteHolders:
 		holder.sort_notes()
-		print("HELLO")
 
 #============================== Chart Rendering ===================================
 
@@ -148,6 +145,7 @@ func sort_note_holders():
 @export var LONG_NOTE_SCENE: PackedScene
 @export var CONNECTOR_SCENE: PackedScene
 @export var SUREGI_CONNECTOR_SCENE: PackedScene
+@export var ARC_CONNECTOR_SCENE: PackedScene
 
 # render_chart() 후 생성된 Note, Connector, Marker의 관계
 #
@@ -186,7 +184,22 @@ func render_chart():
 							noteData.end_time - Setting.time_per_note_width() / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
 			(cur_note as LongNote).set_target_connector(connector as Connector)
 			previous_time = noteData.end_time
-			previous_note = marker;
+			previous_note = marker
+		
+		elif (noteData.type == 2): #JumpNote
+			var end_pos_x = Setting.get_posx_from_time(noteData.end_time)
+			match Setting.gamemode:
+				Setting.GAMEMODE.Normal_Character:
+					var marker = place_note(noteData, end_pos_x, true, cur_note)
+					# TODO: ARC_CONNECTOR_SCENE으로 Connector 만들기
+					previous_time = noteData.end_time
+					previous_note = marker
+				Setting.GAMEMODE.Normal_Line:
+					var marker = place_note(noteData, end_pos_x, true, cur_note)
+					previous_time = noteData.end_time
+					previous_note = marker
+				Setting.GAMEMODE.Suregi:
+					pass # previous_time/note를 점프 노트 시작으로 유지 → 다음 노트와 직선 연결
 			
 	for lane:Lane in levelData.lanes:
 		#lane.print_data()
@@ -195,12 +208,14 @@ func render_chart():
 		place_final_connector(lane)
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
-func place_note(data:NoteData, pos_x: float, is_marker:bool, parent: Node2D) -> Note:
-	var note = (LONG_NOTE_SCENE if not is_marker and data.type == 1 else NOTE_SCENE).instantiate()
+func place_note(data:NoteData, pos_x: float, p_is_marker:bool, parent: Node2D) -> Note:
+	var note = (LONG_NOTE_SCENE if not p_is_marker and data.type == 1 else NOTE_SCENE).instantiate()
 	note.set_data(data)
+	note.is_marker = p_is_marker
 	var lane = Lane.find_lane(levelData.lanes, data.lane)
 	parent.add_child(note)
-	if !is_marker:
+	note.select_color()
+	if !p_is_marker:
 		note.global_position = Vector2(pos_x, lane.get_height(data.time))
 		if data.adjusted == 1:
 			note.set_line()
@@ -288,6 +303,9 @@ func assign_note(note: Note):
 	lane.add_note(note)
 	noteHolders[note.get_data().color].notes.append(note)
 	note.judgement_spread.connect($IngameDataManager.catch_judgement)
+	if (note.get_data().type == 2):
+		note.judgement_spread.connect(lane._on_jump_character)
+		lane.pending_jump_notes.append(note)
 
 #============================== End Level ==================================
 

@@ -1,9 +1,6 @@
 extends Node2D
 class_name Note
 
-const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
-const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
-const SELECTED_COLORS = [Color(1,0,1), Color(0,1,1), Color(1,1,0.7)]
 
 const VEXATONIC_MS = 42
 const SPARKLIC_MS = 84
@@ -30,8 +27,11 @@ func set_data(p_data: NoteData):
 	else:
 		data = p_data
 
-func _ready() -> void:
-	sprite.modulate = UNPROCESSED_COLORS[data.color]
+func select_color():
+	if (data.type == 2 and is_marker):
+		sprite.modulate = Color(1,1,1)
+	else:
+		sprite.modulate = Setting.UNPROCESSED_COLORS[get_data().color]
 
 func process_input(p_color: int, pressed_ms: float) -> int:
 	print("Processing input: pressed time: %f, note time: %f" % [pressed_ms, data.time])
@@ -56,7 +56,7 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	return judgement
 
 func process_color(): 
-	sprite.modulate = PROCESSED_COLORS[get_data().color]
+	sprite.modulate = Setting.PROCESSED_COLORS[get_data().color]
 
 func spread_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Fastslow = Fastslow.NOTHING):
 	judgement_spread.emit(judgement, note, is_long_end, fastslow)
@@ -69,7 +69,7 @@ func get_data() -> NoteData:
 
 # 롱노트 전용 메서드 스텁 — LongNote에서 오버라이드
 func get_marker() -> Note:
-	if (data.type != 1):
+	if (data.type not in [1, 2]):
 		return null
 	for child in get_children():
 		if child is Note:

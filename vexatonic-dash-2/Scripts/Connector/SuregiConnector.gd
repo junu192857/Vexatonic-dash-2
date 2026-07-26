@@ -30,7 +30,7 @@ func set_color():
 	if (data.color == -1):
 		line.modulate = Color(1,1,1)
 	else:
-		line.modulate = UNPROCESSED_COLORS[data.color]
+		line.modulate = Setting.UNPROCESSED_COLORS[data.color]
 
 func _ready():
 	pass

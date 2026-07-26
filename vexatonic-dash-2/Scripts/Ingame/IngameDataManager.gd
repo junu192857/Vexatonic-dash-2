@@ -74,7 +74,7 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 		
 
 func set_total_notes(noteDatas: Array[NoteData]):
-	var single_count = noteDatas.filter(func(n): return n.type == 0).size()
+	var single_count = noteDatas.filter(func(n): return n.type != 1).size()
 	var long_notes = noteDatas.filter(func(n): return n.type == 1)
 	var long_count = long_notes.size()
 	total_long_length = long_notes.reduce(func(acc, n): return acc + n.end_time - n.time, 0.0)

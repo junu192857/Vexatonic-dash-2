@@ -5,7 +5,6 @@ class_name EConnector
 #var data:ConnectorData
 var start_keyframe: Keyframe
 var end_keyframe: Keyframe
-#const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
 
 func _ready():
 	data = ConnectorData.new(-1, 24, 0)
@@ -47,4 +46,4 @@ func set_editor_values(p_lane: Lane, s_keyframe: Keyframe, e_keyframe: Keyframe)
 	end_keyframe = e_keyframe
 	
 func set_editor_color(color: int):
-	polygon.modulate = Color(1,1,1) if color == -1 else PROCESSED_COLORS[color]
+	polygon.modulate = Color(1,1,1) if color == -1 else Setting.PROCESSED_COLORS[color]

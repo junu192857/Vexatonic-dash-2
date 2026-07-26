@@ -130,7 +130,6 @@ text = "Vexatonic"
 horizontal_alignment = 1
 
 [node name="GoTutorialPanel" type="TextureRect" parent="CanvasLayer/Control" unique_id=1717423707]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -195,3 +194,5 @@ text = "No[Esc]"
 [connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
 [connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
+[connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button" to="." method="_on_tutorial_start"]
+[connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button2" to="." method="_on_game_start"]

@@ -9,9 +9,6 @@ var c_start_time: float
 var c_end_time: float
 var processed_polygon: Polygon2D
 
-const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
-const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
-
 
 func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: bool) -> float:
 	c_start_time = start_time
@@ -58,7 +55,7 @@ func set_color():
 	if (data.color == -1):
 		polygon.modulate = Color(1,1,1)
 	else:
-		polygon.modulate = UNPROCESSED_COLORS[data.color]
+		polygon.modulate = Setting.UNPROCESSED_COLORS[data.color]
 
 
 func make_new_polygon():
@@ -86,7 +83,7 @@ func paint_range(from_time: float, to_time: float) -> void:
 			Vector2(local_end_x,   y_end   + Setting.HALF_CONNECTOR_HEIGHT),
 			Vector2(local_start_x, y_start + Setting.HALF_CONNECTOR_HEIGHT),
 		])
-		processed_polygon.color = PROCESSED_COLORS[data.color]
+		processed_polygon.color = Setting.PROCESSED_COLORS[data.color]
 		processed_polygon.visible = true
 
 	#for child in get_children():

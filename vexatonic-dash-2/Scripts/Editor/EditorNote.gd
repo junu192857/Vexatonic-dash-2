@@ -8,7 +8,7 @@ func _ready():
 
 
 func set_color(color: int):
-	sprite.modulate = PROCESSED_COLORS[color]
+	sprite.modulate = Setting.PROCESSED_COLORS[color]
 
 func select_color():
-	sprite.modulate = SELECTED_COLORS[get_data().color]
+	sprite.modulate = Setting.SELECTED_COLORS[get_data().color]

@@ -224,14 +224,11 @@ func realign_lines_by_move():
 	
 # ========================= 레인 및 노트 입력 ======================
 
-const UNPROCECSSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0),Color(1.0, 1.0, 0.4)]
-const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0),Color(0.0, 0.0, 0.7),Color(0.8, 0.7, 0.0)]
-
-enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12, 
-					YellowLong = 13, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34,
+enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12,
+					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34,
 					Nothing = 100}
 
-const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13]
+const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13, 14]
 const modify: Array[int] = [21, 22, 23]
 const trigger: Array[int] = [31, 32, 33, 34]
 
@@ -509,7 +506,7 @@ func generate_preview(selected: int) -> Node2D:
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
-			if (adjusted_toggled):
+			if (adjusted_toggled or selected_note == 14):
 				my_preview.set_line()
 			my_preview.position = get_preview_pos_for_note()
 			my_preview.set_color(selected_color)
@@ -519,7 +516,7 @@ func generate_preview(selected: int) -> Node2D:
 				return null
 			my_preview = NOTE_SCENE.instantiate()
 			add_child(my_preview)
-			if (adjusted_toggled):
+			if (adjusted_toggled or selected_note == 14):
 				my_preview.set_line()
 			my_preview.position = long_start_pos
 			my_preview.set_color(selected_color)
@@ -641,7 +638,7 @@ func generate_modify_preview():
 						return
 					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
 				
-				elif target_note.get_data().type == 1 and not target_note.is_marker:  # 롱노트 앞부분
+				elif target_note.get_data().type in [1, 2] and not target_note.is_marker:  # 롱노트/점프노트 앞부분
 					if (snapped_x >= Setting.get_posx_from_time(target_note.get_data().end_time)):
 						cancel_modify_note()
 						return
@@ -875,7 +872,7 @@ func _on_put_note_ready():
 		current_state = EditorState.Placing
 	elif selected_note in [1,2,3]:  # 단노트
 		_place_single_note()
-	elif selected_note in [11,12,13]:  # 롱노트
+	elif selected_note in [11,12,13,14]:  # 롱노트/점프노트
 		long_start_pos = preview.global_position
 		current_state = EditorState.Placing
 	elif selected_note in trigger:
@@ -884,6 +881,8 @@ func _on_put_note_ready():
 func _on_put_note_placing():
 	if selected_note == NoteSelection.Lane:
 		_place_lane()
+	elif selected_note == NoteSelection.Jump:
+		_place_jump_note()
 	else:
 		_place_long_note()
 	current_state = EditorState.Ready
@@ -899,6 +898,13 @@ func _place_trigger():
 	
 func _place_single_note():
 	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index, adjusted_toggled)
+	levelData.noteDatas.append(data)
+	preview.set_data(data)
+	target_lane.add_note(preview)
+	preview = null
+
+func _place_jump_note():
+	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 2, long_end_time, target_lane.lane_index, 1)
 	levelData.noteDatas.append(data)
 	preview.set_data(data)
 	target_lane.add_note(preview)
@@ -1008,7 +1014,7 @@ func _on_modify_ready():
 				current_state = EditorState.Placing
 			
 		NoteSelection.ModifyNote:
-			if (target_note.get_data().type == 1):
+			if (target_note.get_data().type in [1, 2]):
 				long_start_pos = target_note.get_parent().global_position if target_note.is_marker else target_note.global_position
 			current_state = EditorState.Placing
 		NoteSelection.ModifyTrigger:
@@ -1039,7 +1045,7 @@ func _on_modify_placing():
 	elif selected_note == NoteSelection.ModifyNote:
 		if (target_note.get_data().type == 0):
 			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
-		elif target_note.get_data().type == 1 and not target_note.is_marker:
+		elif target_note.get_data().type in [1, 2] and not target_note.is_marker:
 			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
 			adjust_longNote_connector(target_note, target_note.get_data().time, target_note.get_data().end_time)
 		else:
@@ -1204,8 +1210,8 @@ func adjust_note_position():
 		note.queue_free()
 		
 func adjust_longNote_connector(note: ENote, start_time: float, end_time: float):
-	if (note.get_data().type != 1):
-		push_error("Sorry, this is not a long note")
+	if (note.get_data().type not in [1, 2]):
+		push_error("Sorry, this is not a long/jump note")
 		return
 	
 	note.position.y = target_lane.get_height(start_time)
@@ -1480,7 +1486,7 @@ func parse(chart_path: String):
 		note.set_color(noteData.color)
 		lane.add_note(note)
 
-		if (noteData.type == 1):
+		if (noteData.type in [1, 2]):
 			var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
 			var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
 			if connector_start_x < connector_end_x:

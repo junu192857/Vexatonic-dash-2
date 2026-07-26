@@ -9,7 +9,8 @@ var is_init: bool
 
 var editor_connectors: Array[EConnector]
 
-var ingame_character: Character
+var character: Character
+var pending_jump_notes: Array[Note] = []
 
 func _init(p_index: int, p_is_init: bool):
 	lane_index = p_index
@@ -133,6 +134,10 @@ func insert_editor_connector(connector: EConnector):
 func find_editor_connector(keyframe: Keyframe):
 	for connector in editor_connectors:
 		pass
+
+func _on_jump_character(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
+	if character != null:
+		character.start_jump(note)
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane: Lane in lanes:
