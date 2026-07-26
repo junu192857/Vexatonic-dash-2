@@ -11,7 +11,7 @@ var script_lines: Array[String] = []
 var current_line: int = 0
 var is_typing: bool = false
 
-const EXPLANATION_TRIGGERS = [182.0, 4545.0, 13273.0, 22000.0, 27000.0]
+const EXPLANATION_TRIGGERS = [182.0, 4545.0, 13273.0, 22000.0, 28000.0, 30727.0]
 var trigger_index: int = 0
 
 var phases: Array[Callable] = [

@@ -16,7 +16,7 @@ var fall_start_y: float
 var jump_initialized: bool = false
 var jump_peak: float
 
-const GRAVITY: float = 1500.0      # px/s^2 (아래 방향)
+const GRAVITY: float = 1500.0   # px/s^2 (아래 방향)
 const PEAK_PER_MS: float = 0.30   # ms당 peak 증가량 (px/ms)
 
 func set_lane(p_lane: Lane):
