@@ -17,7 +17,7 @@ var jump_initialized: bool = false
 var jump_peak: float
 
 const GRAVITY: float = 1500.0   # px/s^2 (아래 방향)
-const PEAK_PER_MS: float = 0.30   # ms당 peak 증가량 (px/ms)
+const PEAK_PER_MS: float = 0.15   # ms당 peak 증가량 (px/ms)
 
 func set_lane(p_lane: Lane):
 	lane = p_lane
@@ -29,7 +29,7 @@ func start_jump(note: Note):
 	jump_start_y = global_position.y
 	jump_end_y = lane.get_height(note.get_data().end_time) + Setting.CHARACTER_POS_Y
 	var duration = note.get_data().end_time - note.get_data().time
-	jump_peak = duration * PEAK_PER_MS
+	jump_peak = duration * PEAK_PER_MS * Setting.speed
 	jumping_note = note
 	jump_initialized = false
 	jump_state = JumpState.Jumping
