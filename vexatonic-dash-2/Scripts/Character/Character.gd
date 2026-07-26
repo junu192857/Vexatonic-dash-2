@@ -15,21 +15,23 @@ var jump_end_y: float
 var fall_start_y: float
 var jump_initialized: bool = false
 var jump_peak: float
+var jump_is_miss: bool = false
 
-const GRAVITY: float = 1500.0   # px/s^2 (아래 방향)
+const GRAVITY: float = 5000.0   # px/s^2 (아래 방향)
 const PEAK_PER_MS: float = 0.15   # ms당 peak 증가량 (px/ms)
 
 func set_lane(p_lane: Lane):
 	lane = p_lane
 	pending_jump_notes = lane.pending_jump_notes
 
-func start_jump(note: Note):
+func start_jump(note: Note, is_miss: bool):
 	if note == jump_aborted_note:
 		return  # Case 3: 이미 중단된 노트 — 무시
 	jump_start_y = global_position.y
 	jump_end_y = lane.get_height(note.get_data().end_time) + Setting.CHARACTER_POS_Y
 	var duration = note.get_data().end_time - note.get_data().time
 	jump_peak = duration * PEAK_PER_MS * Setting.speed
+	jump_is_miss = is_miss
 	jumping_note = note
 	jump_initialized = false
 	jump_state = JumpState.Jumping
@@ -85,7 +87,7 @@ func set_character_position(time: float) -> bool:
 				global_position.y = jump_end_y
 			else:
 				var ratio = elapsed / total_dur
-				global_position.y = lerp(jump_start_y, jump_end_y, ratio) \
-					- jump_peak * sin(PI * ratio)
+				var arc_offset = 0.0 if jump_is_miss else -jump_peak * sin(PI * ratio)
+				global_position.y = lerp(jump_start_y, jump_end_y, ratio) + arc_offset
 
 	return false

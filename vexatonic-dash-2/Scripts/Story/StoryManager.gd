@@ -23,7 +23,6 @@ const CHARS_PER_SECOND = 30.0
 func _ready() -> void:
 	await get_tree().process_frame
 	_load_script()
-	start_explanation()
 
 func _load_script():
 	var file = FileAccess.open(script_path, FileAccess.READ)
@@ -74,7 +73,6 @@ func force_typewrite(label: Label):
 	if script_tween and script_tween.is_valid():
 		script_tween.kill()
 	label.visible_characters = -1
-
 
 
 func start_explanation():
