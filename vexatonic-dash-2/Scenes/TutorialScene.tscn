@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_1uws4"]
 [ext_resource type="Script" uid="uid://en0omrumjk71" path="res://Scripts/Tutorial/TutorialManager.gd" id="12_xkm2r"]
 [ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="13_h4w16"]
-[ext_resource type="Texture2D" uid="uid://b3r6by2y1fado" path="res://Textures/Sayane_Live2D.png" id="14_hrv55"]
+[ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="15_h4w16"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
 metadata/_edit_vertical_guides_ = [-111.0]
@@ -54,13 +54,9 @@ resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
 [node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("11_eggky")]
 visible = false
 
-[node name="TutorialManager" type="Node2D" parent="RhythmManager" unique_id=1079243057 node_paths=PackedStringArray("tutorialHolder", "live2d", "tutorial_script", "enter_label", "tutorial_speaker")]
+[node name="TutorialManager" type="Node2D" parent="RhythmManager" unique_id=1079243057 node_paths=PackedStringArray("storyManager")]
 script = ExtResource("12_xkm2r")
-tutorialHolder = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder")
-live2d = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/Live2D")
-tutorial_script = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder/Script")
-enter_label = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder/EnterLabel")
-tutorial_speaker = NodePath("../../CanvasLayer/TutorialControl/TutorialHolder/NameHolder/Speaker")
+storyManager = NodePath("../../CanvasLayer/StoryControl")
 
 [node name="TutorialBGMPlayer" type="AudioStreamPlayer" parent="RhythmManager/TutorialManager" unique_id=1700013039]
 process_mode = 3
@@ -488,93 +484,8 @@ text = "PERFECT PAINT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TutorialControl" type="Control" parent="CanvasLayer" unique_id=153344136]
-process_mode = 3
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TutorialHolder" type="Panel" parent="CanvasLayer/TutorialControl" unique_id=1326941684]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Live2D" type="TextureRect" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=1782607335]
-layout_mode = 0
-offset_left = 765.0
-offset_top = 162.0
-offset_right = 1152.0
-offset_bottom = 807.0
-texture = ExtResource("14_hrv55")
-
-[node name="ScriptHolder" type="TextureRect" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=1566585080]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.15
-anchor_top = 0.6
-anchor_right = 0.85
-anchor_bottom = 0.9
-texture = ExtResource("12_1uws4")
-
-[node name="Script" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder" unique_id=1784256312]
-custom_minimum_size = Vector2(1209.368, 0)
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.05
-anchor_top = 0.2
-anchor_right = 0.95
-anchor_bottom = 0.8
-offset_left = 0.6479988
-offset_top = 0.1159935
-offset_right = 0.41601563
-offset_bottom = -0.115997314
-theme_override_font_sizes/font_size = 36
-text = "Random Text"
-autowrap_mode = 2
-
-[node name="EnterLabel" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/ScriptHolder" unique_id=503899387]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.81100005
-anchor_top = 0.827
-anchor_right = 0.97800004
-anchor_bottom = 0.93200004
-offset_left = 0.015991211
-offset_top = 0.052001953
-offset_right = 0.56799316
-offset_bottom = 0.031982422
-theme_override_font_sizes/font_size = 22
-text = "[L] 또는 [Enter]로 진행"
-
-[node name="NameHolder" type="Panel" parent="CanvasLayer/TutorialControl/TutorialHolder" unique_id=72554070]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.16700001
-anchor_top = 0.568
-anchor_right = 0.31800002
-anchor_bottom = 0.63900006
-offset_left = -0.64001465
-offset_top = -0.44000244
-offset_right = 0.4399414
-offset_bottom = -0.12005615
-
-[node name="Speaker" type="Label" parent="CanvasLayer/TutorialControl/TutorialHolder/NameHolder" unique_id=1735024158]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 49
-text = "사야네"
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("15_h4w16")]
+script_path = "res://Scripts/Tutorial/script.txt"
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
 [connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]

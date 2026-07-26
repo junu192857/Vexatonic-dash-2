@@ -256,25 +256,13 @@ func place_suregi_connector(p_color: int, start_time: float, end_time: float, la
 	
 # 레인의 첫 번째 노트 이전의 Connector 생성. 첫 번째 노트가 없으면 패스
 func place_initial_connector(lane: Lane):
-	if (!lane.notes.is_empty()):
-		if (lane.is_init):
-			print("THIS IS INITIAL LANE")
-			#var initial_height = lane.keyframes[0].y
-			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-				place_suregi_connector(-1, -2 * COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
-									self, Vector2(Setting.get_posx_from_time(-2 * COUNTDOWN_TIME),lane.keyframes[0].kf.y))
-			else:
-				place_connector(-1, -2* COUNTDOWN_TIME, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index, false,\
-									self, Vector2(Setting.get_posx_from_time(-2 * COUNTDOWN_TIME),lane.keyframes[0].kf.y))
-		else:
-			if (lane.keyframes[0].kf.x < lane.notes[0].get_data().time):
-				if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-					place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index,\
-										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
-				else:
-					place_connector(-1, lane.keyframes[0].kf.x, lane.notes[0].get_data().time - Setting.time_per_note_width() / 2, lane.lane_index,\
-										false, self,  Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
-	#TODO: 노트가 없는 initial lane에 대해 대응하기.
+	var start_time = -2 * COUNTDOWN_TIME if lane.is_init else lane.keyframes[0].kf.x
+	var end_time = lane.notes[0].get_data().time - Setting.time_per_note_width() / 2 if !lane.notes.is_empty() else lane.keyframes[-1].kf.x
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+		place_suregi_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(Setting.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
+	else:
+		place_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(Setting.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
+	
 
 # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
 func place_final_connector(lane: Lane):

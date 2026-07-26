@@ -137,7 +137,7 @@ func find_editor_connector(keyframe: Keyframe):
 
 func _on_jump_character(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
 	if character != null:
-		character.start_jump(note)
+		character.start_jump(note, judgement == Note.Judgement.MISS)
 
 static func find_lane(lanes: Array[Lane], index: int) -> Lane:
 	for lane: Lane in lanes:
