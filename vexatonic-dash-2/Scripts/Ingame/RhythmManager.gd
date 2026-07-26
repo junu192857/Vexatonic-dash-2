@@ -133,13 +133,11 @@ func _physics_process(delta: float) -> void:
 			holder.update_visuals(time)
 
 		cameraManager.move(time)
-	print(time)
 	
 
 func sort_note_holders():
 	for holder in noteHolders:
 		holder.sort_notes()
-		print("HELLO")
 
 #============================== Chart Rendering ===================================
 
@@ -307,6 +305,7 @@ func assign_note(note: Note):
 	note.judgement_spread.connect($IngameDataManager.catch_judgement)
 	if (note.get_data().type == 2):
 		note.judgement_spread.connect(lane._on_jump_character)
+		lane.pending_jump_notes.append(note)
 
 #============================== End Level ==================================
 
