@@ -330,6 +330,17 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Jump"
 
+[node name="ChangeSpeedButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1277897035]
+layout_mode = 0
+offset_left = 888.0
+offset_top = 32.0
+offset_right = 988.0
+offset_bottom = 132.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_dfuwn")
+text = "Change
+Speed"
+
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
 anchor_left = 0.25
@@ -774,6 +785,7 @@ script = ExtResource("9_847jc")
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/PlayMusicButton" to="." method="toggle_music"]
 [connection signal="toggled" from="CanvasLayer/NoteSelectorPanel/Button11" to="." method="_on_toggled_adjust"]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button12" to="." method="_on_select_note" binds= [14]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ChangeSpeedButton" to="." method="_on_select_note" binds= [35]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
