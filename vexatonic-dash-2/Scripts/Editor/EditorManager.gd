@@ -807,12 +807,12 @@ func find_trigger_placing_avilable() -> bool:
 				return false
 		return snapped_x > Setting.EPSILON
 	elif (current_state == EditorState.Ready and selected_note == NoteSelection.SpeedTrigger):
-		for i: Trigger in levelData.triggers.filter(func(a): a.type == Trigger.TYPE.Speed):
+		for i: Trigger in levelData.triggers.filter(func(a): return a.type == Trigger.TYPE.Speed):
 			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON):
 				return false
 		return snapped_x > Setting.EPSILON
 	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.Speed):
-		for i: Trigger in levelData.triggers.filter(func(a): a.type == Trigger.TYPE.Speed):
+		for i: Trigger in levelData.triggers.filter(func(a): return a.type == Trigger.TYPE.Speed):
 			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
 				return false
 		return snapped_x > Setting.EPSILON
