@@ -225,12 +225,12 @@ func realign_lines_by_move():
 # ========================= 레인 및 노트 입력 ======================
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12,
-					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34,
+					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34, SpeedTrigger = 35,
 					Nothing = 100}
 
-const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13, 14]
-const modify: Array[int] = [21, 22, 23]
-const trigger: Array[int] = [31, 32, 33, 34]
+const colored_notes_list: Array[int] = [0, 1, 2, 3, 11, 12, 13, 14]
+const modify_list: Array[int] = [21, 22, 23]
+const trigger_list: Array[int] = [31, 32, 33, 34, 35]
 
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
@@ -274,12 +274,12 @@ func _on_select_note(selected: int):
 			InputManager.mouse_left_pressed.disconnect(_on_modify)
 
 		# selected < 20이면 레인/노트, selected > 20이면 modify
-		if (selected in colored_notes):
+		if (selected in colored_notes_list):
 			selected_color = selected % 10 - 1
 			InputManager.mouse_left_pressed.connect(_on_put_note)
-		elif (selected in modify):
+		elif (selected in modify_list):
 			InputManager.mouse_left_pressed.connect(_on_modify)
-		elif (selected in trigger):
+		elif (selected in trigger_list):
 			InputManager.mouse_left_pressed.connect(_on_put_note)
 		current_state = EditorState.Ready
 		if (preview != null):
@@ -300,7 +300,7 @@ func _on_move_preview():
 	mouse_pos = get_global_mouse_position()
 	snapped_x = get_snapped_x(mouse_pos.x)
 	
-	if (selected_note in modify):
+	if (selected_note in modify_list):
 		if (check_mouse_in_available_area()):
 			generate_modify_preview()
 		else:
@@ -358,7 +358,7 @@ func update_preview(selected: int):
 					y = mouse_pos.y
 				preview.set_data(lane_start_pos, Vector2(snapped_x, y))
 				can_do_something = true
-	elif selected in trigger:
+	elif selected in trigger_list:
 		if (current_state == EditorState.Ready):
 			if (!find_trigger_placing_avilable()):
 				cancel_put_something()
@@ -484,7 +484,7 @@ func generate_preview(selected: int) -> Node2D:
 				y = mouse_pos.y
 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, y))
 			my_preview.position = lane_start_pos
-	elif selected in trigger:
+	elif selected in trigger_list:
 		if (current_state == EditorState.Ready):
 			if (!find_trigger_placing_avilable()):
 				cancel_put_something()
@@ -875,7 +875,7 @@ func _on_put_note_ready():
 	elif selected_note in [11,12,13,14]:  # 롱노트/점프노트
 		long_start_pos = preview.global_position
 		current_state = EditorState.Placing
-	elif selected_note in trigger:
+	elif selected_note in trigger_list:
 		_place_trigger()
 
 func _on_put_note_placing():
