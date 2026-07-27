@@ -5,7 +5,7 @@ var editor_pos_y: float
 var node: Node2D
 var length_line: Line2D
 var sprite: Sprite2D
-var bpmText: Label
+var valueText: Label
 
 func select_trigger():
 	sprite.modulate = Color(1,1,1)
@@ -20,12 +20,12 @@ func _init(p_type: TYPE, p_start: float, p_c: float, p_t: float, p_y: float) -> 
 
 func assign_node(p_node: Node2D):
 	node = p_node
-	if (type != Trigger.TYPE.BPM):
+	if (type != Trigger.TYPE.BPM and type != Trigger.TYPE.Speed):
 		length_line = node.get_child(0)
 		sprite = node.get_child(1)
 	else:
 		sprite = node.get_child(0)
-		bpmText = node.get_child(1)
+		valueText = node.get_child(1)
 
 func show_data():
 	match (type):
@@ -40,7 +40,7 @@ func show_data():
 				Vector2(Setting.get_posx_from_time(t), 0)
 			])
 		Trigger.TYPE.BPM:
-			bpmText.text = "%.2f" % c
+			valueText.text = "%.2f" % c
 
 func show_line_preview(end_global_point: Vector2):
 	match(type):

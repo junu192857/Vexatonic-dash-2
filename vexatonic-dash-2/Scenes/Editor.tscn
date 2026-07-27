@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://bul34fxxophy1" path="res://Prefabs/MoveTrigger.tscn" id="5_qexec"]
 [ext_resource type="PackedScene" uid="uid://cq60k3h6dbxia" path="res://Prefabs/ZoomTrigger.tscn" id="6_847jc"]
 [ext_resource type="PackedScene" uid="uid://cw8p2v3afm85j" path="res://Prefabs/BPMTrigger.tscn" id="7_847jc"]
+[ext_resource type="PackedScene" uid="uid://dnbcvrxhsooaf" path="res://Prefabs/SpeedTrigger.tscn" id="8_ir51w"]
 [ext_resource type="Script" uid="uid://dofrhowavsi7y" path="res://Scripts/Editor/Timer.gd" id="9_847jc"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_brgpd"]
@@ -24,6 +25,7 @@ LINE_SCENE = ExtResource("4_5v8xv")
 MOVE_TRIGGER_SCENE = ExtResource("5_qexec")
 ZOOM_TRIGGER_SCENE = ExtResource("6_847jc")
 BPM_TRIGGER_SCENE = ExtResource("7_847jc")
+SPEED_TRIGGER_SCENE = ExtResource("8_ir51w")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
 

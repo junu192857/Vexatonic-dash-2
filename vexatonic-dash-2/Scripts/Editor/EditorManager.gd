@@ -9,7 +9,7 @@ var sorted_bpm: Array
 @export var MOVE_TRIGGER_SCENE: PackedScene
 @export var ZOOM_TRIGGER_SCENE: PackedScene
 @export var BPM_TRIGGER_SCENE: PackedScene
-
+@export var SPEED_TRIGGER_SCENE: PackedScene
 
 @onready var camera = $Camera2D
 @onready var musicPlayer = $AudioStreamPlayer
@@ -81,19 +81,33 @@ func set_initial_value():
 	levelData.metadata.music_path = music_path.get_file()
 	levelData.metadata.length = music_time * 1000
 	
-	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, -500.0)
-	levelData.triggers.append(initial_bpm_trigger)
-	var trigger_node = BPM_TRIGGER_SCENE.instantiate()
-	add_child(trigger_node)
-	trigger_node.global_position = initial_bpm_trigger.get_editor_position()
-	initial_bpm_trigger.assign_node(trigger_node)
-	initial_bpm_trigger.show_data()
-	initial_bpm_trigger.unselect_trigger()
+	add_initial_trigger(Trigger.TYPE.BPM, bpm)
+	add_initial_trigger(Trigger.TYPE.Speed, 1.0)
 	
 	levelData.triggers.append(EditorTrigger.new(Trigger.TYPE.BPM, Setting.INFINITE, 60.0, 0.0, 0.0))
 	
 	chart_loaded = false
-	
+
+func add_initial_trigger(type: Trigger.TYPE, value: float):
+	var pos_y
+	var node
+	match type:
+		Trigger.TYPE.BPM:
+			pos_y = -500.0
+			node = BPM_TRIGGER_SCENE.instantiate()
+		Trigger.TYPE.Speed:
+			pos_y = -1000.0
+			node = SPEED_TRIGGER_SCENE.instantiate()
+		_:
+			pos_y = 0.0
+	var initial_trigger = EditorTrigger.new(type, 0.0, value, 0.0, pos_y)
+	levelData.triggers.append(initial_trigger)
+	add_child(node)
+	node.global_position = initial_trigger.get_editor_position()
+	initial_trigger.assign_node(node)
+	initial_trigger.show_data()
+	initial_trigger.unselect_trigger()
+
 func start_find_music():
 	initialPanel.get_node("FileDialog").popup()
 	
@@ -789,6 +803,16 @@ func find_trigger_placing_avilable() -> bool:
 		return snapped_x > Setting.EPSILON
 	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.BPM):
 		for i: Trigger in sorted_bpm:
+			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
+				return false
+		return snapped_x > Setting.EPSILON
+	elif (current_state == EditorState.Ready and selected_note == NoteSelection.SpeedTrigger):
+		for i: Trigger in levelData.triggers.filter(func(a): a.type == Trigger.TYPE.Speed):
+			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON):
+				return false
+		return snapped_x > Setting.EPSILON
+	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.Speed):
+		for i: Trigger in levelData.triggers.filter(func(a): a.type == Trigger.TYPE.Speed):
 			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
 				return false
 		return snapped_x > Setting.EPSILON
