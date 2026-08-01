@@ -28,19 +28,13 @@ func assign_node(p_node: Node2D):
 		valueText = node.get_child(1)
 
 func show_data():
-	match (type):
-		Trigger.TYPE.Move:
-			length_line.points = PackedVector2Array([
+	if (need_line()):
+		length_line.points = PackedVector2Array([
 				Vector2(0, 0),
 				Vector2(Setting.get_posx_from_time(t), c)
-			])
-		Trigger.TYPE.Zoom:
-			length_line.points = PackedVector2Array([
-				Vector2(0,0),
-				Vector2(Setting.get_posx_from_time(t), 0)
-			])
-		Trigger.TYPE.BPM:
-			valueText.text = "%.2f" % c
+				])
+	else:
+		valueText.text = "%.2f" % c
 
 func show_line_preview(end_global_point: Vector2):
 	match(type):

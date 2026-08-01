@@ -511,6 +511,8 @@ func generate_preview(selected: int) -> Node2D:
 						my_preview = ZOOM_TRIGGER_SCENE.instantiate()
 					NoteSelection.BPMTrigger:
 						my_preview = BPM_TRIGGER_SCENE.instantiate()
+					NoteSelection.SpeedTrigger:
+						my_preview = SPEED_TRIGGER_SCENE.instantiate()
 				add_child(my_preview)
 				my_preview.position = Vector2(snapped_x, mouse_pos.y)
 	else: #Note인 경우
@@ -674,7 +676,7 @@ func generate_modify_preview():
 					cancel_modify_trigger()
 					return
 				else:
-					if (target_trigger.type == Trigger.TYPE.BPM or not pressing_keys["shift"]):
+					if (!target_trigger.need_line() or not pressing_keys["shift"]):
 						target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
 						target_trigger.show_data()
 					else:
@@ -1167,6 +1169,9 @@ func show_modify_panel():
 		Trigger.TYPE.BPM:
 			value_label.text = "Set BPM:"
 			length_spinbox.visible = false
+		Trigger.TYPE.Speed:
+			value_label.text = "Set speed:"
+			length_spinbox.visible = false
 	value_spinbox.value = target_trigger.c
 	length_spinbox.value = target_trigger.t
 
@@ -1408,6 +1413,8 @@ func save_chart():
 				type_string = "ROTATE"
 			Trigger.TYPE.Zoom:
 				type_string = "ZOOM"
+			Trigger.TYPE.Speed:
+				type_string = "SPEED"
 		file.store_line("%s %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.node.global_position.y])
 	
 	quit_save_panel()
@@ -1554,6 +1561,8 @@ func parse(chart_path: String):
 				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.BPM:
 				trigger_node = BPM_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.Speed:
+				trigger_node = SPEED_TRIGGER_SCENE.instantiate()
 		add_child(trigger_node)
 		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)
