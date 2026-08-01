@@ -16,7 +16,7 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	var calculated_delta_y: float = 0.0
 	var start_height
 	if p_lane != null:
-		start_height = p_lane.get_height(start_time - Setting.time_per_note_width()) if first else \
+		start_height = p_lane.get_height(PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(start_time) - Setting.NOTE_WIDTH)) if first else \
 					   p_lane.get_height(start_time)
 					
 # 다음 keyframe이 나오기 전까지만 찍도록 end_time 조정
