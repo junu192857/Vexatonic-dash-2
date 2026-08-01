@@ -31,7 +31,7 @@ func show_data():
 	if (need_line()):
 		length_line.points = PackedVector2Array([
 				Vector2(0, 0),
-				Vector2(Setting.get_posx_from_time(t), c)
+				Vector2(PositionCalculator.get_posx_from_time(t), c)
 				])
 	else:
 		valueText.text = "%.2f" % c
@@ -56,11 +56,11 @@ func set_new_data():
 	match(type):
 		Trigger.TYPE.Move:
 			c = length_line.points[1].y
-			t = Setting.get_time_from_posx(length_line.points[1].x)
+			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
 		Trigger.TYPE.Zoom:
-			t = Setting.get_time_from_posx(length_line.points[1].x)
+			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
 		_:
 			return
 
 func get_editor_position():
-	return Vector2(Setting.get_posx_from_time(start), editor_pos_y)
+	return Vector2(PositionCalculator.get_posx_from_time(start), editor_pos_y)
