@@ -11,9 +11,9 @@ var t: float
 
 func need_line() -> bool:
 	if type == Trigger.TYPE.BPM or type == Trigger.TYPE.Speed:
-		return true
-	else:
 		return false
+	else:
+		return true
 
 func _init(p_type: TYPE, p_start: float, p_c: float, p_t: float) -> void:
 	type = p_type
