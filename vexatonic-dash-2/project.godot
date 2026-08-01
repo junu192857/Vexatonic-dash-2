@@ -21,7 +21,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 SettingLoader="*uid://hqkfmofjf5hs"
-InputManager="*res://Scripts/InputManager.gd"
+InputManager="*res://Scripts/Autoloads/InputManager.gd"
+PositionCalculator="*uid://d0oinqdkgv3q8"
 
 [debug]
 
