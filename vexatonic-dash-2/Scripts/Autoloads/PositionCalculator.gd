@@ -21,7 +21,7 @@ func setup(segments: Array) -> void:
 		pos += (seg.time - prev_time) * Setting.PX_PER_MS * cur_speed
 		_seg_cumulative_pos.append(pos)
 		prev_time = seg.time
-		cur_speed = seg.speed
+		cur_speed = seg.speed * Setting.speed
 	_cur_seg_index = 0
 
 func reset() -> void:
@@ -45,7 +45,7 @@ func get_posx_from_time(time: float) -> float:
 			break
 		pos = _seg_cumulative_pos[i]
 		prev_time = speed_segments[i].time
-		cur_speed = speed_segments[i].speed
+		cur_speed = speed_segments[i].speed * Setting.speed
 	return pos + (time - prev_time) * Setting.PX_PER_MS * cur_speed
 
 # O(n) 버전: posx → time 역산. 렌더링·에디터 전용.
@@ -61,7 +61,7 @@ func get_time_from_posx(posx: float) -> float:
 			return prev_time + remaining / (Setting.PX_PER_MS * cur_speed)
 		remaining -= seg_px
 		prev_time = speed_segments[i].time
-		cur_speed = speed_segments[i].speed
+		cur_speed = speed_segments[i].speed * Setting.speed
 	return prev_time + remaining / (Setting.PX_PER_MS * cur_speed)
 
 # O(1) 상각 버전: time이 단조증가할 때만 정확. 인게임 캐릭터 위치 전용.
@@ -71,4 +71,4 @@ func get_posx_from_time_fast(time: float) -> float:
 	if _cur_seg_index == 0:
 		return time * Setting.PX_PER_MS * Setting.speed
 	var seg = speed_segments[_cur_seg_index - 1]
-	return _seg_cumulative_pos[_cur_seg_index - 1] + (time - seg.time) * Setting.PX_PER_MS * seg.speed
+	return _seg_cumulative_pos[_cur_seg_index - 1] + (time - seg.time) * Setting.PX_PER_MS * seg.speed * Setting.speed
