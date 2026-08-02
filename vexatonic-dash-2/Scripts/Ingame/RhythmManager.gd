@@ -48,8 +48,8 @@ func _ready() -> void:
 	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
 	
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
-	if Setting.is_tutorial:
-		InputManager.process_mode = Node.PROCESS_MODE_ALWAYS
+	#if Setting.is_tutorial:
+	#	InputManager.process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	for i in range(4):
 		noteHolders.append(NoteHolder.new(i))

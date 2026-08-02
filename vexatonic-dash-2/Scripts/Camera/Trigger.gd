@@ -1,10 +1,12 @@
 class_name Trigger
 
-enum TYPE { Move = 31, Zoom  = 32, Rotate = 33, BPM = 34, Speed = 35}
+enum TYPE { Move = 31, Zoom  = 32, Rotate = 33, BPM = 34, Speed = 35, MoveX = 36 }
+const TYPE_STRING = ["MOVE", "ROTATE", "ZOOM", "BPM", "SPEED", "MOVEX"]
 
 var type: TYPE
 var start: float
 #c: 얼마나 이동 또는 줌 또는 속도변경할거냐를 결정
+#Move: y좌표 변화량, Zoom: Zoom 변화량, BPM: 변경된 BPM, Speed: 변경된 속도, MoveX: 시간 기준 변화량 (카메라가 현재보다 몇 초 앞으로 갈 거냐?)
 var c: float
 #t: 이동 또는 줌에 걸리는 시간 결정
 var t: float

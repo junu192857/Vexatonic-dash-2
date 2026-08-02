@@ -149,7 +149,7 @@ func _count_notes(chart_path: String) -> int:
 			in_lane = true
 		elif parts[0] == "END":
 			in_lane = false
-		elif not in_lane and parts.size() >= 5 and not parts[0] in ["MOVE","ROTATE","ZOOM","BPM"]:
+		elif not in_lane and parts.size() >= 5 and not parts[0] in Trigger.TYPE_STRING:
 			if int(parts[2]) == 0:
 				single += 1
 			else:

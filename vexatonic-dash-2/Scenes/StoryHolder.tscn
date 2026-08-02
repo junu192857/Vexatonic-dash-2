@@ -97,3 +97,8 @@ theme_override_font_sizes/font_size = 49
 text = "사야네"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="StoryInputManager" type="Control" parent="." unique_id=564961498]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
