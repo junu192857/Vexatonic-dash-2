@@ -1565,6 +1565,8 @@ func parse(chart_path: String):
 				trigger_node = BPM_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.Speed:
 				trigger_node = SPEED_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.MoveX:
+				trigger_node = SPEED_TRIGGER_SCENE.instantiate()
 		add_child(trigger_node)
 		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)

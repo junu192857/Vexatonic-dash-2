@@ -72,6 +72,7 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 				"ZOOM":   trigger_type = Trigger.TYPE.Zoom
 				"BPM": trigger_type = Trigger.TYPE.BPM
 				"SPEED": trigger_type = Trigger.TYPE.Speed
+				"MOVEX": trigger_type = Trigger.TYPE.MoveX
 				_:
 					push_error("PARSE ERROR: UNKNOWN TRIGGER TYPE")
 			if (is_editor):
