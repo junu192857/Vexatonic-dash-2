@@ -20,7 +20,7 @@ func _init(p_type: TYPE, p_start: float, p_c: float, p_t: float, p_y: float) -> 
 
 func assign_node(p_node: Node2D):
 	node = p_node
-	if (type != Trigger.TYPE.BPM and type != Trigger.TYPE.Speed):
+	if (need_line()):
 		length_line = node.get_child(0)
 		sprite = node.get_child(1)
 	else:
