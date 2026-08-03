@@ -1174,6 +1174,9 @@ func show_modify_panel():
 		Trigger.TYPE.Speed:
 			value_label.text = "Set speed:"
 			length_spinbox.visible = false
+		Trigger.TYPE.MoveX:
+			value_label.text = "Movex_value_time(ms):"
+			length_spinbox.visible = true
 	value_spinbox.value = target_trigger.c
 	length_spinbox.value = target_trigger.t
 
@@ -1417,6 +1420,8 @@ func save_chart():
 				type_string = "ZOOM"
 			Trigger.TYPE.Speed:
 				type_string = "SPEED"
+			Trigger.TYPE.MoveX:
+				type_string = "MOVEX"
 		file.store_line("%s %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.node.global_position.y])
 	
 	quit_save_panel()
