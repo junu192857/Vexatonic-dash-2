@@ -1,10 +1,10 @@
 extends Control
 
-@export var tutorialHolder: Control
+@export var storyHolder: Control
 @export var live2d: TextureRect
-@export var tutorial_script: Label
+@export var story_script: Label
 @export var enter_label: Label
-@export var tutorial_speaker: Label
+@export var story_speaker: Label
 @export var script_path: String
 
 var script_tween
@@ -51,12 +51,12 @@ func _show_line(index: int):
 					push_error("argument tarimasen for special phase")
 		return
 	is_typing = true
-	typewrite(tutorial_script, line, line.length() / CHARS_PER_SECOND)
+	typewrite(story_script, line, line.length() / CHARS_PER_SECOND)
 	script_tween.tween_callback(func(): is_typing = false)
 
 func _on_click():
 	if is_typing:
-		force_typewrite(tutorial_script)
+		force_typewrite(story_script)
 		is_typing = false
 	else:
 		current_line += 1
@@ -80,7 +80,7 @@ func start_explanation():
 	InputManager.pressed_enter.connect(_on_click)
 	InputManager.pressed_l.connect(_on_click)
 	get_tree().paused = true
-	tutorialHolder.visible = true
+	storyHolder.visible = true
 	_show_line(current_line)
 
 func start_tutorial_play():
@@ -90,15 +90,15 @@ func start_tutorial_play():
 		InputManager.pressed_enter.disconnect(_on_click)
 	if InputManager.pressed_l.is_connected(_on_click):
 		InputManager.pressed_l.disconnect(_on_click)
-	tutorialHolder.visible = false
+	storyHolder.visible = false
 	get_tree().paused = false
 
 func hide_live2D():
-	tutorialHolder.get_node("Live2D").visible = false
+	storyHolder.get_node("Live2D").visible = false
 	_show_line(current_line)
 
 func show_live2D():
-	tutorialHolder.get_node("Live2D").visible = true
+	storyHolder.get_node("Live2D").visible = true
 	_show_line(current_line)
 
 func change_live2D(index: int):

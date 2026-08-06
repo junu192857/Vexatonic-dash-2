@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b3r6by2y1fado" path="res://Textures/Sayane_Live2D.png" id="1_pcs6n"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="2_paxo6"]
 
-[node name="StoryControl" type="Control" unique_id=194327749 node_paths=PackedStringArray("tutorialHolder", "live2d", "tutorial_script", "enter_label", "tutorial_speaker")]
+[node name="StoryControl" type="Control" unique_id=194327749 node_paths=PackedStringArray("storyHolder", "live2d", "story_script", "enter_label", "story_speaker")]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 15
@@ -13,13 +13,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_paxo6")
-tutorialHolder = NodePath("TutorialHolder")
-live2d = NodePath("TutorialHolder/Live2D")
-tutorial_script = NodePath("TutorialHolder/ScriptHolder/Script")
-enter_label = NodePath("TutorialHolder/ScriptHolder/EnterLabel")
-tutorial_speaker = NodePath("TutorialHolder/NameHolder/Speaker")
+storyHolder = NodePath("StoryHolder")
+live2d = NodePath("StoryHolder/Live2D")
+story_script = NodePath("StoryHolder/ScriptHolder/Script")
+enter_label = NodePath("StoryHolder/ScriptHolder/EnterLabel")
+story_speaker = NodePath("StoryHolder/NameHolder/Speaker")
 
-[node name="TutorialHolder" type="Panel" parent="." unique_id=125738451]
+[node name="StoryHolder" type="Panel" parent="." unique_id=125738451]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,7 +27,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Live2D" type="TextureRect" parent="TutorialHolder" unique_id=1668585676]
+[node name="Live2D" type="TextureRect" parent="StoryHolder" unique_id=1668585676]
 layout_mode = 0
 offset_left = 765.0
 offset_top = 162.0
@@ -35,7 +35,7 @@ offset_right = 1152.0
 offset_bottom = 807.0
 texture = ExtResource("1_pcs6n")
 
-[node name="ScriptHolder" type="TextureRect" parent="TutorialHolder" unique_id=562684793]
+[node name="ScriptHolder" type="TextureRect" parent="StoryHolder" unique_id=562684793]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15
@@ -44,7 +44,7 @@ anchor_right = 0.85
 anchor_bottom = 0.9
 texture = ExtResource("2_paxo6")
 
-[node name="Script" type="Label" parent="TutorialHolder/ScriptHolder" unique_id=1964866749]
+[node name="Script" type="Label" parent="StoryHolder/ScriptHolder" unique_id=1964866749]
 custom_minimum_size = Vector2(1209.368, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -60,7 +60,7 @@ theme_override_font_sizes/font_size = 36
 text = "Random Text"
 autowrap_mode = 2
 
-[node name="EnterLabel" type="Label" parent="TutorialHolder/ScriptHolder" unique_id=397628069]
+[node name="EnterLabel" type="Label" parent="StoryHolder/ScriptHolder" unique_id=397628069]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.81100005
@@ -74,7 +74,7 @@ offset_bottom = 0.031982422
 theme_override_font_sizes/font_size = 22
 text = "[L] 또는 [Enter]로 진행"
 
-[node name="NameHolder" type="Panel" parent="TutorialHolder" unique_id=1838767337]
+[node name="NameHolder" type="Panel" parent="StoryHolder" unique_id=1838767337]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.16700001
@@ -86,7 +86,7 @@ offset_top = -0.44000244
 offset_right = 0.4399414
 offset_bottom = -0.12005615
 
-[node name="Speaker" type="Label" parent="TutorialHolder/NameHolder" unique_id=644680094]
+[node name="Speaker" type="Label" parent="StoryHolder/NameHolder" unique_id=644680094]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
