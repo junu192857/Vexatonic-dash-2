@@ -14,7 +14,7 @@ var is_typing: bool = false
 
 var phases: Array[Callable] = [
 	start_explanation,
-	start_tutorial_play,
+	quit_story,
 	hide_live2D,
 	show_live2D
 ]
@@ -32,6 +32,7 @@ func _load_script():
 		var line = file.get_line()
 		if not line.is_empty():
 			script_lines.append(line)
+	current_line = 0
 
 func _show_line(index: int):
 	if index >= script_lines.size():
@@ -81,7 +82,7 @@ func start_explanation():
 	storyHolder.visible = true
 	_show_line(current_line)
 
-func start_tutorial_play():
+func quit_story():
 	if pressed_next.is_connected(_on_click):
 		pressed_next.disconnect(_on_click)
 	storyHolder.visible = false

@@ -102,3 +102,6 @@ func close_setting():
 	settingRect.visible = false
 	Setting.save()
 	state = MainMenuState.Main
+
+func open_random_conversation():
+	pass
