@@ -35,7 +35,7 @@ func show_data():
 				Vector2(0, 0),
 				Vector2(PositionCalculator.get_posx_from_time(t), c)
 				])
-			Trigger.TYPE.MoveX or Trigger.TYPE.Zoom:
+			Trigger.TYPE.MoveX, Trigger.TYPE.Zoom:
 				length_line.points = PackedVector2Array([
 				Vector2(0, 0),
 				Vector2(PositionCalculator.get_posx_from_time(t), 0)
@@ -50,7 +50,7 @@ func show_line_preview(end_global_point: Vector2):
 				Vector2(0,0),
 				end_global_point - node.position
 			])
-		Trigger.TYPE.Zoom or Trigger.TYPE.MoveX:
+		Trigger.TYPE.Zoom, Trigger.TYPE.MoveX:
 			length_line.points = PackedVector2Array([
 				Vector2(0,0),
 				Vector2.RIGHT * (end_global_point.x - node.position.x)
@@ -64,7 +64,7 @@ func set_new_data():
 		Trigger.TYPE.Move:
 			c = length_line.points[1].y
 			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
-		Trigger.TYPE.Zoom or Trigger.TYPE.MoveX:
+		Trigger.TYPE.Zoom, Trigger.TYPE.MoveX:
 			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
 		_:
 			return

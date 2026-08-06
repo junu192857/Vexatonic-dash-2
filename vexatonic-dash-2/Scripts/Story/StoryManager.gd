@@ -76,20 +76,14 @@ func force_typewrite(label: Label):
 
 
 func start_explanation():
-	InputManager.mouse_left_pressed.connect(_on_click)
-	InputManager.pressed_enter.connect(_on_click)
-	InputManager.pressed_l.connect(_on_click)
+	pressed_next.connect(_on_click)
 	get_tree().paused = true
 	storyHolder.visible = true
 	_show_line(current_line)
 
 func start_tutorial_play():
-	if InputManager.mouse_left_pressed.is_connected(_on_click):
-		InputManager.mouse_left_pressed.disconnect(_on_click)
-	if InputManager.pressed_enter.is_connected(_on_click):
-		InputManager.pressed_enter.disconnect(_on_click)
-	if InputManager.pressed_l.is_connected(_on_click):
-		InputManager.pressed_l.disconnect(_on_click)
+	if pressed_next.is_connected(_on_click):
+		pressed_next.disconnect(_on_click)
 	storyHolder.visible = false
 	get_tree().paused = false
 
@@ -108,3 +102,13 @@ func change_live2D(index: int):
 		_:
 			pass
 	show_live2D()
+
+signal pressed_next
+
+func _input(event):
+	if event is InputEventKey:
+		match event.keycode:
+			KEY_L, KEY_ENTER:
+				if event.pressed and not event.is_echo():
+					print("hello")
+					pressed_next.emit()

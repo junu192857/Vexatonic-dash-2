@@ -265,7 +265,6 @@ text = "Vexatonic"
 horizontal_alignment = 1
 
 [node name="GoTutorialPanel" type="TextureRect" parent="CanvasLayer/Control" unique_id=1717423707]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -355,8 +354,10 @@ text = "사야네와 랜덤대화"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StoryManager" type="Node2D" parent="." unique_id=1212675922]
+[node name="StoryManager" type="Control" parent="." unique_id=2091723251]
 process_mode = 3
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("11_if7li")
 
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button" to="." method="_on_tutorial_start"]
