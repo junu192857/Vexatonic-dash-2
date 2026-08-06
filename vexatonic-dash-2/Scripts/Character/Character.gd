@@ -45,7 +45,7 @@ func set_character_position(time: float) -> bool:
 		queue_free()
 		return true
 
-	global_position.x = Setting.get_posx_from_time(time)
+	global_position.x = PositionCalculator.get_posx_from_time_fast(time)
 
 	match jump_state:
 		JumpState.None:

@@ -8,7 +8,7 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	lane = p_lane
 	var start_height
 	if p_lane != null:
-		start_height = p_lane.get_height(start_time - Setting.time_per_note_width()) if first else \
+		start_height = p_lane.get_height(PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(start_time) - Setting.NOTE_WIDTH)) if first else \
 					   p_lane.get_height(start_time)
 	
 	line.add_point(Vector2.ZERO)
@@ -16,13 +16,13 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	for kf in p_lane.keyframes:
 		if (kf.kf.x > start_time):
 			if kf.kf.x >= end_time:
-				line.add_point(Vector2(Setting.get_posx_from_time(end_time - start_time), p_lane.get_height(end_time) - start_height))
+				line.add_point(Vector2(PositionCalculator.get_posx_from_time(end_time) - PositionCalculator.get_posx_from_time(start_time), p_lane.get_height(end_time) - start_height))
 				break
 			else:
-				line.add_point(Vector2(Setting.get_posx_from_time(kf.kf.x - start_time), kf.kf.y - start_height))
+				line.add_point(Vector2(PositionCalculator.get_posx_from_time(kf.kf.x) - PositionCalculator.get_posx_from_time(start_time), kf.kf.y - start_height))
 			
 	
-	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), p_lane.get_height(end_time) - start_height)
+	data = ConnectorData.new(p_color, PositionCalculator.get_posx_from_time(end_time) - PositionCalculator.get_posx_from_time(start_time), p_lane.get_height(end_time) - start_height)
 	set_color()
 	return end_time
 

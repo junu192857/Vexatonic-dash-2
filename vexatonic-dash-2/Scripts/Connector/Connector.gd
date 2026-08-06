@@ -16,7 +16,7 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	var calculated_delta_y: float = 0.0
 	var start_height
 	if p_lane != null:
-		start_height = p_lane.get_height(start_time - Setting.time_per_note_width()) if first else \
+		start_height = p_lane.get_height(PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(start_time) - Setting.NOTE_WIDTH)) if first else \
 					   p_lane.get_height(start_time)
 					
 # 다음 keyframe이 나오기 전까지만 찍도록 end_time 조정
@@ -29,7 +29,7 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 					end_time = kf.kf.x
 				break
 	c_end_time = end_time
-	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)
+	data = ConnectorData.new(p_color, PositionCalculator.get_posx_from_time(end_time) - PositionCalculator.get_posx_from_time(start_time), calculated_delta_y)
 	return end_time
 
 func _ready():
@@ -70,8 +70,8 @@ func paint_range(from_time: float, to_time: float) -> void:
 	if processed_polygon == null:
 		return
 	
-	var local_start_x = clamp(Setting.get_posx_from_time(from_time - c_start_time), 0.0, data.length)
-	var local_end_x   = clamp(Setting.get_posx_from_time(to_time   - c_start_time), 0.0, data.length)
+	var local_start_x = clamp(PositionCalculator.get_posx_from_time(from_time) - PositionCalculator.get_posx_from_time(c_start_time), 0.0, data.length)
+	var local_end_x   = clamp(PositionCalculator.get_posx_from_time(to_time) - PositionCalculator.get_posx_from_time(c_start_time), 0.0, data.length)
 	if local_end_x <= local_start_x or data.length <= Setting.EPSILON:
 		processed_polygon.visible = false
 	else:

@@ -27,8 +27,8 @@ func set_polygon_dynamically():
 	])
 
 func set_data_from_keyframes():
-	var start_pos = Vector2(Setting.get_posx_from_time(start_keyframe.kf.x), start_keyframe.kf.y)
-	var end_pos = Vector2(Setting.get_posx_from_time(end_keyframe.kf.x), end_keyframe.kf.y)
+	var start_pos = Vector2(PositionCalculator.get_posx_from_time(start_keyframe.kf.x), start_keyframe.kf.y)
+	var end_pos = Vector2(PositionCalculator.get_posx_from_time(end_keyframe.kf.x), end_keyframe.kf.y)
 	global_position = start_pos
 	set_data(start_pos, end_pos)
 	

@@ -9,7 +9,7 @@ var sorted_bpm: Array
 @export var MOVE_TRIGGER_SCENE: PackedScene
 @export var ZOOM_TRIGGER_SCENE: PackedScene
 @export var BPM_TRIGGER_SCENE: PackedScene
-
+@export var SPEED_TRIGGER_SCENE: PackedScene
 
 @onready var camera = $Camera2D
 @onready var musicPlayer = $AudioStreamPlayer
@@ -71,7 +71,7 @@ func initiate_editor():
 	settingPanel.visible = true
 
 	_update_sorted_bpm_triggers()
-	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.metadata.length), 6.0)
+	$x_axis_bar.size = Vector2(PositionCalculator.get_posx_from_time(levelData.metadata.length), 6.0)
 
 func set_initial_value():
 	levelData = LevelData.new()
@@ -81,19 +81,33 @@ func set_initial_value():
 	levelData.metadata.music_path = music_path.get_file()
 	levelData.metadata.length = music_time * 1000
 	
-	var initial_bpm_trigger = EditorTrigger.new(Trigger.TYPE.BPM, 0.0, bpm, 0.0, -500.0)
-	levelData.triggers.append(initial_bpm_trigger)
-	var trigger_node = BPM_TRIGGER_SCENE.instantiate()
-	add_child(trigger_node)
-	trigger_node.global_position = initial_bpm_trigger.get_editor_position()
-	initial_bpm_trigger.assign_node(trigger_node)
-	initial_bpm_trigger.show_data()
-	initial_bpm_trigger.unselect_trigger()
+	add_initial_trigger(Trigger.TYPE.BPM, bpm)
+	add_initial_trigger(Trigger.TYPE.Speed, 1.0)
 	
 	levelData.triggers.append(EditorTrigger.new(Trigger.TYPE.BPM, Setting.INFINITE, 60.0, 0.0, 0.0))
 	
 	chart_loaded = false
-	
+
+func add_initial_trigger(type: Trigger.TYPE, value: float):
+	var pos_y
+	var node
+	match type:
+		Trigger.TYPE.BPM:
+			pos_y = -500.0
+			node = BPM_TRIGGER_SCENE.instantiate()
+		Trigger.TYPE.Speed:
+			pos_y = -1000.0
+			node = SPEED_TRIGGER_SCENE.instantiate()
+		_:
+			pos_y = 0.0
+	var initial_trigger = EditorTrigger.new(type, 0.0, value, 0.0, pos_y)
+	levelData.triggers.append(initial_trigger)
+	add_child(node)
+	node.global_position = initial_trigger.get_editor_position()
+	initial_trigger.assign_node(node)
+	initial_trigger.show_data()
+	initial_trigger.unselect_trigger()
+
 func start_find_music():
 	initialPanel.get_node("FileDialog").popup()
 	
@@ -189,7 +203,7 @@ func place_bar_lines():
 		var snap_count = 0
 		
 		while true:
-			var x = Setting.get_posx_from_time(time)
+			var x = PositionCalculator.get_posx_from_time(time)
 			if snap_count % effective_bit == 0:
 				put_line(x, true)  # 마디 시작 (굵은 선)
 			else:
@@ -199,7 +213,7 @@ func place_bar_lines():
 			if time >= bpm_end_time - Setting.EPSILON:
 				break
 		
-		var x = Setting.get_posx_from_time(bpm_end_time)
+		var x = PositionCalculator.get_posx_from_time(bpm_end_time)
 		put_line(x, true)
 
 func put_line(pos_x: float, major: bool):
@@ -225,12 +239,12 @@ func realign_lines_by_move():
 # ========================= 레인 및 노트 입력 ======================
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12,
-					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34,
+					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34, SpeedTrigger = 35,
 					Nothing = 100}
 
-const colored_notes: Array[int] = [0, 1, 2, 3, 11, 12, 13, 14]
-const modify: Array[int] = [21, 22, 23]
-const trigger: Array[int] = [31, 32, 33, 34]
+const colored_notes_list: Array[int] = [0, 1, 2, 3, 11, 12, 13, 14]
+const modify_list: Array[int] = [21, 22, 23]
+const trigger_list: Array[int] = [31, 32, 33, 34, 35]
 
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
@@ -274,12 +288,12 @@ func _on_select_note(selected: int):
 			InputManager.mouse_left_pressed.disconnect(_on_modify)
 
 		# selected < 20이면 레인/노트, selected > 20이면 modify
-		if (selected in colored_notes):
+		if (selected in colored_notes_list):
 			selected_color = selected % 10 - 1
 			InputManager.mouse_left_pressed.connect(_on_put_note)
-		elif (selected in modify):
+		elif (selected in modify_list):
 			InputManager.mouse_left_pressed.connect(_on_modify)
-		elif (selected in trigger):
+		elif (selected in trigger_list):
 			InputManager.mouse_left_pressed.connect(_on_put_note)
 		current_state = EditorState.Ready
 		if (preview != null):
@@ -300,7 +314,7 @@ func _on_move_preview():
 	mouse_pos = get_global_mouse_position()
 	snapped_x = get_snapped_x(mouse_pos.x)
 	
-	if (selected_note in modify):
+	if (selected_note in modify_list):
 		if (check_mouse_in_available_area()):
 			generate_modify_preview()
 		else:
@@ -353,12 +367,12 @@ func update_preview(selected: int):
 				if pressing_keys["shift"]:
 					y = lane_start_pos.y
 				elif pressing_keys["c"]:
-					y =  get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
+					y =  get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
 				else: 
 					y = mouse_pos.y
 				preview.set_data(lane_start_pos, Vector2(snapped_x, y))
 				can_do_something = true
-	elif selected in trigger:
+	elif selected in trigger_list:
 		if (current_state == EditorState.Ready):
 			if (!find_trigger_placing_avilable()):
 				cancel_put_something()
@@ -391,7 +405,7 @@ func update_preview(selected: int):
 					# 구간 포인트 수집
 					var points = [connector_start_x]
 					for kf in target_lane.keyframes:
-						var kf_x = Setting.get_posx_from_time(kf.kf.x)
+						var kf_x = PositionCalculator.get_posx_from_time(kf.kf.x)
 						if kf_x > connector_start_x and kf_x < connector_end_x:
 							points.append(kf_x)
 						if kf_x >= connector_end_x:
@@ -411,8 +425,8 @@ func update_preview(selected: int):
 					
 					print("points.size:  %d" % points.size())
 					for i in range(points.size() - 1):
-						var start_pos = Vector2(points[i], target_lane.get_height(Setting.get_time_from_posx(points[i])))
-						var end_pos = Vector2(points[i + 1], target_lane.get_height(Setting.get_time_from_posx(points[i + 1])))
+						var start_pos = Vector2(points[i], target_lane.get_height(PositionCalculator.get_time_from_posx(points[i])))
+						var end_pos = Vector2(points[i + 1], target_lane.get_height(PositionCalculator.get_time_from_posx(points[i + 1])))
 						current.set_data(start_pos, end_pos)
 						current.global_position = start_pos
 						
@@ -448,8 +462,8 @@ func update_preview(selected: int):
 					preview.add_child(existing_marker)
 					existing_marker.is_marker = true
 					existing_marker.set_color(selected_color)
-				long_end_time = Setting.get_time_from_posx(existing_marker.global_position.x)
-				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+				long_end_time = PositionCalculator.get_time_from_posx(existing_marker.global_position.x)
+				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
 				
 				can_do_something = true
 #새로운 노트나 레인을 찍기 위한 preview를 만드는 함수.
@@ -479,12 +493,12 @@ func generate_preview(selected: int) -> Node2D:
 			if pressing_keys["shift"]:
 				y = lane_start_pos.y
 			elif pressing_keys["c"]:
-				y = get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
+				y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
 			else: 
 				y = mouse_pos.y
 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, y))
 			my_preview.position = lane_start_pos
-	elif selected in trigger:
+	elif selected in trigger_list:
 		if (current_state == EditorState.Ready):
 			if (!find_trigger_placing_avilable()):
 				cancel_put_something()
@@ -497,6 +511,8 @@ func generate_preview(selected: int) -> Node2D:
 						my_preview = ZOOM_TRIGGER_SCENE.instantiate()
 					NoteSelection.BPMTrigger:
 						my_preview = BPM_TRIGGER_SCENE.instantiate()
+					NoteSelection.SpeedTrigger:
+						my_preview = SPEED_TRIGGER_SCENE.instantiate()
 				add_child(my_preview)
 				my_preview.position = Vector2(snapped_x, mouse_pos.y)
 	else: #Note인 경우
@@ -526,7 +542,7 @@ func generate_preview(selected: int) -> Node2D:
 			if connector_end_x > connector_start_x:
 				var points = [connector_start_x]
 				for kf in target_lane.keyframes:
-					var kf_x = Setting.get_posx_from_time(kf.kf.x)
+					var kf_x = PositionCalculator.get_posx_from_time(kf.kf.x)
 					if kf_x > connector_start_x and kf_x < connector_end_x:
 						points.append(kf_x)
 					if kf_x >= connector_end_x:
@@ -537,8 +553,8 @@ func generate_preview(selected: int) -> Node2D:
 				for i in range(points.size() - 1):
 					var start_x = points[i]
 					var end_x = points[i + 1]
-					var start_pos = Vector2(start_x, target_lane.get_height(Setting.get_time_from_posx(start_x)))
-					var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
+					var start_pos = Vector2(start_x, target_lane.get_height(PositionCalculator.get_time_from_posx(start_x)))
+					var end_pos = Vector2(end_x, target_lane.get_height(PositionCalculator.get_time_from_posx(end_x)))
 					
 					var longNote_connector = CONNECTOR_SCENE.instantiate()
 					parent_node.add_child(longNote_connector)
@@ -551,9 +567,9 @@ func generate_preview(selected: int) -> Node2D:
 			var my_marker = NOTE_SCENE.instantiate()
 			my_preview.add_child(my_marker)
 			my_marker.is_marker = true
-			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
 			my_marker.set_color(selected_color)
-			long_end_time = Setting.get_time_from_posx(my_marker.global_position.x)
+			long_end_time = PositionCalculator.get_time_from_posx(my_marker.global_position.x)
 			
 	can_do_something = true
 	return my_preview
@@ -601,18 +617,18 @@ func generate_modify_preview():
 				#var kf_index = target_lane.keyframes.find(target_keyframe)
 				#var prev_kf = target_lane.keyframes[kf_index - 1] if kf_index > 0 else null
 				#var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
-				var prev_x = Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x) if previous_connector else -INF
-				var next_x = Setting.get_posx_from_time(next_connector.end_keyframe.kf.x) if next_connector else INF
+				var prev_x = PositionCalculator.get_posx_from_time(previous_connector.start_keyframe.kf.x) if previous_connector else -INF
+				var next_x = PositionCalculator.get_posx_from_time(next_connector.end_keyframe.kf.x) if next_connector else INF
 				if pressing_keys["shift"]:
 					if previous_connector:
 						adjusted_y = previous_connector.start_keyframe.kf.y
 					elif next_connector:
 						adjusted_y = next_connector.end_keyframe.kf.y
 				elif pressing_keys["c"]:
-					adjusted_y = get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
+					adjusted_y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
 				else:
 					adjusted_y = mouse_pos.y
-				var new_keyframe = Keyframe.new(Setting.get_time_from_posx(snapped_x), adjusted_y)
+				var new_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(snapped_x), adjusted_y)
 				new_keyframe.set_lane(target_lane.lane_index)
 				if snapped_x > prev_x + Setting.EPSILON and snapped_x < next_x - Setting.EPSILON:
 					if previous_connector:
@@ -636,35 +652,35 @@ func generate_modify_preview():
 					if (!find_note_placing_available()):
 						cancel_modify_note()
 						return
-					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+					target_note.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
 				
 				elif target_note.get_data().type in [1, 2] and not target_note.is_marker:  # 롱노트/점프노트 앞부분
-					if (snapped_x >= Setting.get_posx_from_time(target_note.get_data().end_time)):
+					if (snapped_x >= PositionCalculator.get_posx_from_time(target_note.get_data().end_time)):
 						cancel_modify_note()
 						return
 					if (!find_note_placing_available()):
 						cancel_modify_note()
 						return
 					print("Trying move only parent")
-					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
-					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x))))
-					adjust_longNote_connector(target_note, Setting.get_time_from_posx(snapped_x), target_note.get_data().end_time)
+					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
+					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x))))
+					adjust_longNote_connector(target_note, PositionCalculator.get_time_from_posx(snapped_x), target_note.get_data().end_time)
 				else:  # 롱노트 뒷부분
 					if (!find_longNote_placing_available()):
 						cancel_modify_note()
 						return
-					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
-					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
+					target_note.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
+					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, PositionCalculator.get_time_from_posx(snapped_x))
 			NoteSelection.ModifyTrigger:
 				if (!find_trigger_placing_avilable()):
 					cancel_modify_trigger()
 					return
 				else:
-					if (target_trigger.type == Trigger.TYPE.BPM or not pressing_keys["shift"]):
+					if (!target_trigger.need_line() or not pressing_keys["shift"]):
 						target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
 						target_trigger.show_data()
 					else:
-						target_trigger.node.global_position = Vector2(Setting.get_posx_from_time(target_trigger.start), target_trigger.editor_pos_y)
+						target_trigger.node.global_position = Vector2(PositionCalculator.get_posx_from_time(target_trigger.start), target_trigger.editor_pos_y)
 						target_trigger.show_line_preview(mouse_pos)
 					target_trigger.select_trigger()
 	can_do_something = true
@@ -705,12 +721,12 @@ func cancel_modify_note():
 		if (current_state == EditorState.Placing):
 			var data = target_note.get_data()
 			if (data.type == 0):
-				target_note.global_position = Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time))
+				target_note.global_position = Vector2(PositionCalculator.get_posx_from_time(data.time), target_lane.get_height(data.time))
 			elif (target_note.is_marker):
-				target_note.global_position = Vector2(Setting.get_posx_from_time(data.end_time), target_lane.get_height(data.end_time))
+				target_note.global_position = Vector2(PositionCalculator.get_posx_from_time(data.end_time), target_lane.get_height(data.end_time))
 				adjust_longNote_connector(target_note.get_parent(), data.time, data.end_time)
 			else:
-				move_only_parent(target_note, Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time)))
+				move_only_parent(target_note, Vector2(PositionCalculator.get_posx_from_time(data.time), target_lane.get_height(data.time)))
 				adjust_longNote_connector(target_note, data.time, data.end_time)
 
 func cancel_modify_trigger():
@@ -722,7 +738,7 @@ func cancel_modify_trigger():
 func put_keyframe_indicator():
 	var indicator = NOTE_SCENE.instantiate()
 	add_child(indicator)
-	indicator.global_position = Vector2(Setting.get_posx_from_time(target_keyframe.kf.x), target_keyframe.kf.y)
+	indicator.global_position = Vector2(PositionCalculator.get_posx_from_time(target_keyframe.kf.x), target_keyframe.kf.y)
 	indicator.sprite.modulate = Color(0,0,0)
 	return indicator
 
@@ -748,10 +764,10 @@ func find_lane_placing_case() -> LanePlacingCase:
 
 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
 	for lane in levelData.lanes:
-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
+		var lane_x_start = PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x)
+		var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
 		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
-			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
+			var lane_y = lane.get_height(PositionCalculator.get_time_from_posx(mouse_pos.x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				set_target_lane(lane)
 				return LanePlacingCase.Case2
@@ -761,7 +777,7 @@ func find_lane_placing_case() -> LanePlacingCase:
 	var closest_dist: float = Setting.INFINITE
 
 	for lane in levelData.lanes:
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
+		var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
 		if mouse_pos.x > lane_x_end:
 			if camera_left < lane_x_end:
 				var lane_y_end = lane.keyframes[-1].kf.y
@@ -784,12 +800,22 @@ func find_lane_placing_case() -> LanePlacingCase:
 func find_trigger_placing_avilable() -> bool:
 	if (current_state == EditorState.Ready and selected_note == NoteSelection.BPMTrigger):
 		for i: Trigger in sorted_bpm:
-			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON):
+			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON):
 				return false
 		return snapped_x > Setting.EPSILON
 	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.BPM):
 		for i: Trigger in sorted_bpm:
-			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
+			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
+				return false
+		return snapped_x > Setting.EPSILON
+	elif (current_state == EditorState.Ready and selected_note == NoteSelection.SpeedTrigger):
+		for i: Trigger in levelData.triggers.filter(func(a): return a.type == Trigger.TYPE.Speed):
+			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON):
+				return false
+		return snapped_x > Setting.EPSILON
+	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.Speed):
+		for i: Trigger in levelData.triggers.filter(func(a): return a.type == Trigger.TYPE.Speed):
+			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
 				return false
 		return snapped_x > Setting.EPSILON
 	else:
@@ -800,8 +826,8 @@ func find_note_placing_available() -> bool:
 	if (current_state == EditorState.Ready):
 		for i in range(levelData.lanes.size()):
 			var lane = levelData.lanes[levelData.lanes.size()-i-1]
-			var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
-			var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
+			var lane_x_start = PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x)
+			var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
 			var delta_start = lane_x_start - snapped_x
 			var delta_end = snapped_x - lane_x_end
 			if (0 < delta_start and delta_start < snapped_x):
@@ -809,14 +835,14 @@ func find_note_placing_available() -> bool:
 			elif (0 < delta_end and delta_end < Setting.EPSILON):
 				snapped_x -= Setting.EPSILON
 			if snapped_x >= lane_x_start and snapped_x <= lane_x_end:
-				var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
+				var lane_y = lane.get_height(PositionCalculator.get_time_from_posx(snapped_x))
 				if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 					set_target_lane(lane)
 					return true
 	#Placing 단계: 오직 target_lane 안에서만 판정함
 	elif (current_state == EditorState.Placing):
-		var lane_x_start = Setting.get_posx_from_time(target_lane.keyframes[0].kf.x)
-		var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
+		var lane_x_start = PositionCalculator.get_posx_from_time(target_lane.keyframes[0].kf.x)
+		var lane_x_end = PositionCalculator.get_posx_from_time(target_lane.keyframes[-1].kf.x)
 		var delta_start = lane_x_start - snapped_x
 		var delta_end = snapped_x - lane_x_end
 		if (0 < delta_start and delta_start < snapped_x):
@@ -832,11 +858,11 @@ func find_longNote_placing_available() -> bool:
 	print("Finding..")
 	if (long_start_pos.x >= snapped_x - Setting.EPSILON):
 		return false
-	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
+	var lane_x_end = PositionCalculator.get_posx_from_time(target_lane.keyframes[-1].kf.x)
 	var delta = snapped_x - lane_x_end
 	if (0 < delta and delta < Setting.EPSILON):
 		snapped_x -= Setting.EPSILON
-		print("Adjusted snapped_x. new x is %f and new time is %f" % [snapped_x, Setting.get_time_from_posx(snapped_x)])
+		print("Adjusted snapped_x. new x is %f and new time is %f" % [snapped_x, PositionCalculator.get_time_from_posx(snapped_x)])
 	if (snapped_x > lane_x_end):
 		return false
 	return true
@@ -848,13 +874,13 @@ func get_preview_pos_for_lane(case: LanePlacingCase) -> Vector2:
 	if (case == LanePlacingCase.Case1):
 		return Vector2(0, mouse_pos.y)
 	elif (case == LanePlacingCase.Case2):
-		return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+		return Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
 	elif (case == LanePlacingCase.Case3):
-		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x),target_lane.keyframes[-1].kf.y)
+		return Vector2(PositionCalculator.get_posx_from_time(target_lane.keyframes[-1].kf.x),target_lane.keyframes[-1].kf.y)
 	return Vector2.ZERO
 	
 func get_preview_pos_for_note() -> Vector2:
-	return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+	return Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
 
 func _on_put_note():
 	if !editor_ready or !can_do_something or modifying_trigger or !check_mouse_in_available_area():
@@ -875,7 +901,7 @@ func _on_put_note_ready():
 	elif selected_note in [11,12,13,14]:  # 롱노트/점프노트
 		long_start_pos = preview.global_position
 		current_state = EditorState.Placing
-	elif selected_note in trigger:
+	elif selected_note in trigger_list:
 		_place_trigger()
 
 func _on_put_note_placing():
@@ -888,7 +914,7 @@ func _on_put_note_placing():
 	current_state = EditorState.Ready
 
 func _place_trigger():
-	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0, preview.position.y)
+	var trigger_data = EditorTrigger.new(selected_note as int, PositionCalculator.get_time_from_posx(preview.global_position.x), 0, 0, preview.position.y)
 	trigger_data.assign_node(preview)
 	levelData.triggers.append(trigger_data)
 	preview = null	
@@ -897,21 +923,21 @@ func _place_trigger():
 	show_modify_panel()
 	
 func _place_single_note():
-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index, adjusted_toggled)
+	var data = NoteData.new(PositionCalculator.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index, adjusted_toggled)
 	levelData.noteDatas.append(data)
 	preview.set_data(data)
 	target_lane.add_note(preview)
 	preview = null
 
 func _place_jump_note():
-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 2, long_end_time, target_lane.lane_index, 1)
+	var data = NoteData.new(PositionCalculator.get_time_from_posx(preview.global_position.x), selected_color, 2, long_end_time, target_lane.lane_index, 1)
 	levelData.noteDatas.append(data)
 	preview.set_data(data)
 	target_lane.add_note(preview)
 	preview = null
 
 func _place_long_note():
-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index, adjusted_toggled)
+	var data = NoteData.new(PositionCalculator.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index, adjusted_toggled)
 	levelData.noteDatas.append(data)
 	preview.set_data(data)
 	target_lane.add_note(preview)
@@ -930,7 +956,7 @@ func _place_lane_case1():
 	var new_index = Lane.find_free_index(levelData.lanes)
 	var new_lane = Lane.new(new_index, true)
 	var new_start_keyframe = Keyframe.new(0, lane_start_pos.y)
-	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_end_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 	new_start_keyframe.set_lane(new_index)
 	new_end_keyframe.set_lane(new_index)
 	new_lane.add_keyframe(new_start_keyframe)
@@ -944,8 +970,8 @@ func _place_lane_case2():
 	print("CASE 2 ACTIVATED")
 	var new_index = Lane.find_free_index(levelData.lanes)
 	var new_lane = Lane.new(new_index, false)
-	var new_start_keyframe = Keyframe.new(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
-	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_start_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
+	var new_end_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 	new_start_keyframe.set_lane(new_index)
 	new_end_keyframe.set_lane(new_index)
 	new_lane.add_keyframe(new_start_keyframe)
@@ -957,7 +983,7 @@ func _place_lane_case2():
 
 func _place_lane_case3():
 	print("CASE 3 ACTIVATED")
-	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+	var new_end_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
 	new_end_keyframe.set_lane(target_lane.lane_index)
 	print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
 	target_lane.add_editor_connector(preview)
@@ -982,10 +1008,10 @@ func _on_modify_ready():
 				# 1. previous_connector 찾기
 				print("Finding previous connector..")
 				for connector in target_lane.editor_connectors:
-					var conn_start_x = Setting.get_posx_from_time(connector.start_keyframe.kf.x)
-					var target_x = Setting.get_posx_from_time(target_keyframe.kf.x)
+					var conn_start_x = PositionCalculator.get_posx_from_time(connector.start_keyframe.kf.x)
+					var target_x = PositionCalculator.get_posx_from_time(target_keyframe.kf.x)
 					if conn_start_x < target_x:
-						if previous_connector == null or conn_start_x > Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x):
+						if previous_connector == null or conn_start_x > PositionCalculator.get_posx_from_time(previous_connector.start_keyframe.kf.x):
 							previous_connector = connector
 		
 				if previous_connector == null:
@@ -1026,7 +1052,7 @@ func _on_modify_placing():
 	if selected_note == NoteSelection.ModifyLane:
 		if (target_keyframe.lane_index == -1):
 			# 1. target_keyframe을 현재 마우스 위치로 수정 (in-place, to preserve connector references)
-			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), adjusted_y)
+			target_keyframe.kf = Vector2(PositionCalculator.get_time_from_posx(snapped_x), adjusted_y)
 			previous_connector.end_keyframe = target_keyframe
 			previous_connector.set_data_from_keyframes()
 			next_connector.start_keyframe = target_keyframe
@@ -1034,7 +1060,7 @@ func _on_modify_placing():
 			target_lane.insert_editor_connector(next_connector)
 			target_lane.insert_keyframe(target_keyframe)
 		else:
-			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), adjusted_y)
+			target_keyframe.kf = Vector2(PositionCalculator.get_time_from_posx(snapped_x), adjusted_y)
 			if previous_connector:
 				previous_connector.end_keyframe = target_keyframe
 				previous_connector.set_data_from_keyframes()
@@ -1044,13 +1070,13 @@ func _on_modify_placing():
 		adjust_note_position()
 	elif selected_note == NoteSelection.ModifyNote:
 		if (target_note.get_data().type == 0):
-			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
+			target_note.get_data().time = PositionCalculator.get_time_from_posx(snapped_x)
 		elif target_note.get_data().type in [1, 2] and not target_note.is_marker:
-			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
+			target_note.get_data().time = PositionCalculator.get_time_from_posx(snapped_x)
 			adjust_longNote_connector(target_note, target_note.get_data().time, target_note.get_data().end_time)
 		else:
 			var head = target_note.get_parent()
-			head.get_data().end_time = Setting.get_time_from_posx(snapped_x)
+			head.get_data().end_time = PositionCalculator.get_time_from_posx(snapped_x)
 			adjust_longNote_connector(head, target_note.get_data().time, target_note.get_data().end_time)
 		target_note.process_color()
 	elif selected_note == NoteSelection.ModifyTrigger:
@@ -1143,6 +1169,9 @@ func show_modify_panel():
 		Trigger.TYPE.BPM:
 			value_label.text = "Set BPM:"
 			length_spinbox.visible = false
+		Trigger.TYPE.Speed:
+			value_label.text = "Set speed:"
+			length_spinbox.visible = false
 	value_spinbox.value = target_trigger.c
 	length_spinbox.value = target_trigger.t
 
@@ -1157,7 +1186,7 @@ func quit_modify_panel():
 	target_trigger.c = value_spinbox.value
 	target_trigger.t = max(length_spinbox.value, 0)
 	target_trigger.editor_pos_y = target_trigger.node.global_position.y
-	target_trigger.start = Setting.get_time_from_posx(target_trigger.node.global_position.x)
+	target_trigger.start = PositionCalculator.get_time_from_posx(target_trigger.node.global_position.x)
 	target_trigger.show_data()
 	cancel_modify_trigger()
 	modifyPanel.visible = false
@@ -1225,13 +1254,13 @@ func adjust_longNote_connector(note: ENote, start_time: float, end_time: float):
 			marker = child
 	
 	# connector 새로 찍기
-	var connector_start_x = Setting.get_posx_from_time(start_time) + Setting.NOTE_WIDTH / 2.0
-	var connector_end_x = Setting.get_posx_from_time(end_time) - Setting.NOTE_WIDTH / 2.0
+	var connector_start_x = PositionCalculator.get_posx_from_time(start_time) + Setting.NOTE_WIDTH / 2.0
+	var connector_end_x = PositionCalculator.get_posx_from_time(end_time) - Setting.NOTE_WIDTH / 2.0
 	if connector_start_x < connector_end_x:
 		var points = [connector_start_x]
 		for kf in target_lane.keyframes:
-			if kf.kf.x > start_time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < end_time:
-				points.append(Setting.get_posx_from_time(kf.kf.x))
+			if kf.kf.x > start_time + PositionCalculator.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < end_time:
+				points.append(PositionCalculator.get_posx_from_time(kf.kf.x))
 			if kf.kf.x > end_time:
 				break
 		points.append(connector_end_x)
@@ -1239,8 +1268,8 @@ func adjust_longNote_connector(note: ENote, start_time: float, end_time: float):
 		for i in range(points.size() - 1):
 			var start_x = points[i]
 			var end_x = points[i + 1]
-			var start_pos = Vector2(start_x, target_lane.get_height(Setting.get_time_from_posx(start_x)))
-			var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
+			var start_pos = Vector2(start_x, target_lane.get_height(PositionCalculator.get_time_from_posx(start_x)))
+			var end_pos = Vector2(end_x, target_lane.get_height(PositionCalculator.get_time_from_posx(end_x)))
 			var longNote_connector = CONNECTOR_SCENE.instantiate()
 			longNote_connector.z_index = 1
 			parent_node.add_child(longNote_connector)
@@ -1255,7 +1284,7 @@ func get_snapped_x(mouse_x: float) -> float:
 	if bit == 0:
 		return mouse_x
 	
-	var time = Setting.get_time_from_posx(mouse_x)
+	var time = PositionCalculator.get_time_from_posx(mouse_x)
 
 
 	var bpm = sorted_bpm[0].c
@@ -1272,7 +1301,7 @@ func get_snapped_x(mouse_x: float) -> float:
 	var elapsed = time - bpm_start_time
 	var snapped_time = bpm_start_time + round(elapsed / snap_duration) * snap_duration
 	
-	return Setting.get_posx_from_time(snapped_time)
+	return PositionCalculator.get_posx_from_time(snapped_time)
 
 func _update_sorted_bpm_triggers() -> Array:
 	sorted_bpm = levelData.triggers.filter(func(t): return t.type == Trigger.TYPE.BPM)
@@ -1384,6 +1413,8 @@ func save_chart():
 				type_string = "ROTATE"
 			Trigger.TYPE.Zoom:
 				type_string = "ZOOM"
+			Trigger.TYPE.Speed:
+				type_string = "SPEED"
 		file.store_line("%s %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.node.global_position.y])
 	
 	quit_save_panel()
@@ -1464,7 +1495,7 @@ func parse(chart_path: String):
 	for lane in levelData.lanes:
 		for i in range(lane.keyframes.size() - 1):
 			var start_time = lane.keyframes[i].kf.x
-			var start_pos = Vector2(Setting.get_posx_from_time(start_time), lane.keyframes[i].kf.y)
+			var start_pos = Vector2(PositionCalculator.get_posx_from_time(start_time), lane.keyframes[i].kf.y)
 			
 			var connector = CONNECTOR_SCENE.instantiate()
 			add_child(connector)
@@ -1482,18 +1513,18 @@ func parse(chart_path: String):
 		add_child(note)
 		if (noteData.adjusted):
 			note.set_line()
-		note.position = Vector2(Setting.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
+		note.position = Vector2(PositionCalculator.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
 		note.set_color(noteData.color)
 		lane.add_note(note)
 
 		if (noteData.type in [1, 2]):
-			var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
-			var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
+			var connector_start_x = PositionCalculator.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
+			var connector_end_x = PositionCalculator.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
 			if connector_start_x < connector_end_x:
 				var points = [connector_start_x]
 				for kf in lane.keyframes:
-					if kf.kf.x > noteData.time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < noteData.end_time:
-						points.append(Setting.get_posx_from_time(kf.kf.x))
+					if kf.kf.x > noteData.time + PositionCalculator.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < noteData.end_time:
+						points.append(PositionCalculator.get_posx_from_time(kf.kf.x))
 					if kf.kf.x > noteData.end_time:
 						break
 				points.append(connector_end_x)
@@ -1505,8 +1536,8 @@ func parse(chart_path: String):
 				for i in range(points.size() - 1):
 					start_x = points[i]
 					end_x = points[i + 1]
-					start_pos = Vector2(start_x, lane.get_height(Setting.get_time_from_posx(start_x)))
-					end_pos = Vector2(end_x, lane.get_height(Setting.get_time_from_posx(end_x)))
+					start_pos = Vector2(start_x, lane.get_height(PositionCalculator.get_time_from_posx(start_x)))
+					end_pos = Vector2(end_x, lane.get_height(PositionCalculator.get_time_from_posx(end_x)))
 					
 					var longNote_connector = CONNECTOR_SCENE.instantiate()
 					parent_node.add_child(longNote_connector)
@@ -1519,7 +1550,7 @@ func parse(chart_path: String):
 			note.add_child(marker)
 			marker.set_color(noteData.color)
 			marker.is_marker = true
-			marker.global_position = Vector2(Setting.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
+			marker.global_position = Vector2(PositionCalculator.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
 	
 	for trigger: EditorTrigger in levelData.triggers:
 		var trigger_node
@@ -1530,6 +1561,8 @@ func parse(chart_path: String):
 				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.BPM:
 				trigger_node = BPM_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.Speed:
+				trigger_node = SPEED_TRIGGER_SCENE.instantiate()
 		add_child(trigger_node)
 		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)
@@ -1548,7 +1581,7 @@ func toggle_music():
 		ingameStatusHolder.visible = true
 		music_playing = true
 		var initial_pos_x = get_music_start_pos()
-		var music_start_time = Setting.get_time_from_posx(initial_pos_x) / 1000
+		var music_start_time = PositionCalculator.get_time_from_posx(initial_pos_x) / 1000
 		musicPlayer.play(music_start_time)
 		music_bar = put_line(initial_pos_x, true)
 		music_bar.get_child(0).modulate = Color(120,120,0)
@@ -1572,7 +1605,7 @@ func get_music_start_pos() -> float:
 func _process(_delta:float):
 	if (music_playing):
 		var current_time = musicPlayer.get_playback_position() * 1000
-		music_bar.global_position.x = Setting.get_posx_from_time(current_time)
+		music_bar.global_position.x = PositionCalculator.get_posx_from_time(current_time)
 		var trigger_vector2 = get_trigger_process_at_time(current_time)
 		camera_range.set_bounds(get_camera_bounds_at(current_time, trigger_vector2))
 		set_ingame_status(current_time, trigger_vector2)
@@ -1586,7 +1619,7 @@ func get_camera_bounds_at(time: float, trigger_vector: Vector2) -> Rect2:
 	var vp = get_viewport_rect().size
 	var vp_w = vp.x / trigger_vector.y
 	var vp_h = vp.y / trigger_vector.y
-	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
+	var center_x = PositionCalculator.get_posx_from_time(time) + vp_w * 0.3
 	return Rect2(center_x - vp_w * 0.5, trigger_vector.x - vp_h * 0.5, vp_w, vp_h)
 
 #return: (delta_y, zoom) 형태의 Vector2
@@ -1611,7 +1644,7 @@ func find_target_keyframe():
 	# 1. 기존 keyframe 근처에 있는지 먼저 체크
 	for lane in levelData.lanes:
 		for kf in lane.keyframes:
-			var kf_x = Setting.get_posx_from_time(kf.kf.x)
+			var kf_x = PositionCalculator.get_posx_from_time(kf.kf.x)
 			var kf_y = kf.kf.y
 			if abs(snapped_x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
@@ -1620,13 +1653,13 @@ func find_target_keyframe():
 	
 	# 2. 레인 위에 있지만 keyframe 근처는 아닌 경우 -> 새로운 keyframe 생성
 	for lane in levelData.lanes:
-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
+		var lane_x_start = PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x)
+		var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
 		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
-			var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
+			var lane_y = lane.get_height(PositionCalculator.get_time_from_posx(snapped_x))
 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
 				set_target_lane(lane)
-				var new_kf = Keyframe.new(Setting.get_time_from_posx(snapped_x), lane_y)
+				var new_kf = Keyframe.new(PositionCalculator.get_time_from_posx(snapped_x), lane_y)
 				return new_kf
 	
 	return null
@@ -1636,8 +1669,8 @@ func find_target_note() -> Variant:
 	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
 	
 	for noteData in levelData.noteDatas:
-		var note_x = Setting.get_posx_from_time(noteData.time)
-		var note_end_x = Setting.get_posx_from_time(noteData.end_time)
+		var note_x = PositionCalculator.get_posx_from_time(noteData.time)
+		var note_end_x = PositionCalculator.get_posx_from_time(noteData.end_time)
 		if (note_x < camera_left or note_x > camera_right) and (note_end_x < camera_left or note_end_x > camera_right):
 			continue
 		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
@@ -1649,7 +1682,7 @@ func find_target_note() -> Variant:
 				target_lane = lane
 				return find_enote_by_data(lane, noteData)
 		else:  # 롱노트
-			var end_x = Setting.get_posx_from_time(noteData.end_time)
+			var end_x = PositionCalculator.get_posx_from_time(noteData.end_time)
 			var end_y = lane.get_height(noteData.end_time)
 			if abs(mouse_pos.x - note_x) <= Setting.NOTE_WIDTH and \
 			   abs(mouse_pos.y - note_y) <= Setting.HALF_CONNECTOR_HEIGHT:
@@ -1709,7 +1742,7 @@ func _on_move_to_last_note():
 		return
 	var last_note = levelData.noteDatas.reduce(func(a, b): return a if a.time > b.time else b)
 	if (last_note != null):
-		camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
+		camera.global_position = Vector2(PositionCalculator.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
 	else:
 		camera.global_position = Vector2.ZERO
 	

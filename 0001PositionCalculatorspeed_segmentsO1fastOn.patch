@@ -1,0 +1,934 @@
+From 3433fb8d078b040605f001bc633d459328b5d4f8 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 1 Aug 2026 15:34:41 +0000
+Subject: [PATCH] =?UTF-8?q?PositionCalculator=20=EC=98=A4=ED=86=A0?=
+ =?UTF-8?q?=EB=A1=9C=EB=93=9C=EB=A1=9C=20speed=5Fsegments=20=EA=B4=80?=
+ =?UTF-8?q?=EB=A6=AC,=20=EC=BA=90=EB=A6=AD=ED=84=B0=EB=8A=94=20O(1)=20fast?=
+ =?UTF-8?q?,=20=EB=82=98=EB=A8=B8=EC=A7=80=EB=8A=94=20O(n)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../Scripts/Autoloads/PositionCalculator.gd   |  75 ++++++-
+ .../Scripts/Camera/CameraManager.gd           |   2 +-
+ .../Scripts/Character/Character.gd            |   2 +-
+ .../Scripts/Connector/Connector.gd            |   6 +-
+ .../Scripts/Connector/SuregiConnector.gd      |   6 +-
+ .../Scripts/Editor/EditorConnector.gd         |   4 +-
+ .../Scripts/Editor/EditorManager.gd           | 190 +++++++++---------
+ .../Scripts/Editor/EditorTrigger.gd           |   8 +-
+ .../Scripts/Ingame/RhythmManager.gd           |  25 ++-
+ 9 files changed, 193 insertions(+), 125 deletions(-)
+
+diff --git a/vexatonic-dash-2/Scripts/Autoloads/PositionCalculator.gd b/vexatonic-dash-2/Scripts/Autoloads/PositionCalculator.gd
+index fae2c76..ca926ca 100644
+--- a/vexatonic-dash-2/Scripts/Autoloads/PositionCalculator.gd
++++ b/vexatonic-dash-2/Scripts/Autoloads/PositionCalculator.gd
+@@ -1,11 +1,74 @@
+ extends Node
+ 
++# Speed 트리거 목록: [{time: float, speed: float}, ...] time 오름차순 정렬
++# 인게임 시작 전 RhythmManager에서 세팅, 게임 종료 후 초기화
++var speed_segments: Array = []
+ 
+-# Called when the node enters the scene tree for the first time.
+-func _ready() -> void:
+-	pass # Replace with function body.
++# speed_segments[i].time 시점의 누적 x 좌표 (미리 계산)
++var _seg_cumulative_pos: Array = []
+ 
++# 단조증가 탐색용 인덱스 (physics loop 전용)
++var _cur_seg_index: int = 0
+ 
+-# Called every frame. 'delta' is the elapsed time since the previous frame.
+-func _process(delta: float) -> void:
+-	pass
++# speed_segments와 누적 캐시를 세팅. 인게임 시작 전에 호출.
++func setup(segments: Array) -> void:
++	speed_segments = segments
++	_seg_cumulative_pos = []
++	var pos = 0.0
++	var prev_time = 0.0
++	var cur_speed = Setting.speed
++	for seg in speed_segments:
++		pos += (seg.time - prev_time) * Setting.PX_PER_MS * cur_speed
++		_seg_cumulative_pos.append(pos)
++		prev_time = seg.time
++		cur_speed = seg.speed
++	_cur_seg_index = 0
++
++func reset() -> void:
++	speed_segments = []
++	_seg_cumulative_pos = []
++	_cur_seg_index = 0
++
++# 단조증가 탐색 인덱스 초기화 (physics loop 재시작 시 호출)
++func reset_monotonic_index() -> void:
++	_cur_seg_index = 0
++
++# O(n) 버전: time이 임의 순서여도 동작. 렌더링·에디터 전용.
++func get_posx_from_time(time: float) -> float:
++	if speed_segments.is_empty():
++		return time * Setting.PX_PER_MS * Setting.speed
++	var pos = 0.0
++	var prev_time = 0.0
++	var cur_speed = Setting.speed
++	for i in range(speed_segments.size()):
++		if time <= speed_segments[i].time:
++			break
++		pos = _seg_cumulative_pos[i]
++		prev_time = speed_segments[i].time
++		cur_speed = speed_segments[i].speed
++	return pos + (time - prev_time) * Setting.PX_PER_MS * cur_speed
++
++# O(n) 버전: posx → time 역산. 렌더링·에디터 전용.
++func get_time_from_posx(posx: float) -> float:
++	if speed_segments.is_empty():
++		return posx / (Setting.PX_PER_MS * Setting.speed)
++	var remaining = posx
++	var prev_time = 0.0
++	var cur_speed = Setting.speed
++	for i in range(speed_segments.size()):
++		var seg_px = _seg_cumulative_pos[i] - (_seg_cumulative_pos[i - 1] if i > 0 else 0.0)
++		if remaining <= seg_px + Setting.EPSILON:
++			return prev_time + remaining / (Setting.PX_PER_MS * cur_speed)
++		remaining -= seg_px
++		prev_time = speed_segments[i].time
++		cur_speed = speed_segments[i].speed
++	return prev_time + remaining / (Setting.PX_PER_MS * cur_speed)
++
++# O(1) 상각 버전: time이 단조증가할 때만 정확. 인게임 캐릭터 위치 전용.
++func get_posx_from_time_fast(time: float) -> float:
++	while _cur_seg_index < speed_segments.size() and time >= speed_segments[_cur_seg_index].time:
++		_cur_seg_index += 1
++	if _cur_seg_index == 0:
++		return time * Setting.PX_PER_MS * Setting.speed
++	var seg = speed_segments[_cur_seg_index - 1]
++	return _seg_cumulative_pos[_cur_seg_index - 1] + (time - seg.time) * Setting.PX_PER_MS * seg.speed
+diff --git a/vexatonic-dash-2/Scripts/Camera/CameraManager.gd b/vexatonic-dash-2/Scripts/Camera/CameraManager.gd
+index c77e0a7..178ba27 100644
+--- a/vexatonic-dash-2/Scripts/Camera/CameraManager.gd
++++ b/vexatonic-dash-2/Scripts/Camera/CameraManager.gd
+@@ -51,7 +51,7 @@ func move(time: float) -> void:
+ 	if (triggered_zoom):
+ 		set_camera_zoom()
+ 		set_camera_position()
+-	position = Vector2(Setting.get_posx_from_time(time), 0.0) + triggered_delta_position + temp_delta_position
++	position = Vector2(PositionCalculator.get_posx_from_time(time), 0.0) + triggered_delta_position + temp_delta_position
+ 	
+ func _apply_triggers(time: float) -> void:
+ 	if triggers.is_empty():
+diff --git a/vexatonic-dash-2/Scripts/Character/Character.gd b/vexatonic-dash-2/Scripts/Character/Character.gd
+index df86800..5bb2114 100644
+--- a/vexatonic-dash-2/Scripts/Character/Character.gd
++++ b/vexatonic-dash-2/Scripts/Character/Character.gd
+@@ -45,7 +45,7 @@ func set_character_position(time: float) -> bool:
+ 		queue_free()
+ 		return true
+ 
+-	global_position.x = Setting.get_posx_from_time(time)
++	global_position.x = PositionCalculator.get_posx_from_time_fast(time)
+ 
+ 	match jump_state:
+ 		JumpState.None:
+diff --git a/vexatonic-dash-2/Scripts/Connector/Connector.gd b/vexatonic-dash-2/Scripts/Connector/Connector.gd
+index 656505b..b9cf040 100644
+--- a/vexatonic-dash-2/Scripts/Connector/Connector.gd
++++ b/vexatonic-dash-2/Scripts/Connector/Connector.gd
+@@ -29,7 +29,7 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first:
+ 					end_time = kf.kf.x
+ 				break
+ 	c_end_time = end_time
+-	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), calculated_delta_y)
++	data = ConnectorData.new(p_color, PositionCalculator.get_posx_from_time(end_time - start_time), calculated_delta_y)
+ 	return end_time
+ 
+ func _ready():
+@@ -70,8 +70,8 @@ func paint_range(from_time: float, to_time: float) -> void:
+ 	if processed_polygon == null:
+ 		return
+ 	
+-	var local_start_x = clamp(Setting.get_posx_from_time(from_time - c_start_time), 0.0, data.length)
+-	var local_end_x   = clamp(Setting.get_posx_from_time(to_time   - c_start_time), 0.0, data.length)
++	var local_start_x = clamp(PositionCalculator.get_posx_from_time(from_time - c_start_time), 0.0, data.length)
++	var local_end_x   = clamp(PositionCalculator.get_posx_from_time(to_time   - c_start_time), 0.0, data.length)
+ 	if local_end_x <= local_start_x or data.length <= Setting.EPSILON:
+ 		processed_polygon.visible = false
+ 	else:
+diff --git a/vexatonic-dash-2/Scripts/Connector/SuregiConnector.gd b/vexatonic-dash-2/Scripts/Connector/SuregiConnector.gd
+index 86f8d34..ad49314 100644
+--- a/vexatonic-dash-2/Scripts/Connector/SuregiConnector.gd
++++ b/vexatonic-dash-2/Scripts/Connector/SuregiConnector.gd
+@@ -16,13 +16,13 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first:
+ 	for kf in p_lane.keyframes:
+ 		if (kf.kf.x > start_time):
+ 			if kf.kf.x >= end_time:
+-				line.add_point(Vector2(Setting.get_posx_from_time(end_time - start_time), p_lane.get_height(end_time) - start_height))
++				line.add_point(Vector2(PositionCalculator.get_posx_from_time(end_time - start_time), p_lane.get_height(end_time) - start_height))
+ 				break
+ 			else:
+-				line.add_point(Vector2(Setting.get_posx_from_time(kf.kf.x - start_time), kf.kf.y - start_height))
++				line.add_point(Vector2(PositionCalculator.get_posx_from_time(kf.kf.x - start_time), kf.kf.y - start_height))
+ 			
+ 	
+-	data = ConnectorData.new(p_color, Setting.get_posx_from_time(end_time - start_time), p_lane.get_height(end_time) - start_height)
++	data = ConnectorData.new(p_color, PositionCalculator.get_posx_from_time(end_time - start_time), p_lane.get_height(end_time) - start_height)
+ 	set_color()
+ 	return end_time
+ 
+diff --git a/vexatonic-dash-2/Scripts/Editor/EditorConnector.gd b/vexatonic-dash-2/Scripts/Editor/EditorConnector.gd
+index 1cfdd17..0a49eea 100644
+--- a/vexatonic-dash-2/Scripts/Editor/EditorConnector.gd
++++ b/vexatonic-dash-2/Scripts/Editor/EditorConnector.gd
+@@ -27,8 +27,8 @@ func set_polygon_dynamically():
+ 	])
+ 
+ func set_data_from_keyframes():
+-	var start_pos = Vector2(Setting.get_posx_from_time(start_keyframe.kf.x), start_keyframe.kf.y)
+-	var end_pos = Vector2(Setting.get_posx_from_time(end_keyframe.kf.x), end_keyframe.kf.y)
++	var start_pos = Vector2(PositionCalculator.get_posx_from_time(start_keyframe.kf.x), start_keyframe.kf.y)
++	var end_pos = Vector2(PositionCalculator.get_posx_from_time(end_keyframe.kf.x), end_keyframe.kf.y)
+ 	global_position = start_pos
+ 	set_data(start_pos, end_pos)
+ 	
+diff --git a/vexatonic-dash-2/Scripts/Editor/EditorManager.gd b/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
+index 663105d..f6ca4e2 100644
+--- a/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
++++ b/vexatonic-dash-2/Scripts/Editor/EditorManager.gd
+@@ -71,7 +71,7 @@ func initiate_editor():
+ 	settingPanel.visible = true
+ 
+ 	_update_sorted_bpm_triggers()
+-	$x_axis_bar.size = Vector2(Setting.get_posx_from_time(levelData.metadata.length), 6.0)
++	$x_axis_bar.size = Vector2(PositionCalculator.get_posx_from_time(levelData.metadata.length), 6.0)
+ 
+ func set_initial_value():
+ 	levelData = LevelData.new()
+@@ -203,7 +203,7 @@ func place_bar_lines():
+ 		var snap_count = 0
+ 		
+ 		while true:
+-			var x = Setting.get_posx_from_time(time)
++			var x = PositionCalculator.get_posx_from_time(time)
+ 			if snap_count % effective_bit == 0:
+ 				put_line(x, true)  # 마디 시작 (굵은 선)
+ 			else:
+@@ -213,7 +213,7 @@ func place_bar_lines():
+ 			if time >= bpm_end_time - Setting.EPSILON:
+ 				break
+ 		
+-		var x = Setting.get_posx_from_time(bpm_end_time)
++		var x = PositionCalculator.get_posx_from_time(bpm_end_time)
+ 		put_line(x, true)
+ 
+ func put_line(pos_x: float, major: bool):
+@@ -367,7 +367,7 @@ func update_preview(selected: int):
+ 				if pressing_keys["shift"]:
+ 					y = lane_start_pos.y
+ 				elif pressing_keys["c"]:
+-					y =  get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
++					y =  get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
+ 				else: 
+ 					y = mouse_pos.y
+ 				preview.set_data(lane_start_pos, Vector2(snapped_x, y))
+@@ -405,7 +405,7 @@ func update_preview(selected: int):
+ 					# 구간 포인트 수집
+ 					var points = [connector_start_x]
+ 					for kf in target_lane.keyframes:
+-						var kf_x = Setting.get_posx_from_time(kf.kf.x)
++						var kf_x = PositionCalculator.get_posx_from_time(kf.kf.x)
+ 						if kf_x > connector_start_x and kf_x < connector_end_x:
+ 							points.append(kf_x)
+ 						if kf_x >= connector_end_x:
+@@ -425,8 +425,8 @@ func update_preview(selected: int):
+ 					
+ 					print("points.size:  %d" % points.size())
+ 					for i in range(points.size() - 1):
+-						var start_pos = Vector2(points[i], target_lane.get_height(Setting.get_time_from_posx(points[i])))
+-						var end_pos = Vector2(points[i + 1], target_lane.get_height(Setting.get_time_from_posx(points[i + 1])))
++						var start_pos = Vector2(points[i], target_lane.get_height(PositionCalculator.get_time_from_posx(points[i])))
++						var end_pos = Vector2(points[i + 1], target_lane.get_height(PositionCalculator.get_time_from_posx(points[i + 1])))
+ 						current.set_data(start_pos, end_pos)
+ 						current.global_position = start_pos
+ 						
+@@ -462,8 +462,8 @@ func update_preview(selected: int):
+ 					preview.add_child(existing_marker)
+ 					existing_marker.is_marker = true
+ 					existing_marker.set_color(selected_color)
+-				long_end_time = Setting.get_time_from_posx(existing_marker.global_position.x)
+-				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
++				long_end_time = PositionCalculator.get_time_from_posx(existing_marker.global_position.x)
++				existing_marker.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
+ 				
+ 				can_do_something = true
+ #새로운 노트나 레인을 찍기 위한 preview를 만드는 함수.
+@@ -493,7 +493,7 @@ func generate_preview(selected: int) -> Node2D:
+ 			if pressing_keys["shift"]:
+ 				y = lane_start_pos.y
+ 			elif pressing_keys["c"]:
+-				y = get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
++				y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
+ 			else: 
+ 				y = mouse_pos.y
+ 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, y))
+@@ -542,7 +542,7 @@ func generate_preview(selected: int) -> Node2D:
+ 			if connector_end_x > connector_start_x:
+ 				var points = [connector_start_x]
+ 				for kf in target_lane.keyframes:
+-					var kf_x = Setting.get_posx_from_time(kf.kf.x)
++					var kf_x = PositionCalculator.get_posx_from_time(kf.kf.x)
+ 					if kf_x > connector_start_x and kf_x < connector_end_x:
+ 						points.append(kf_x)
+ 					if kf_x >= connector_end_x:
+@@ -553,8 +553,8 @@ func generate_preview(selected: int) -> Node2D:
+ 				for i in range(points.size() - 1):
+ 					var start_x = points[i]
+ 					var end_x = points[i + 1]
+-					var start_pos = Vector2(start_x, target_lane.get_height(Setting.get_time_from_posx(start_x)))
+-					var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
++					var start_pos = Vector2(start_x, target_lane.get_height(PositionCalculator.get_time_from_posx(start_x)))
++					var end_pos = Vector2(end_x, target_lane.get_height(PositionCalculator.get_time_from_posx(end_x)))
+ 					
+ 					var longNote_connector = CONNECTOR_SCENE.instantiate()
+ 					parent_node.add_child(longNote_connector)
+@@ -567,9 +567,9 @@ func generate_preview(selected: int) -> Node2D:
+ 			var my_marker = NOTE_SCENE.instantiate()
+ 			my_preview.add_child(my_marker)
+ 			my_marker.is_marker = true
+-			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
++			my_marker.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
+ 			my_marker.set_color(selected_color)
+-			long_end_time = Setting.get_time_from_posx(my_marker.global_position.x)
++			long_end_time = PositionCalculator.get_time_from_posx(my_marker.global_position.x)
+ 			
+ 	can_do_something = true
+ 	return my_preview
+@@ -617,18 +617,18 @@ func generate_modify_preview():
+ 				#var kf_index = target_lane.keyframes.find(target_keyframe)
+ 				#var prev_kf = target_lane.keyframes[kf_index - 1] if kf_index > 0 else null
+ 				#var next_kf = target_lane.keyframes[kf_index + 1] if kf_index < target_lane.keyframes.size() - 1 else null
+-				var prev_x = Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x) if previous_connector else -INF
+-				var next_x = Setting.get_posx_from_time(next_connector.end_keyframe.kf.x) if next_connector else INF
++				var prev_x = PositionCalculator.get_posx_from_time(previous_connector.start_keyframe.kf.x) if previous_connector else -INF
++				var next_x = PositionCalculator.get_posx_from_time(next_connector.end_keyframe.kf.x) if next_connector else INF
+ 				if pressing_keys["shift"]:
+ 					if previous_connector:
+ 						adjusted_y = previous_connector.start_keyframe.kf.y
+ 					elif next_connector:
+ 						adjusted_y = next_connector.end_keyframe.kf.y
+ 				elif pressing_keys["c"]:
+-					adjusted_y = get_trigger_process_at_time(Setting.get_time_from_posx(snapped_x)).x
++					adjusted_y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
+ 				else:
+ 					adjusted_y = mouse_pos.y
+-				var new_keyframe = Keyframe.new(Setting.get_time_from_posx(snapped_x), adjusted_y)
++				var new_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(snapped_x), adjusted_y)
+ 				new_keyframe.set_lane(target_lane.lane_index)
+ 				if snapped_x > prev_x + Setting.EPSILON and snapped_x < next_x - Setting.EPSILON:
+ 					if previous_connector:
+@@ -652,25 +652,25 @@ func generate_modify_preview():
+ 					if (!find_note_placing_available()):
+ 						cancel_modify_note()
+ 						return
+-					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
++					target_note.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
+ 				
+ 				elif target_note.get_data().type in [1, 2] and not target_note.is_marker:  # 롱노트/점프노트 앞부분
+-					if (snapped_x >= Setting.get_posx_from_time(target_note.get_data().end_time)):
++					if (snapped_x >= PositionCalculator.get_posx_from_time(target_note.get_data().end_time)):
+ 						cancel_modify_note()
+ 						return
+ 					if (!find_note_placing_available()):
+ 						cancel_modify_note()
+ 						return
+ 					print("Trying move only parent")
+-					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+-					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x))))
+-					adjust_longNote_connector(target_note, Setting.get_time_from_posx(snapped_x), target_note.get_data().end_time)
++					#target_note.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
++					move_only_parent(target_note, Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x))))
++					adjust_longNote_connector(target_note, PositionCalculator.get_time_from_posx(snapped_x), target_note.get_data().end_time)
+ 				else:  # 롱노트 뒷부분
+ 					if (!find_longNote_placing_available()):
+ 						cancel_modify_note()
+ 						return
+-					target_note.global_position = Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
+-					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, Setting.get_time_from_posx(snapped_x))
++					target_note.global_position = Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
++					adjust_longNote_connector(target_note.get_parent(), target_note.get_data().time, PositionCalculator.get_time_from_posx(snapped_x))
+ 			NoteSelection.ModifyTrigger:
+ 				if (!find_trigger_placing_avilable()):
+ 					cancel_modify_trigger()
+@@ -680,7 +680,7 @@ func generate_modify_preview():
+ 						target_trigger.node.global_position = Vector2(snapped_x, mouse_pos.y)
+ 						target_trigger.show_data()
+ 					else:
+-						target_trigger.node.global_position = Vector2(Setting.get_posx_from_time(target_trigger.start), target_trigger.editor_pos_y)
++						target_trigger.node.global_position = Vector2(PositionCalculator.get_posx_from_time(target_trigger.start), target_trigger.editor_pos_y)
+ 						target_trigger.show_line_preview(mouse_pos)
+ 					target_trigger.select_trigger()
+ 	can_do_something = true
+@@ -721,12 +721,12 @@ func cancel_modify_note():
+ 		if (current_state == EditorState.Placing):
+ 			var data = target_note.get_data()
+ 			if (data.type == 0):
+-				target_note.global_position = Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time))
++				target_note.global_position = Vector2(PositionCalculator.get_posx_from_time(data.time), target_lane.get_height(data.time))
+ 			elif (target_note.is_marker):
+-				target_note.global_position = Vector2(Setting.get_posx_from_time(data.end_time), target_lane.get_height(data.end_time))
++				target_note.global_position = Vector2(PositionCalculator.get_posx_from_time(data.end_time), target_lane.get_height(data.end_time))
+ 				adjust_longNote_connector(target_note.get_parent(), data.time, data.end_time)
+ 			else:
+-				move_only_parent(target_note, Vector2(Setting.get_posx_from_time(data.time), target_lane.get_height(data.time)))
++				move_only_parent(target_note, Vector2(PositionCalculator.get_posx_from_time(data.time), target_lane.get_height(data.time)))
+ 				adjust_longNote_connector(target_note, data.time, data.end_time)
+ 
+ func cancel_modify_trigger():
+@@ -738,7 +738,7 @@ func cancel_modify_trigger():
+ func put_keyframe_indicator():
+ 	var indicator = NOTE_SCENE.instantiate()
+ 	add_child(indicator)
+-	indicator.global_position = Vector2(Setting.get_posx_from_time(target_keyframe.kf.x), target_keyframe.kf.y)
++	indicator.global_position = Vector2(PositionCalculator.get_posx_from_time(target_keyframe.kf.x), target_keyframe.kf.y)
+ 	indicator.sprite.modulate = Color(0,0,0)
+ 	return indicator
+ 
+@@ -764,10 +764,10 @@ func find_lane_placing_case() -> LanePlacingCase:
+ 
+ 	# Case 2 우선 체크: 레인 위에 마우스가 있는 경우
+ 	for lane in levelData.lanes:
+-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
+-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
++		var lane_x_start = PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x)
++		var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
+ 		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
+-			var lane_y = lane.get_height(Setting.get_time_from_posx(mouse_pos.x))
++			var lane_y = lane.get_height(PositionCalculator.get_time_from_posx(mouse_pos.x))
+ 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+ 				set_target_lane(lane)
+ 				return LanePlacingCase.Case2
+@@ -777,7 +777,7 @@ func find_lane_placing_case() -> LanePlacingCase:
+ 	var closest_dist: float = Setting.INFINITE
+ 
+ 	for lane in levelData.lanes:
+-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
++		var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
+ 		if mouse_pos.x > lane_x_end:
+ 			if camera_left < lane_x_end:
+ 				var lane_y_end = lane.keyframes[-1].kf.y
+@@ -800,22 +800,22 @@ func find_lane_placing_case() -> LanePlacingCase:
+ func find_trigger_placing_avilable() -> bool:
+ 	if (current_state == EditorState.Ready and selected_note == NoteSelection.BPMTrigger):
+ 		for i: Trigger in sorted_bpm:
+-			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON):
++			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON):
+ 				return false
+ 		return snapped_x > Setting.EPSILON
+ 	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.BPM):
+ 		for i: Trigger in sorted_bpm:
+-			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
++			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
+ 				return false
+ 		return snapped_x > Setting.EPSILON
+ 	elif (current_state == EditorState.Ready and selected_note == NoteSelection.SpeedTrigger):
+ 		for i: Trigger in levelData.triggers.filter(func(a): return a.type == Trigger.TYPE.Speed):
+-			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON):
++			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON):
+ 				return false
+ 		return snapped_x > Setting.EPSILON
+ 	elif (selected_note == NoteSelection.ModifyTrigger and target_trigger.type == Trigger.TYPE.Speed):
+ 		for i: Trigger in levelData.triggers.filter(func(a): return a.type == Trigger.TYPE.Speed):
+-			if (abs(i.start - Setting.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
++			if (abs(i.start - PositionCalculator.get_time_from_posx(snapped_x)) < Setting.EPSILON and i != target_trigger):
+ 				return false
+ 		return snapped_x > Setting.EPSILON
+ 	else:
+@@ -826,8 +826,8 @@ func find_note_placing_available() -> bool:
+ 	if (current_state == EditorState.Ready):
+ 		for i in range(levelData.lanes.size()):
+ 			var lane = levelData.lanes[levelData.lanes.size()-i-1]
+-			var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
+-			var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
++			var lane_x_start = PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x)
++			var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
+ 			var delta_start = lane_x_start - snapped_x
+ 			var delta_end = snapped_x - lane_x_end
+ 			if (0 < delta_start and delta_start < snapped_x):
+@@ -835,14 +835,14 @@ func find_note_placing_available() -> bool:
+ 			elif (0 < delta_end and delta_end < Setting.EPSILON):
+ 				snapped_x -= Setting.EPSILON
+ 			if snapped_x >= lane_x_start and snapped_x <= lane_x_end:
+-				var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
++				var lane_y = lane.get_height(PositionCalculator.get_time_from_posx(snapped_x))
+ 				if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+ 					set_target_lane(lane)
+ 					return true
+ 	#Placing 단계: 오직 target_lane 안에서만 판정함
+ 	elif (current_state == EditorState.Placing):
+-		var lane_x_start = Setting.get_posx_from_time(target_lane.keyframes[0].kf.x)
+-		var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
++		var lane_x_start = PositionCalculator.get_posx_from_time(target_lane.keyframes[0].kf.x)
++		var lane_x_end = PositionCalculator.get_posx_from_time(target_lane.keyframes[-1].kf.x)
+ 		var delta_start = lane_x_start - snapped_x
+ 		var delta_end = snapped_x - lane_x_end
+ 		if (0 < delta_start and delta_start < snapped_x):
+@@ -858,11 +858,11 @@ func find_longNote_placing_available() -> bool:
+ 	print("Finding..")
+ 	if (long_start_pos.x >= snapped_x - Setting.EPSILON):
+ 		return false
+-	var lane_x_end = Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x)
++	var lane_x_end = PositionCalculator.get_posx_from_time(target_lane.keyframes[-1].kf.x)
+ 	var delta = snapped_x - lane_x_end
+ 	if (0 < delta and delta < Setting.EPSILON):
+ 		snapped_x -= Setting.EPSILON
+-		print("Adjusted snapped_x. new x is %f and new time is %f" % [snapped_x, Setting.get_time_from_posx(snapped_x)])
++		print("Adjusted snapped_x. new x is %f and new time is %f" % [snapped_x, PositionCalculator.get_time_from_posx(snapped_x)])
+ 	if (snapped_x > lane_x_end):
+ 		return false
+ 	return true
+@@ -874,13 +874,13 @@ func get_preview_pos_for_lane(case: LanePlacingCase) -> Vector2:
+ 	if (case == LanePlacingCase.Case1):
+ 		return Vector2(0, mouse_pos.y)
+ 	elif (case == LanePlacingCase.Case2):
+-		return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
++		return Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
+ 	elif (case == LanePlacingCase.Case3):
+-		return Vector2(Setting.get_posx_from_time(target_lane.keyframes[-1].kf.x),target_lane.keyframes[-1].kf.y)
++		return Vector2(PositionCalculator.get_posx_from_time(target_lane.keyframes[-1].kf.x),target_lane.keyframes[-1].kf.y)
+ 	return Vector2.ZERO
+ 	
+ func get_preview_pos_for_note() -> Vector2:
+-	return Vector2(snapped_x, target_lane.get_height(Setting.get_time_from_posx(snapped_x)))
++	return Vector2(snapped_x, target_lane.get_height(PositionCalculator.get_time_from_posx(snapped_x)))
+ 
+ func _on_put_note():
+ 	if !editor_ready or !can_do_something or modifying_trigger or !check_mouse_in_available_area():
+@@ -914,7 +914,7 @@ func _on_put_note_placing():
+ 	current_state = EditorState.Ready
+ 
+ func _place_trigger():
+-	var trigger_data = EditorTrigger.new(selected_note as int, Setting.get_time_from_posx(preview.global_position.x), 0, 0, preview.position.y)
++	var trigger_data = EditorTrigger.new(selected_note as int, PositionCalculator.get_time_from_posx(preview.global_position.x), 0, 0, preview.position.y)
+ 	trigger_data.assign_node(preview)
+ 	levelData.triggers.append(trigger_data)
+ 	preview = null	
+@@ -923,21 +923,21 @@ func _place_trigger():
+ 	show_modify_panel()
+ 	
+ func _place_single_note():
+-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index, adjusted_toggled)
++	var data = NoteData.new(PositionCalculator.get_time_from_posx(preview.global_position.x), selected_color, 0, 0, target_lane.lane_index, adjusted_toggled)
+ 	levelData.noteDatas.append(data)
+ 	preview.set_data(data)
+ 	target_lane.add_note(preview)
+ 	preview = null
+ 
+ func _place_jump_note():
+-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 2, long_end_time, target_lane.lane_index, 1)
++	var data = NoteData.new(PositionCalculator.get_time_from_posx(preview.global_position.x), selected_color, 2, long_end_time, target_lane.lane_index, 1)
+ 	levelData.noteDatas.append(data)
+ 	preview.set_data(data)
+ 	target_lane.add_note(preview)
+ 	preview = null
+ 
+ func _place_long_note():
+-	var data = NoteData.new(Setting.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index, adjusted_toggled)
++	var data = NoteData.new(PositionCalculator.get_time_from_posx(preview.global_position.x), selected_color, 1, long_end_time, target_lane.lane_index, adjusted_toggled)
+ 	levelData.noteDatas.append(data)
+ 	preview.set_data(data)
+ 	target_lane.add_note(preview)
+@@ -956,7 +956,7 @@ func _place_lane_case1():
+ 	var new_index = Lane.find_free_index(levelData.lanes)
+ 	var new_lane = Lane.new(new_index, true)
+ 	var new_start_keyframe = Keyframe.new(0, lane_start_pos.y)
+-	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
++	var new_end_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+ 	new_start_keyframe.set_lane(new_index)
+ 	new_end_keyframe.set_lane(new_index)
+ 	new_lane.add_keyframe(new_start_keyframe)
+@@ -970,8 +970,8 @@ func _place_lane_case2():
+ 	print("CASE 2 ACTIVATED")
+ 	var new_index = Lane.find_free_index(levelData.lanes)
+ 	var new_lane = Lane.new(new_index, false)
+-	var new_start_keyframe = Keyframe.new(Setting.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
+-	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
++	var new_start_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(lane_start_pos.x), lane_start_pos.y)
++	var new_end_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+ 	new_start_keyframe.set_lane(new_index)
+ 	new_end_keyframe.set_lane(new_index)
+ 	new_lane.add_keyframe(new_start_keyframe)
+@@ -983,7 +983,7 @@ func _place_lane_case2():
+ 
+ func _place_lane_case3():
+ 	print("CASE 3 ACTIVATED")
+-	var new_end_keyframe = Keyframe.new(Setting.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
++	var new_end_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(preview.get_end_pos(lane_start_pos).x), preview.get_end_pos(lane_start_pos).y)
+ 	new_end_keyframe.set_lane(target_lane.lane_index)
+ 	print("Lane %d: added new keyframe with y %f" % [target_lane.lane_index, preview.get_end_pos(lane_start_pos).y])
+ 	target_lane.add_editor_connector(preview)
+@@ -1008,10 +1008,10 @@ func _on_modify_ready():
+ 				# 1. previous_connector 찾기
+ 				print("Finding previous connector..")
+ 				for connector in target_lane.editor_connectors:
+-					var conn_start_x = Setting.get_posx_from_time(connector.start_keyframe.kf.x)
+-					var target_x = Setting.get_posx_from_time(target_keyframe.kf.x)
++					var conn_start_x = PositionCalculator.get_posx_from_time(connector.start_keyframe.kf.x)
++					var target_x = PositionCalculator.get_posx_from_time(target_keyframe.kf.x)
+ 					if conn_start_x < target_x:
+-						if previous_connector == null or conn_start_x > Setting.get_posx_from_time(previous_connector.start_keyframe.kf.x):
++						if previous_connector == null or conn_start_x > PositionCalculator.get_posx_from_time(previous_connector.start_keyframe.kf.x):
+ 							previous_connector = connector
+ 		
+ 				if previous_connector == null:
+@@ -1052,7 +1052,7 @@ func _on_modify_placing():
+ 	if selected_note == NoteSelection.ModifyLane:
+ 		if (target_keyframe.lane_index == -1):
+ 			# 1. target_keyframe을 현재 마우스 위치로 수정 (in-place, to preserve connector references)
+-			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), adjusted_y)
++			target_keyframe.kf = Vector2(PositionCalculator.get_time_from_posx(snapped_x), adjusted_y)
+ 			previous_connector.end_keyframe = target_keyframe
+ 			previous_connector.set_data_from_keyframes()
+ 			next_connector.start_keyframe = target_keyframe
+@@ -1060,7 +1060,7 @@ func _on_modify_placing():
+ 			target_lane.insert_editor_connector(next_connector)
+ 			target_lane.insert_keyframe(target_keyframe)
+ 		else:
+-			target_keyframe.kf = Vector2(Setting.get_time_from_posx(snapped_x), adjusted_y)
++			target_keyframe.kf = Vector2(PositionCalculator.get_time_from_posx(snapped_x), adjusted_y)
+ 			if previous_connector:
+ 				previous_connector.end_keyframe = target_keyframe
+ 				previous_connector.set_data_from_keyframes()
+@@ -1070,13 +1070,13 @@ func _on_modify_placing():
+ 		adjust_note_position()
+ 	elif selected_note == NoteSelection.ModifyNote:
+ 		if (target_note.get_data().type == 0):
+-			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
++			target_note.get_data().time = PositionCalculator.get_time_from_posx(snapped_x)
+ 		elif target_note.get_data().type in [1, 2] and not target_note.is_marker:
+-			target_note.get_data().time = Setting.get_time_from_posx(snapped_x)
++			target_note.get_data().time = PositionCalculator.get_time_from_posx(snapped_x)
+ 			adjust_longNote_connector(target_note, target_note.get_data().time, target_note.get_data().end_time)
+ 		else:
+ 			var head = target_note.get_parent()
+-			head.get_data().end_time = Setting.get_time_from_posx(snapped_x)
++			head.get_data().end_time = PositionCalculator.get_time_from_posx(snapped_x)
+ 			adjust_longNote_connector(head, target_note.get_data().time, target_note.get_data().end_time)
+ 		target_note.process_color()
+ 	elif selected_note == NoteSelection.ModifyTrigger:
+@@ -1186,7 +1186,7 @@ func quit_modify_panel():
+ 	target_trigger.c = value_spinbox.value
+ 	target_trigger.t = max(length_spinbox.value, 0)
+ 	target_trigger.editor_pos_y = target_trigger.node.global_position.y
+-	target_trigger.start = Setting.get_time_from_posx(target_trigger.node.global_position.x)
++	target_trigger.start = PositionCalculator.get_time_from_posx(target_trigger.node.global_position.x)
+ 	target_trigger.show_data()
+ 	cancel_modify_trigger()
+ 	modifyPanel.visible = false
+@@ -1254,13 +1254,13 @@ func adjust_longNote_connector(note: ENote, start_time: float, end_time: float):
+ 			marker = child
+ 	
+ 	# connector 새로 찍기
+-	var connector_start_x = Setting.get_posx_from_time(start_time) + Setting.NOTE_WIDTH / 2.0
+-	var connector_end_x = Setting.get_posx_from_time(end_time) - Setting.NOTE_WIDTH / 2.0
++	var connector_start_x = PositionCalculator.get_posx_from_time(start_time) + Setting.NOTE_WIDTH / 2.0
++	var connector_end_x = PositionCalculator.get_posx_from_time(end_time) - Setting.NOTE_WIDTH / 2.0
+ 	if connector_start_x < connector_end_x:
+ 		var points = [connector_start_x]
+ 		for kf in target_lane.keyframes:
+-			if kf.kf.x > start_time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < end_time:
+-				points.append(Setting.get_posx_from_time(kf.kf.x))
++			if kf.kf.x > start_time + PositionCalculator.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < end_time:
++				points.append(PositionCalculator.get_posx_from_time(kf.kf.x))
+ 			if kf.kf.x > end_time:
+ 				break
+ 		points.append(connector_end_x)
+@@ -1268,8 +1268,8 @@ func adjust_longNote_connector(note: ENote, start_time: float, end_time: float):
+ 		for i in range(points.size() - 1):
+ 			var start_x = points[i]
+ 			var end_x = points[i + 1]
+-			var start_pos = Vector2(start_x, target_lane.get_height(Setting.get_time_from_posx(start_x)))
+-			var end_pos = Vector2(end_x, target_lane.get_height(Setting.get_time_from_posx(end_x)))
++			var start_pos = Vector2(start_x, target_lane.get_height(PositionCalculator.get_time_from_posx(start_x)))
++			var end_pos = Vector2(end_x, target_lane.get_height(PositionCalculator.get_time_from_posx(end_x)))
+ 			var longNote_connector = CONNECTOR_SCENE.instantiate()
+ 			longNote_connector.z_index = 1
+ 			parent_node.add_child(longNote_connector)
+@@ -1284,7 +1284,7 @@ func get_snapped_x(mouse_x: float) -> float:
+ 	if bit == 0:
+ 		return mouse_x
+ 	
+-	var time = Setting.get_time_from_posx(mouse_x)
++	var time = PositionCalculator.get_time_from_posx(mouse_x)
+ 
+ 
+ 	var bpm = sorted_bpm[0].c
+@@ -1301,7 +1301,7 @@ func get_snapped_x(mouse_x: float) -> float:
+ 	var elapsed = time - bpm_start_time
+ 	var snapped_time = bpm_start_time + round(elapsed / snap_duration) * snap_duration
+ 	
+-	return Setting.get_posx_from_time(snapped_time)
++	return PositionCalculator.get_posx_from_time(snapped_time)
+ 
+ func _update_sorted_bpm_triggers() -> Array:
+ 	sorted_bpm = levelData.triggers.filter(func(t): return t.type == Trigger.TYPE.BPM)
+@@ -1495,7 +1495,7 @@ func parse(chart_path: String):
+ 	for lane in levelData.lanes:
+ 		for i in range(lane.keyframes.size() - 1):
+ 			var start_time = lane.keyframes[i].kf.x
+-			var start_pos = Vector2(Setting.get_posx_from_time(start_time), lane.keyframes[i].kf.y)
++			var start_pos = Vector2(PositionCalculator.get_posx_from_time(start_time), lane.keyframes[i].kf.y)
+ 			
+ 			var connector = CONNECTOR_SCENE.instantiate()
+ 			add_child(connector)
+@@ -1513,18 +1513,18 @@ func parse(chart_path: String):
+ 		add_child(note)
+ 		if (noteData.adjusted):
+ 			note.set_line()
+-		note.position = Vector2(Setting.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
++		note.position = Vector2(PositionCalculator.get_posx_from_time(noteData.time), lane.get_height(noteData.time))
+ 		note.set_color(noteData.color)
+ 		lane.add_note(note)
+ 
+ 		if (noteData.type in [1, 2]):
+-			var connector_start_x = Setting.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
+-			var connector_end_x = Setting.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
++			var connector_start_x = PositionCalculator.get_posx_from_time(noteData.time) + Setting.NOTE_WIDTH / 2.0
++			var connector_end_x = PositionCalculator.get_posx_from_time(noteData.end_time) - Setting.NOTE_WIDTH / 2.0
+ 			if connector_start_x < connector_end_x:
+ 				var points = [connector_start_x]
+ 				for kf in lane.keyframes:
+-					if kf.kf.x > noteData.time + Setting.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < noteData.end_time:
+-						points.append(Setting.get_posx_from_time(kf.kf.x))
++					if kf.kf.x > noteData.time + PositionCalculator.get_time_from_posx(Setting.NOTE_WIDTH) and kf.kf.x < noteData.end_time:
++						points.append(PositionCalculator.get_posx_from_time(kf.kf.x))
+ 					if kf.kf.x > noteData.end_time:
+ 						break
+ 				points.append(connector_end_x)
+@@ -1536,8 +1536,8 @@ func parse(chart_path: String):
+ 				for i in range(points.size() - 1):
+ 					start_x = points[i]
+ 					end_x = points[i + 1]
+-					start_pos = Vector2(start_x, lane.get_height(Setting.get_time_from_posx(start_x)))
+-					end_pos = Vector2(end_x, lane.get_height(Setting.get_time_from_posx(end_x)))
++					start_pos = Vector2(start_x, lane.get_height(PositionCalculator.get_time_from_posx(start_x)))
++					end_pos = Vector2(end_x, lane.get_height(PositionCalculator.get_time_from_posx(end_x)))
+ 					
+ 					var longNote_connector = CONNECTOR_SCENE.instantiate()
+ 					parent_node.add_child(longNote_connector)
+@@ -1550,7 +1550,7 @@ func parse(chart_path: String):
+ 			note.add_child(marker)
+ 			marker.set_color(noteData.color)
+ 			marker.is_marker = true
+-			marker.global_position = Vector2(Setting.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
++			marker.global_position = Vector2(PositionCalculator.get_posx_from_time(noteData.end_time), lane.get_height(noteData.end_time))
+ 	
+ 	for trigger: EditorTrigger in levelData.triggers:
+ 		var trigger_node
+@@ -1581,7 +1581,7 @@ func toggle_music():
+ 		ingameStatusHolder.visible = true
+ 		music_playing = true
+ 		var initial_pos_x = get_music_start_pos()
+-		var music_start_time = Setting.get_time_from_posx(initial_pos_x) / 1000
++		var music_start_time = PositionCalculator.get_time_from_posx(initial_pos_x) / 1000
+ 		musicPlayer.play(music_start_time)
+ 		music_bar = put_line(initial_pos_x, true)
+ 		music_bar.get_child(0).modulate = Color(120,120,0)
+@@ -1605,7 +1605,7 @@ func get_music_start_pos() -> float:
+ func _process(_delta:float):
+ 	if (music_playing):
+ 		var current_time = musicPlayer.get_playback_position() * 1000
+-		music_bar.global_position.x = Setting.get_posx_from_time(current_time)
++		music_bar.global_position.x = PositionCalculator.get_posx_from_time(current_time)
+ 		var trigger_vector2 = get_trigger_process_at_time(current_time)
+ 		camera_range.set_bounds(get_camera_bounds_at(current_time, trigger_vector2))
+ 		set_ingame_status(current_time, trigger_vector2)
+@@ -1619,7 +1619,7 @@ func get_camera_bounds_at(time: float, trigger_vector: Vector2) -> Rect2:
+ 	var vp = get_viewport_rect().size
+ 	var vp_w = vp.x / trigger_vector.y
+ 	var vp_h = vp.y / trigger_vector.y
+-	var center_x = Setting.get_posx_from_time(time) + vp_w * 0.3
++	var center_x = PositionCalculator.get_posx_from_time(time) + vp_w * 0.3
+ 	return Rect2(center_x - vp_w * 0.5, trigger_vector.x - vp_h * 0.5, vp_w, vp_h)
+ 
+ #return: (delta_y, zoom) 형태의 Vector2
+@@ -1644,7 +1644,7 @@ func find_target_keyframe():
+ 	# 1. 기존 keyframe 근처에 있는지 먼저 체크
+ 	for lane in levelData.lanes:
+ 		for kf in lane.keyframes:
+-			var kf_x = Setting.get_posx_from_time(kf.kf.x)
++			var kf_x = PositionCalculator.get_posx_from_time(kf.kf.x)
+ 			var kf_y = kf.kf.y
+ 			if abs(snapped_x - kf_x) <= Setting.HALF_CONNECTOR_HEIGHT and \
+ 			   abs(mouse_pos.y - kf_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+@@ -1653,13 +1653,13 @@ func find_target_keyframe():
+ 	
+ 	# 2. 레인 위에 있지만 keyframe 근처는 아닌 경우 -> 새로운 keyframe 생성
+ 	for lane in levelData.lanes:
+-		var lane_x_start = Setting.get_posx_from_time(lane.keyframes[0].kf.x)
+-		var lane_x_end = Setting.get_posx_from_time(lane.keyframes[-1].kf.x)
++		var lane_x_start = PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x)
++		var lane_x_end = PositionCalculator.get_posx_from_time(lane.keyframes[-1].kf.x)
+ 		if snapped_x >= lane_x_start and mouse_pos.x > lane_x_start and snapped_x < lane_x_end and mouse_pos.x <= lane_x_end:
+-			var lane_y = lane.get_height(Setting.get_time_from_posx(snapped_x))
++			var lane_y = lane.get_height(PositionCalculator.get_time_from_posx(snapped_x))
+ 			if abs(lane_y - mouse_pos.y) <= Setting.HALF_CONNECTOR_HEIGHT:
+ 				set_target_lane(lane)
+-				var new_kf = Keyframe.new(Setting.get_time_from_posx(snapped_x), lane_y)
++				var new_kf = Keyframe.new(PositionCalculator.get_time_from_posx(snapped_x), lane_y)
+ 				return new_kf
+ 	
+ 	return null
+@@ -1669,8 +1669,8 @@ func find_target_note() -> Variant:
+ 	var camera_right = camera.global_position.x + get_viewport_rect().size.x / camera.zoom.x / 2
+ 	
+ 	for noteData in levelData.noteDatas:
+-		var note_x = Setting.get_posx_from_time(noteData.time)
+-		var note_end_x = Setting.get_posx_from_time(noteData.end_time)
++		var note_x = PositionCalculator.get_posx_from_time(noteData.time)
++		var note_end_x = PositionCalculator.get_posx_from_time(noteData.end_time)
+ 		if (note_x < camera_left or note_x > camera_right) and (note_end_x < camera_left or note_end_x > camera_right):
+ 			continue
+ 		var lane = Lane.find_lane(levelData.lanes, noteData.lane)
+@@ -1682,7 +1682,7 @@ func find_target_note() -> Variant:
+ 				target_lane = lane
+ 				return find_enote_by_data(lane, noteData)
+ 		else:  # 롱노트
+-			var end_x = Setting.get_posx_from_time(noteData.end_time)
++			var end_x = PositionCalculator.get_posx_from_time(noteData.end_time)
+ 			var end_y = lane.get_height(noteData.end_time)
+ 			if abs(mouse_pos.x - note_x) <= Setting.NOTE_WIDTH and \
+ 			   abs(mouse_pos.y - note_y) <= Setting.HALF_CONNECTOR_HEIGHT:
+@@ -1742,7 +1742,7 @@ func _on_move_to_last_note():
+ 		return
+ 	var last_note = levelData.noteDatas.reduce(func(a, b): return a if a.time > b.time else b)
+ 	if (last_note != null):
+-		camera.global_position = Vector2(Setting.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
++		camera.global_position = Vector2(PositionCalculator.get_posx_from_time(last_note.time), Lane.find_lane(levelData.lanes, last_note.lane).get_height(last_note.time))
+ 	else:
+ 		camera.global_position = Vector2.ZERO
+ 	
+diff --git a/vexatonic-dash-2/Scripts/Editor/EditorTrigger.gd b/vexatonic-dash-2/Scripts/Editor/EditorTrigger.gd
+index 744105e..b1109fb 100644
+--- a/vexatonic-dash-2/Scripts/Editor/EditorTrigger.gd
++++ b/vexatonic-dash-2/Scripts/Editor/EditorTrigger.gd
+@@ -31,7 +31,7 @@ func show_data():
+ 	if (need_line()):
+ 		length_line.points = PackedVector2Array([
+ 				Vector2(0, 0),
+-				Vector2(Setting.get_posx_from_time(t), c)
++				Vector2(PositionCalculator.get_posx_from_time(t), c)
+ 				])
+ 	else:
+ 		valueText.text = "%.2f" % c
+@@ -56,11 +56,11 @@ func set_new_data():
+ 	match(type):
+ 		Trigger.TYPE.Move:
+ 			c = length_line.points[1].y
+-			t = Setting.get_time_from_posx(length_line.points[1].x)
++			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
+ 		Trigger.TYPE.Zoom:
+-			t = Setting.get_time_from_posx(length_line.points[1].x)
++			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
+ 		_:
+ 			return
+ 
+ func get_editor_position():
+-	return Vector2(Setting.get_posx_from_time(start), editor_pos_y)
++	return Vector2(PositionCalculator.get_posx_from_time(start), editor_pos_y)
+diff --git a/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd b/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
+index 223cc7f..86bccb3 100644
+--- a/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
++++ b/vexatonic-dash-2/Scripts/Ingame/RhythmManager.gd
+@@ -62,6 +62,10 @@ func _ready() -> void:
+ 	
+ 	levelData.sort_noteDatas()
+ 	levelData.sort_triggers()
++	# Speed 트리거 세팅 (render_chart 전에 해야 위치 계산이 올바름)
++	var speed_trigs = levelData.triggers.filter(func(t): return t.type == Trigger.TYPE.Speed)
++	speed_trigs.sort_custom(func(a, b): return a.start < b.start)
++	PositionCalculator.setup(speed_trigs.map(func(t): return {time = t.start, speed = t.c}))
+ 	# 채보 찍기
+ 	render_chart()
+ 	sort_note_holders()
+@@ -121,7 +125,7 @@ func _physics_process(delta: float) -> void:
+ 			place_character(levelData.lanes[lane_index])
+ 			lane_index += 1
+ 			
+-		character_holder.position = Vector2(Setting.get_posx_from_time(time), cameraManager.position.y)
++		character_holder.position = Vector2(PositionCalculator.get_posx_from_time_fast(time), cameraManager.position.y)
+ 		if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
+ 			lineSprite.scale = Vector2(0.01, 6.0) / camera.zoom.y
+ 		for character in characters:
+@@ -162,7 +166,7 @@ func render_chart():
+ 	var previous_note
+ 	var previous_lane = -1
+ 	for noteData in levelData.noteDatas:
+-		pos_x = Setting.get_posx_from_time(noteData.time)
++		pos_x = PositionCalculator.get_posx_from_time(noteData.time)
+ 		var cur_note = place_note(noteData, pos_x, false, self)
+ 		assign_note(cur_note)
+ 		if (previous_time >= 0 and previous_lane == noteData.lane):
+@@ -178,7 +182,7 @@ func render_chart():
+ 		previous_note = cur_note;
+ 	
+ 		if (noteData.type == 1): #LongNote
+-			var end_pos_x = Setting.get_posx_from_time(noteData.end_time)
++			var end_pos_x = PositionCalculator.get_posx_from_time(noteData.end_time)
+ 			var marker = place_note(noteData, end_pos_x, true, cur_note)
+ 			var connector = place_connector(noteData.color, noteData.time + Setting.time_per_note_width() / 2, \
+ 							noteData.end_time - Setting.time_per_note_width() / 2, previous_lane, true, cur_note, Vector2(Setting.NOTE_WIDTH / 2.0, 0))
+@@ -187,7 +191,7 @@ func render_chart():
+ 			previous_note = marker
+ 		
+ 		elif (noteData.type == 2): #JumpNote
+-			var end_pos_x = Setting.get_posx_from_time(noteData.end_time)
++			var end_pos_x = PositionCalculator.get_posx_from_time(noteData.end_time)
+ 			match Setting.gamemode:
+ 				Setting.GAMEMODE.Normal_Character:
+ 					var marker = place_note(noteData, end_pos_x, true, cur_note)
+@@ -259,9 +263,9 @@ func place_initial_connector(lane: Lane):
+ 	var start_time = -2 * COUNTDOWN_TIME if lane.is_init else lane.keyframes[0].kf.x
+ 	var end_time = lane.notes[0].get_data().time - Setting.time_per_note_width() / 2 if !lane.notes.is_empty() else lane.keyframes[-1].kf.x
+ 	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+-		place_suregi_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(Setting.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
++		place_suregi_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(PositionCalculator.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
+ 	else:
+-		place_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(Setting.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
++		place_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(PositionCalculator.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
+ 	
+ 
+ # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
+@@ -273,17 +277,17 @@ func place_final_connector(lane: Lane):
+ 			var connector_time = last_note_time + Setting.time_per_note_width() / 2
+ 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+ 				var final_connector = place_suregi_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
+-								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
++								  self,  Vector2(PositionCalculator.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
+ 			else:
+ 				var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
+-								  self,  Vector2(Setting.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
++								  self,  Vector2(PositionCalculator.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
+ 	else:
+ 		if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+ 			var final_connector = place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
+-							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
++							  self, Vector2(PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
+ 		else:
+ 			var final_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
+-							  self, Vector2(Setting.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
++							  self, Vector2(PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
+ 
+ # 생성된 노트를 레인의 노트 큐에 할당
+ func assign_note(note: Note):
+@@ -299,6 +303,7 @@ func assign_note(note: Note):
+ 
+ func end_game():
+ 	game_finished = true
++	PositionCalculator.reset()
+ 	$IngameDataManager.on_song_end(level_path)
+ 	var result = $IngameDataManager.get_result_data()
+ 	$IngameUIManager.show_result_2(result)
+-- 
+2.43.0
+

@@ -64,13 +64,14 @@ static func parse_chart(chart_path: String, data: LevelData, is_editor: bool):
 			current_lane.add_keyframe(new_keyframe)
 			continue
 		
-		if current_lane == null and parts[0] in ["MOVE", "ROTATE", "ZOOM", "BPM"]:
+		if current_lane == null and parts[0] in ["MOVE", "ROTATE", "ZOOM", "BPM", "SPEED"]:
 			var trigger_type
 			match parts[0]:
 				"MOVE":   trigger_type = Trigger.TYPE.Move
 				"ROTATE": trigger_type = Trigger.TYPE.Rotate
 				"ZOOM":   trigger_type = Trigger.TYPE.Zoom
 				"BPM": trigger_type = Trigger.TYPE.BPM
+				"SPEED": trigger_type = Trigger.TYPE.Speed
 				_:
 					push_error("PARSE ERROR: UNKNOWN TRIGGER TYPE")
 			if (is_editor):

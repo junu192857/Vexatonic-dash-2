@@ -18,8 +18,9 @@ func _init(p_index: int, p_is_init: bool):
 	note_index = 0
 
 func adjust_keyframe(note_time: float, note_height: float):
-	var first_time = note_time - Setting.time_per_note_width() / 2
-	var second_time = note_time + Setting.time_per_note_width() / 2
+	var note_posx = PositionCalculator.get_posx_from_time(note_time)
+	var first_time = PositionCalculator.get_time_from_posx(note_posx - Setting.NOTE_WIDTH / 2.0)
+	var second_time = PositionCalculator.get_time_from_posx(note_posx + Setting.NOTE_WIDTH / 2.0)
 	var first_keyframe = Keyframe.new(first_time, note_height)
 	var second_keyframe = Keyframe.new(second_time, note_height)
 	var deleted = delete_middle_keyframe(first_time, second_time)
