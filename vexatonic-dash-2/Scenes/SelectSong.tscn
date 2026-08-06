@@ -11,6 +11,43 @@
 [ext_resource type="Script" uid="uid://vu1ylxgvkxim" path="res://Scripts/SelectSong/ScrollLabel.gd" id="5_wt3iw"]
 [ext_resource type="Texture2D" uid="uid://c182j04qnntpm" path="res://Textures/signs.jpg" id="8_hlphe"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="8_puwos"]
+[ext_resource type="Script" uid="uid://dembd4cn3s2i0" path="res://Scripts/SelectSong/DifficultyRectColor.gd" id="12_mp2i7"]
+
+[sub_resource type="Gradient" id="Gradient_n78af"]
+colors = PackedColorArray(0, 0, 0, 1, 0.5330367, 0.5330367, 0.5330367, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mxlqr"]
+gradient = SubResource("Gradient_n78af")
+
+[sub_resource type="Gradient" id="Gradient_mjwro"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0.46618086, 0.4661808, 0.4661808, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vyi73"]
+gradient = SubResource("Gradient_mjwro")
+
+[sub_resource type="Gradient" id="Gradient_hlphe"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hlphe"]
+gradient = SubResource("Gradient_hlphe")
+
+[sub_resource type="Gradient" id="Gradient_mp2i7"]
+colors = PackedColorArray(0, 0.5545257, 9.62615e-07, 1, 0, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mp2i7"]
+gradient = SubResource("Gradient_mp2i7")
+
+[sub_resource type="Gradient" id="Gradient_2hg7p"]
+colors = PackedColorArray(0.69895935, 0.1442242, 3.85046e-07, 1, 1, 0.57151157, 0.33757403, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_2hg7p"]
+gradient = SubResource("Gradient_2hg7p")
+
+[sub_resource type="Gradient" id="Gradient_kc5mb"]
+colors = PackedColorArray(0.6014544, 0.00026500793, 0.60145015, 1, 1, 0.35763314, 0.99153453, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kc5mb"]
+gradient = SubResource("Gradient_kc5mb")
 
 [node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("leftSongHolder", "middleSongHolder", "rightSongHolder", "songDataHolder", "settingHolder")]
 script = ExtResource("1_03mcv")
@@ -562,7 +599,7 @@ theme_override_font_sizes/font_size = 44
 text = "Full Vexatonic"
 horizontal_alignment = 1
 
-[node name="SettingButton" type="Button" parent="CanvasLayer/Control" unique_id=174885694]
+[node name="SettingButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=362854101]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.8
@@ -573,9 +610,9 @@ offset_left = -4.0
 offset_top = -0.3200016
 offset_right = -0.16003418
 offset_bottom = -0.3199463
-theme_override_fonts/font = ExtResource("8_puwos")
-theme_override_font_sizes/font_size = 52
-text = "Settings    "
+texture_normal = SubResource("GradientTexture2D_mxlqr")
+ignore_texture_size = true
+stretch_mode = 0
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=730083471]
 layout_mode = 1
@@ -607,15 +644,31 @@ text = "F10"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StartButton" type="Button" parent="CanvasLayer/Control" unique_id=330670203]
+[node name="Label" type="Label" parent="CanvasLayer/Control/SettingButton" unique_id=274575582]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.076000005
+anchor_right = 0.70600003
+anchor_bottom = 1.0
+offset_left = -0.18400192
+offset_right = -0.104003906
+offset_bottom = -6.1035156e-05
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 52
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StartButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=465525343]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.8
 anchor_top = 0.85
 anchor_right = 1.0
 anchor_bottom = 0.95
-theme_override_font_sizes/font_size = 66
-text = "Start!!!     "
+texture_normal = SubResource("GradientTexture2D_mxlqr")
+texture_disabled = SubResource("GradientTexture2D_vyi73")
+stretch_mode = 0
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/StartButton" unique_id=1333744545]
 layout_mode = 1
@@ -644,6 +697,20 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Enter"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/StartButton" unique_id=349860342]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.086
+anchor_right = 0.651
+anchor_bottom = 1.0
+offset_left = -0.024002075
+offset_right = 0.015991211
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 72
+text = "Start"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -755,7 +822,7 @@ text = "-30"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="DifficultyRect" type="ColorRect" parent="CanvasLayer/Control" unique_id=765677216]
+[node name="DifficultyRect" type="TextureRect" parent="CanvasLayer/Control" unique_id=821852999]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.030000001
@@ -763,7 +830,11 @@ anchor_right = 0.15
 anchor_bottom = 0.1
 offset_top = -0.32000732
 offset_bottom = -0.2800064
-color = Color(0, 0, 0, 1)
+texture = SubResource("GradientTexture2D_hlphe")
+script = ExtResource("12_mp2i7")
+easy_gradient = SubResource("GradientTexture2D_mp2i7")
+hard_gradient = SubResource("GradientTexture2D_2hg7p")
+vex_gradient = SubResource("GradientTexture2D_kc5mb")
 
 [node name="Difficulty" type="Label" parent="CanvasLayer/Control/DifficultyRect" unique_id=1564091235]
 layout_mode = 1
@@ -780,6 +851,7 @@ theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 43
 text = "Easy"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/DifficultyRect" unique_id=179376584]
 layout_mode = 1

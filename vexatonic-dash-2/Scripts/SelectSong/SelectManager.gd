@@ -5,9 +5,9 @@ extends Node2D
 @export var rightSongHolder: SongHolder
 @export var songDataHolder: SongDataHolder
 @export var settingHolder: SettingHolder
-@onready var difficultyRect: ColorRect = $CanvasLayer/Control/DifficultyRect
-@onready var settingButton: Button = $CanvasLayer/Control/SettingButton
-@onready var startButton: Button = $CanvasLayer/Control/StartButton
+@onready var difficultyRect: TextureRect = $CanvasLayer/Control/DifficultyRect
+@onready var settingButton: TextureButton = $CanvasLayer/Control/SettingButton
+@onready var startButton: TextureButton = $CanvasLayer/Control/StartButton
 
 @export var settingRectScene: PackedScene
 var settingRect
@@ -15,7 +15,6 @@ var settingRect
 var setting_open: bool = false
 
 const CHARTS_DIR = "user://Charts"
-const DIFFICULTY_COLORS = [Color(0.5, 0.85, 0.3), Color(1.0, 0.55, 0.1), Color(0.6, 0.2, 0.9)]
 
 var song_list: Array[LevelMetaData] = []
 var current_index: int = 0
@@ -117,7 +116,7 @@ func _refresh_holders():
 
 func _refresh_difficulty():
 	var diff = Setting.selected_difficulty
-	difficultyRect.color = DIFFICULTY_COLORS[diff]
+	difficultyRect.set_gradient_texture(diff)
 	difficultyRect.get_node("Difficulty").text = Setting.DIFFICULTY_NAMES[diff]
 
 func _refresh_song_data():
