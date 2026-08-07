@@ -1,5 +1,7 @@
 extends Node
 
+var blocked: bool = false
+
 # Directional keys
 signal pressed_up
 signal pressed_down
@@ -41,7 +43,14 @@ signal mouse_moved(position: Vector2)
 func _ready():
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 
+func _process(float):
+	if blocked:
+		blocked = false
+
 func _input(event):
+	if blocked:
+		return
+	
 	if event is InputEventKey:
 		match event.keycode:
 			KEY_UP:

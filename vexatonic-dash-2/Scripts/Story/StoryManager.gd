@@ -91,6 +91,7 @@ func quit_story():
 	if PausedInputManager.pressed_enter.is_connected(_on_click):
 		PausedInputManager.pressed_enter.disconnect(_on_click)
 	storyHolder.visible = false
+	InputManager.blocked = true
 	get_tree().paused = false
 
 func hide_live2D():
