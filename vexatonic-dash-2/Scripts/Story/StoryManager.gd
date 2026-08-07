@@ -111,5 +111,4 @@ func _input(event):
 		match event.keycode:
 			KEY_L, KEY_ENTER:
 				if event.pressed and not event.is_echo():
-					print("hello")
 					pressed_next.emit()

@@ -52,7 +52,6 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 			return
 	
 	pressed_note_count += 1
-	print("Combo lamp: %d" % _combo_lamp)
 	
 	if (is_long_end):
 		pressed_long_length += note.get_parent().total_pressed_time
@@ -78,7 +77,6 @@ func set_total_notes(noteDatas: Array[NoteData]):
 	var long_notes = noteDatas.filter(func(n): return n.type == 1)
 	var long_count = long_notes.size()
 	total_long_length = long_notes.reduce(func(acc, n): return acc + n.end_time - n.time, 0.0)
-	print("total_long_length = %f" % total_long_length)
 	if (single_count + long_count != noteDatas.size()):
 		push_error("Note count do not match")
 	

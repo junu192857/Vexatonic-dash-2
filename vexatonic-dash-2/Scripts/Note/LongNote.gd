@@ -70,7 +70,6 @@ func update_hold_visual(to_time: float) -> void:
 		target_visual_connector.paint_range(hold_paint_from, target_visual_connector.c_end_time)
 		hold_paint_from = target_visual_connector.c_end_time
 		target_visual_connector = find_child_connector()
-		print("moved to child connector")
 		move_to_new_connector = true
 	if (target_visual_connector != null and move_to_new_connector):
 		target_visual_connector.make_new_polygon()
