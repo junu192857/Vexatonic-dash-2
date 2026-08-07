@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="3_df05h"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="4_ghw46"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_xim88"]
-[ext_resource type="Texture2D" uid="uid://b6da4bo2wovn0" path="res://Textures/Connector.jpg" id="6_koqhg"]
+[ext_resource type="Texture2D" uid="uid://bmp7buy6slvnu" path="res://Textures/Connector.jpg" id="6_koqhg"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="7_koqhg"]
 [ext_resource type="Script" uid="uid://bmavuels06wvq" path="res://Scripts/MainMenu/GameEndButton.gd" id="8_loo7a"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="9_cmrfp"]

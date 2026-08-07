@@ -51,12 +51,14 @@ colors = PackedColorArray(0.6014544, 0.00026500793, 0.60145015, 1, 1, 0.35763314
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_kc5mb"]
 gradient = SubResource("Gradient_kc5mb")
 
-[node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("songSelectionHolder", "leftSongHolder", "middleSongHolder", "rightSongHolder", "songDataHolder", "settingHolder")]
+[node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("songSelectionHolder", "leftmostSongHolder", "leftSongHolder", "middleSongHolder", "rightSongHolder", "rightmostSongHolder", "songDataHolder", "settingHolder")]
 script = ExtResource("1_03mcv")
 songSelectionHolder = NodePath("CanvasLayer/Control/SongSelectionHolder")
+leftmostSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder")
 leftSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/LeftSongHolder")
 middleSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder")
 rightSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightSongHolder")
+rightmostSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder")
 songDataHolder = NodePath("CanvasLayer/Control/SongDataHolder/Holder")
 settingHolder = NodePath("CanvasLayer/Control/SettingHolder")
 settingRectScene = ExtResource("2_mdyll")

@@ -1,9 +1,11 @@
 extends Node2D
 
 @export var songSelectionHolder: Control
+@export var leftmostSongHolder: SongHolder
 @export var leftSongHolder: SongHolder
 @export var middleSongHolder: SongHolder
 @export var rightSongHolder: SongHolder
+@export var rightmostSongHolder: SongHolder
 @export var songDataHolder: SongDataHolder
 @export var settingHolder: SettingHolder
 @onready var difficultyRect: TextureRect = $CanvasLayer/Control/DifficultyRect
@@ -14,6 +16,7 @@ extends Node2D
 var settingRect
 
 var setting_open: bool = false
+var is_animating: bool = false
 
 const CHARTS_DIR = "user://Charts"
 
@@ -111,9 +114,11 @@ func _get_metadata(offset: int) -> LevelMetaData:
 	return song_list[(current_index + offset + size) % size]
 
 func _refresh_holders():
+	leftmostSongHolder.set_song_metadata(_get_metadata(-2))
+	leftSongHolder.set_song_metadata(_get_metadata(-1))
 	middleSongHolder.set_song_metadata(_get_metadata(0))
 	rightSongHolder.set_song_metadata(_get_metadata(1))
-	leftSongHolder.set_song_metadata(_get_metadata(-1))
+	rightmostSongHolder.set_song_metadata(_get_metadata(2))
 
 func _refresh_difficulty():
 	var diff = Setting.selected_difficulty
@@ -157,18 +162,27 @@ func _count_notes(chart_path: String) -> int:
 	return single + 2 * long
 
 func _on_move_left():
-	if not setting_open:
-		current_index = (current_index - 1 + song_list.size()) % song_list.size()
-		_refresh_holders()
-		_refresh_song_data()
-		_refresh_start_button()
+	_slide_and_refresh(1)
 
 func _on_move_right():
-	if not setting_open:
-		current_index = (current_index + 1) % song_list.size()
+	_slide_and_refresh(-1)
+
+func _slide_and_refresh(slide_dir: int):
+	if setting_open or is_animating:
+		return
+	is_animating = true
+	var slot_width = get_viewport().get_visible_rect().size.x * 0.45
+	var origin_x = songSelectionHolder.position.x
+	var tween = create_tween()
+	tween.tween_property(songSelectionHolder, "position:x", origin_x + slide_dir * slot_width, 0.3)
+	tween.tween_callback(func():
+		current_index = (current_index - slide_dir + song_list.size()) % song_list.size()
 		_refresh_holders()
 		_refresh_song_data()
 		_refresh_start_button()
+		songSelectionHolder.position.x = origin_x
+		is_animating = false
+	)
 
 func _on_change_difficulty():
 	if not setting_open:
