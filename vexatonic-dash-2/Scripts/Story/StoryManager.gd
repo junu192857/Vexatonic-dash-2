@@ -53,7 +53,7 @@ func _show_line(index: int):
 				4:
 					change_live2D(0 if parts.size() < 3 else int(parts[2]))
 				_:
-					push_error("argument tarimasen for special phase")
+					push_error("need more argument for special phase")
 		return
 	is_typing = true
 	typewrite(story_script, line, line.length() / CHARS_PER_SECOND)
@@ -81,11 +81,12 @@ func force_typewrite(label: Label):
 
 
 func start_explanation():
-	PausedInputManager.pressed_l.connect(_on_click)
-	PausedInputManager.pressed_enter.connect(_on_click)
 	get_tree().paused = true
 	storyHolder.visible = true
 	_show_line(current_line)
+	PausedInputManager.blocked = true
+	PausedInputManager.pressed_l.connect(_on_click)
+	PausedInputManager.pressed_enter.connect(_on_click)
 
 func quit_story():
 	if PausedInputManager.pressed_l.is_connected(_on_click):
