@@ -22,6 +22,7 @@ func _ready():
 	InputManager.pressed_down.connect(_on_pressed_down)
 	InputManager.pressed_enter.connect(_on_pressed_enter)
 	InputManager.pressed_esc.connect(_on_pressed_esc)
+	InputManager.pressed_a.connect(open_random_conversation)
 	settingRect = settingRectScene.instantiate()
 	$CanvasLayer/Control.add_child(settingRect)
 	settingRect.visible = false
