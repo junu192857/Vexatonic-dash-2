@@ -18,6 +18,7 @@
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="16_r4r31"]
 [ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="16_rvley"]
 [ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="17_rvley"]
+[ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="18_twb25"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
 metadata/_edit_vertical_guides_ = [-111.0]
@@ -316,6 +317,7 @@ anchor_bottom = 0.23
 offset_left = -0.45603943
 offset_top = 0.20799255
 offset_right = -0.256073
+theme_override_fonts/font = ExtResource("18_twb25")
 theme_override_font_sizes/font_size = 36
 text = "Score_"
 
@@ -330,6 +332,7 @@ offset_left = -0.32000732
 offset_top = 0.13800049
 offset_right = 0.27197266
 offset_bottom = -0.23400879
+theme_override_fonts/font = ExtResource("18_twb25")
 theme_override_font_sizes/font_size = 30
 text = "Back To Main [Enter]"
 
