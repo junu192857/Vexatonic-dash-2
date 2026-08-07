@@ -18,6 +18,7 @@
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="16_r4r31"]
 [ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="16_rvley"]
 [ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="17_rvley"]
+[ext_resource type="FontFile" uid="uid://b4ulcao8amlsl" path="res://Fonts/SB_Window_Font/SB 어그로 M.ttf" id="18_qvaf3"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="18_twb25"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
@@ -265,8 +266,13 @@ anchor_bottom = 0.592
 offset_top = -0.05999756
 offset_right = 0.5039673
 offset_bottom = -0.060028076
+theme_override_colors/font_color = Color(1, 0, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Vexatonic"
+vertical_alignment = 1
 
 [node name="SparklicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1531845158]
 layout_mode = 1
@@ -278,8 +284,13 @@ anchor_bottom = 0.67800003
 offset_top = 0.2659912
 offset_right = 0.5039673
 offset_bottom = 0.2659607
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Sparklic"
+vertical_alignment = 1
 
 [node name="WildLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1998486912]
 layout_mode = 1
@@ -291,8 +302,13 @@ anchor_bottom = 0.76600003
 offset_top = -0.16400146
 offset_right = 0.5039673
 offset_bottom = -0.16400146
+theme_override_colors/font_color = Color(0.8890923, 0.6294428, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Wild"
+vertical_alignment = 1
 
 [node name="MissLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=616339394]
 layout_mode = 1
@@ -304,8 +320,12 @@ anchor_bottom = 0.85200006
 offset_top = 0.10797119
 offset_right = 0.5039673
 offset_bottom = 0.10797119
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Miss"
+vertical_alignment = 1
 
 [node name="ScoreLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1297994137]
 layout_mode = 1
@@ -401,8 +421,10 @@ offset_left = -0.4560547
 offset_top = 0.0059814453
 offset_right = 0.55996704
 offset_bottom = 0.16397095
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "Paint 100.0%"
+vertical_alignment = 1
 
 [node name="VexatonicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=373429698]
 layout_mode = 1
@@ -415,9 +437,11 @@ offset_left = -0.5120239
 offset_top = -0.05999756
 offset_right = -0.0079956055
 offset_bottom = -0.060028076
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="SparklicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1365964631]
 layout_mode = 1
@@ -430,9 +454,11 @@ offset_left = -0.5120239
 offset_top = 0.2659912
 offset_right = -0.0079956055
 offset_bottom = 0.2659607
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="WildText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=26379827]
 layout_mode = 1
@@ -445,9 +471,11 @@ offset_left = -0.5120239
 offset_top = -0.16400146
 offset_right = -0.0079956055
 offset_bottom = -0.16400146
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="MissText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1519663053]
 layout_mode = 1
@@ -460,9 +488,11 @@ offset_left = -0.5120239
 offset_top = 0.10797119
 offset_right = -0.0079956055
 offset_bottom = 0.10797119
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="RankText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=627003622]
 layout_mode = 1
