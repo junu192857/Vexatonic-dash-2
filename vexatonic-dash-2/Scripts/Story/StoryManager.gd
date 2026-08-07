@@ -81,12 +81,12 @@ func force_typewrite(label: Label):
 
 
 func start_explanation():
-	get_tree().paused = true
-	storyHolder.visible = true
-	_show_line(current_line)
 	PausedInputManager.blocked = true
 	PausedInputManager.pressed_l.connect(_on_click)
 	PausedInputManager.pressed_enter.connect(_on_click)
+	get_tree().paused = true
+	storyHolder.visible = true
+	_show_line(current_line)
 
 func quit_story():
 	if PausedInputManager.pressed_l.is_connected(_on_click):

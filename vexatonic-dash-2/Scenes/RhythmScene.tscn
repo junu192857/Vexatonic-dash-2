@@ -508,7 +508,6 @@ vertical_alignment = 1
 
 [node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("17_rvley")]
 visible = false
-script_path = "res://Scripts/Tutorial/script.txt"
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1570471814]
 layer = -1
