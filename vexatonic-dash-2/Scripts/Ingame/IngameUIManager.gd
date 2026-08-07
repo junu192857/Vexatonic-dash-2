@@ -5,6 +5,8 @@ extends Node
 @export var canvasLayer: CanvasLayer
 @export var lampTextHolder: Control
 @export var resultPanelHolder: Control
+@export var rightCover: TextureRect
+@export var leftCover: TextureRect
 
 @onready var resultPanel = resultPanelHolder.get_node("ResultPanel")
 @onready var scoreText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/ScoreText")
@@ -19,6 +21,13 @@ extends Node
 
 
 func _ready():
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+		leftCover.visible = true
+		rightCover.visible = true
+	else:
+		leftCover.visible = false
+		rightCover.visible = false
+	
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
 			score_text.text = "SCORE %07d" % 0

@@ -10,6 +10,7 @@ var sorted_bpm: Array
 @export var ZOOM_TRIGGER_SCENE: PackedScene
 @export var BPM_TRIGGER_SCENE: PackedScene
 @export var SPEED_TRIGGER_SCENE: PackedScene
+@export var MOVEX_TRIGGER_SCENE: PackedScene
 
 @onready var camera = $Camera2D
 @onready var musicPlayer = $AudioStreamPlayer
@@ -239,12 +240,13 @@ func realign_lines_by_move():
 # ========================= 레인 및 노트 입력 ======================
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12,
-					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22, ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34, SpeedTrigger = 35,
+					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22,
+					ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34, SpeedTrigger = 35, MoveXTrigger = 36,
 					Nothing = 100}
 
 const colored_notes_list: Array[int] = [0, 1, 2, 3, 11, 12, 13, 14]
 const modify_list: Array[int] = [21, 22, 23]
-const trigger_list: Array[int] = [31, 32, 33, 34, 35]
+const trigger_list: Array[int] = [31, 32, 33, 34, 35, 36]
 
 enum EditorState { Ready, Placing }
 #Case 1: Initial lane 제작
@@ -1172,6 +1174,9 @@ func show_modify_panel():
 		Trigger.TYPE.Speed:
 			value_label.text = "Set speed:"
 			length_spinbox.visible = false
+		Trigger.TYPE.MoveX:
+			value_label.text = "Movex_value_time(ms):"
+			length_spinbox.visible = true
 	value_spinbox.value = target_trigger.c
 	length_spinbox.value = target_trigger.t
 
@@ -1415,6 +1420,8 @@ func save_chart():
 				type_string = "ZOOM"
 			Trigger.TYPE.Speed:
 				type_string = "SPEED"
+			Trigger.TYPE.MoveX:
+				type_string = "MOVEX"
 		file.store_line("%s %f %f %f %f" % [type_string, trigger.start, trigger.c, trigger.t, trigger.node.global_position.y])
 	
 	quit_save_panel()
@@ -1563,6 +1570,8 @@ func parse(chart_path: String):
 				trigger_node = BPM_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.Speed:
 				trigger_node = SPEED_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.MoveX:
+				trigger_node = MOVEX_TRIGGER_SCENE.instantiate()
 		add_child(trigger_node)
 		trigger_node.global_position = trigger.get_editor_position()
 		trigger.assign_node(trigger_node)

@@ -18,7 +18,6 @@ func sort_notes():
 	)
 	if not notes.is_empty():
 		current_note = notes[0]
-		print("Set current note")
 
 # 매 프레임 호출: 처리 안 된 롱노트 끝점 체크 + current_note Miss 체크
 func check_miss(time: float):
@@ -30,7 +29,6 @@ func check_miss(time: float):
 		if note.get_data().type == 0 and not note.is_hit and time >= note.get_data().time + Note.WILD_MS:
 			_force_start_miss(note)
 		elif note.get_data().type == 1 and not note.end_judged and time >= note.get_data().end_time:
-			print("Trying judge long end: note %d at time %f" % [i, time])
 			_judge_long_end(note)
 	_advance_earliest_unprocessed(time)
 
@@ -39,7 +37,6 @@ func check_miss(time: float):
 
 	# current_note가 롱노트이고 end_time 경과
 	if current_note.get_data().type == 1 and not current_note.end_judged and time >= current_note.get_data().end_time:
-		print("Trying judge long end: current note %d" % current_index)
 		_judge_long_end(current_note)
 		move_to_next_note()
 		_advance_earliest_unprocessed()
@@ -60,7 +57,6 @@ func _advance_earliest_unprocessed(time: float = 0):
 		var done = (note.get_data().type == 1 and note.end_judged) or \
 				   (note.get_data().type != 1 and note.is_hit)
 		if done:
-			print("Note index %d: done. time: %f" % [earliest_unprocessed_index, time])
 			earliest_unprocessed_index += 1
 		else:
 			break
@@ -146,7 +142,6 @@ func move_to_next_note() -> bool:
 	return true
 	
 func update_visuals(time: float) -> void:
-	#print("Update_visuals at time %f" % time)
 	var upper = min(current_index, notes.size() - 1)
 	for i in range(earliest_unprocessed_index, upper + 1):
 		var note = notes[i]

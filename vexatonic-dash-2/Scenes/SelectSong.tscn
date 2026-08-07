@@ -4,9 +4,50 @@
 [ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_mdyll"]
 [ext_resource type="Script" uid="uid://pgxarv2aqaf0" path="res://Scripts/SelectSong/SongHolder.gd" id="2_uvoqn"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
+[ext_resource type="Texture2D" uid="uid://budl6ub3l3w1m" path="res://Textures/MainBackground.jpg" id="3_puwos"]
 [ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
+[ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="5_7150g"]
 [ext_resource type="Script" uid="uid://c4ftuyjsig7p7" path="res://Scripts/SelectSong/SettingHolder.gd" id="5_mdyll"]
 [ext_resource type="Script" uid="uid://vu1ylxgvkxim" path="res://Scripts/SelectSong/ScrollLabel.gd" id="5_wt3iw"]
+[ext_resource type="Texture2D" uid="uid://c182j04qnntpm" path="res://Textures/signs.jpg" id="8_hlphe"]
+[ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="8_puwos"]
+[ext_resource type="Script" uid="uid://dembd4cn3s2i0" path="res://Scripts/SelectSong/DifficultyRectColor.gd" id="12_mp2i7"]
+
+[sub_resource type="Gradient" id="Gradient_n78af"]
+colors = PackedColorArray(0, 0, 0, 1, 0.5330367, 0.5330367, 0.5330367, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mxlqr"]
+gradient = SubResource("Gradient_n78af")
+
+[sub_resource type="Gradient" id="Gradient_mjwro"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0.46618086, 0.4661808, 0.4661808, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vyi73"]
+gradient = SubResource("Gradient_mjwro")
+
+[sub_resource type="Gradient" id="Gradient_hlphe"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hlphe"]
+gradient = SubResource("Gradient_hlphe")
+
+[sub_resource type="Gradient" id="Gradient_mp2i7"]
+colors = PackedColorArray(0, 0.5545257, 9.62615e-07, 1, 0, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mp2i7"]
+gradient = SubResource("Gradient_mp2i7")
+
+[sub_resource type="Gradient" id="Gradient_2hg7p"]
+colors = PackedColorArray(0.69895935, 0.1442242, 3.85046e-07, 1, 1, 0.57151157, 0.33757403, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_2hg7p"]
+gradient = SubResource("Gradient_2hg7p")
+
+[sub_resource type="Gradient" id="Gradient_kc5mb"]
+colors = PackedColorArray(0.6014544, 0.00026500793, 0.60145015, 1, 1, 0.35763314, 0.99153453, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kc5mb"]
+gradient = SubResource("Gradient_kc5mb")
 
 [node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("leftSongHolder", "middleSongHolder", "rightSongHolder", "songDataHolder", "settingHolder")]
 script = ExtResource("1_03mcv")
@@ -26,6 +67,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Background" type="TextureRect" parent="CanvasLayer/Control" unique_id=1170965721]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3_puwos")
 
 [node name="SongSelectionHolder" type="Control" parent="CanvasLayer/Control" unique_id=2007234695]
 layout_mode = 1
@@ -137,8 +184,10 @@ offset_left = -0.29600525
 offset_top = -3.0
 offset_right = -0.12802124
 offset_bottom = 0.009994507
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
+vertical_alignment = 1
 
 [node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1107589057]
 layout_mode = 1
@@ -166,9 +215,11 @@ offset_left = -0.056030273
 offset_top = 0.10000038
 offset_right = 0.2479248
 offset_bottom = -0.12000275
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 56
 text = "Level"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1058927506]
 custom_minimum_size = Vector2(400, 80)
@@ -190,13 +241,17 @@ script = ExtResource("5_wt3iw")
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
 
 [node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder/SongName" unique_id=85162456]
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
 
 [node name="MiddleSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1490555348]
 layout_mode = 1
@@ -219,8 +274,10 @@ offset_left = -0.29600525
 offset_top = -3.0
 offset_right = -0.12802124
 offset_bottom = 0.009994507
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
+vertical_alignment = 1
 
 [node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=1214240176]
 layout_mode = 1
@@ -248,9 +305,11 @@ offset_left = -0.056030273
 offset_top = 0.10000038
 offset_right = 0.2479248
 offset_bottom = -0.12000275
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 56
 text = "Level"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=1039738498]
 custom_minimum_size = Vector2(400, 80)
@@ -272,13 +331,17 @@ script = ExtResource("5_wt3iw")
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
 
 [node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder/SongName" unique_id=587421603]
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
 
 [node name="LeftSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1649229551]
 layout_mode = 1
@@ -301,8 +364,10 @@ offset_left = -0.29600525
 offset_top = -3.0
 offset_right = -0.12802124
 offset_bottom = 0.009994507
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
+vertical_alignment = 1
 
 [node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=38239312]
 layout_mode = 1
@@ -330,9 +395,11 @@ offset_left = -0.056030273
 offset_top = 0.10000038
 offset_right = 0.2479248
 offset_bottom = -0.12000275
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 56
 text = "Level"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=1581496288]
 custom_minimum_size = Vector2(400, 80)
@@ -354,13 +421,17 @@ script = ExtResource("5_wt3iw")
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
 
 [node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder/SongName" unique_id=595855864]
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
 
 [node name="SongDataHolder" type="Control" parent="CanvasLayer/Control" unique_id=1382802090]
 layout_mode = 1
@@ -405,8 +476,8 @@ anchor_right = 1.095
 anchor_bottom = 0.70000005
 offset_left = -0.35046387
 offset_right = -0.1772461
-offset_bottom = -3.0517578e-05
-texture = ExtResource("3_74yen")
+offset_bottom = -0.22402954
+texture = ExtResource("8_hlphe")
 expand_mode = 1
 script = ExtResource("4_gjw2d")
 
@@ -421,8 +492,11 @@ offset_left = 0.05368042
 offset_top = -0.072769165
 offset_right = 0.082977295
 offset_bottom = 0.013092041
-theme_override_font_sizes/font_size = 57
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("8_puwos")
+theme_override_font_sizes/font_size = 50
 text = "Vexatonics"
+vertical_alignment = 1
 
 [node name="BestScore" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1883576132]
 layout_mode = 1
@@ -435,8 +509,11 @@ offset_left = -0.026794434
 offset_top = 0.0735054
 offset_right = -0.43603516
 offset_bottom = 0.1593628
-theme_override_font_sizes/font_size = 57
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("8_puwos")
+theme_override_font_sizes/font_size = 50
 text = "Best Score"
+vertical_alignment = 1
 
 [node name="VexatonicValue" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1834441864]
 layout_mode = 1
@@ -449,9 +526,12 @@ offset_left = -0.45303345
 offset_top = 0.11349487
 offset_right = 0.34796143
 offset_bottom = -0.12158203
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 50
 text = "1,314 / 1,314"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="ScoreValue" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1309190163]
 layout_mode = 1
@@ -463,9 +543,12 @@ anchor_bottom = 0.38
 offset_top = -0.17004395
 offset_right = 0.1749878
 offset_bottom = -0.026885986
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 62
 text = "1,000,000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Rank" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=2040935189]
 layout_mode = 1
@@ -478,6 +561,7 @@ offset_left = -0.44604492
 offset_top = -0.118457794
 offset_right = -0.56103516
 offset_bottom = -0.0042419434
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 150
 text = "S"
 horizontal_alignment = 1
@@ -494,6 +578,7 @@ offset_left = -0.16201782
 offset_top = -0.0843811
 offset_right = 0.473938
 offset_bottom = 0.020629883
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 44
 text = "Perfect Paint"
 horizontal_alignment = 1
@@ -509,11 +594,12 @@ offset_left = -0.38000488
 offset_top = -0.0843811
 offset_right = 0.25598145
 offset_bottom = 0.020629883
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 44
 text = "Full Vexatonic"
 horizontal_alignment = 1
 
-[node name="SettingButton" type="Button" parent="CanvasLayer/Control" unique_id=174885694]
+[node name="SettingButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=362854101]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.8
@@ -524,8 +610,9 @@ offset_left = -4.0
 offset_top = -0.3200016
 offset_right = -0.16003418
 offset_bottom = -0.3199463
-theme_override_font_sizes/font_size = 66
-text = "Settings    "
+texture_normal = SubResource("GradientTexture2D_mxlqr")
+ignore_texture_size = true
+stretch_mode = 0
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=730083471]
 layout_mode = 1
@@ -557,15 +644,31 @@ text = "F10"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StartButton" type="Button" parent="CanvasLayer/Control" unique_id=330670203]
+[node name="Label" type="Label" parent="CanvasLayer/Control/SettingButton" unique_id=274575582]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.076000005
+anchor_right = 0.70600003
+anchor_bottom = 1.0
+offset_left = -0.18400192
+offset_right = -0.104003906
+offset_bottom = -6.1035156e-05
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 52
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StartButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=465525343]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.8
 anchor_top = 0.85
 anchor_right = 1.0
 anchor_bottom = 0.95
-theme_override_font_sizes/font_size = 66
-text = "Start!!!     "
+texture_normal = SubResource("GradientTexture2D_mxlqr")
+texture_disabled = SubResource("GradientTexture2D_vyi73")
+stretch_mode = 0
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/StartButton" unique_id=1333744545]
 layout_mode = 1
@@ -597,6 +700,20 @@ text = "Enter"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Label" type="Label" parent="CanvasLayer/Control/StartButton" unique_id=349860342]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.086
+anchor_right = 0.651
+anchor_bottom = 1.0
+offset_left = -0.024002075
+offset_right = 0.015991211
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 72
+text = "Start"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="SettingHolder" type="TextureRect" parent="CanvasLayer/Control" unique_id=350180774]
 layout_mode = 1
 anchors_preset = -1
@@ -621,8 +738,10 @@ offset_left = -0.26202393
 offset_top = -0.14335632
 offset_right = -0.1510315
 offset_bottom = 0.13470459
-theme_override_font_sizes/font_size = 45
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 40
 text = "Judge_Offset"
+vertical_alignment = 1
 
 [node name="SoundOffset" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=2025918682]
 layout_mode = 1
@@ -635,8 +754,10 @@ offset_left = -0.26202393
 offset_top = 0.0067367554
 offset_right = -103.15103
 offset_bottom = -0.039352417
-theme_override_font_sizes/font_size = 45
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 40
 text = "Sound_Offset"
+vertical_alignment = 1
 
 [node name="Speed" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1621748373]
 layout_mode = 1
@@ -649,8 +770,10 @@ offset_left = -0.26202393
 offset_top = 8.150749
 offset_right = 0.010269165
 offset_bottom = 8.10466
-theme_override_font_sizes/font_size = 45
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 40
 text = "Speed"
+vertical_alignment = 1
 
 [node name="SpeedValue" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1290855835]
 layout_mode = 1
@@ -659,9 +782,11 @@ anchor_left = 0.646
 anchor_top = 0.132
 anchor_right = 0.90300006
 anchor_bottom = 0.34500003
-theme_override_font_sizes/font_size = 45
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 40
 text = "2.0"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="JudgeOffsetValue" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1831197387]
 layout_mode = 1
@@ -674,9 +799,11 @@ offset_left = 0.017303467
 offset_top = -0.14335632
 offset_right = -0.09698486
 offset_bottom = 0.13470459
-theme_override_font_sizes/font_size = 45
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 40
 text = "-30"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="SoundOffsetValue2" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=9550399]
 layout_mode = 1
@@ -689,11 +816,13 @@ offset_left = 0.017303467
 offset_top = -0.0207901
 offset_right = 1.0556641
 offset_bottom = -0.06687927
-theme_override_font_sizes/font_size = 45
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 40
 text = "-30"
 horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="DifficultyRect" type="ColorRect" parent="CanvasLayer/Control" unique_id=765677216]
+[node name="DifficultyRect" type="TextureRect" parent="CanvasLayer/Control" unique_id=821852999]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.030000001
@@ -701,7 +830,11 @@ anchor_right = 0.15
 anchor_bottom = 0.1
 offset_top = -0.32000732
 offset_bottom = -0.2800064
-color = Color(0, 0, 0, 1)
+texture = SubResource("GradientTexture2D_hlphe")
+script = ExtResource("12_mp2i7")
+easy_gradient = SubResource("GradientTexture2D_mp2i7")
+hard_gradient = SubResource("GradientTexture2D_2hg7p")
+vex_gradient = SubResource("GradientTexture2D_kc5mb")
 
 [node name="Difficulty" type="Label" parent="CanvasLayer/Control/DifficultyRect" unique_id=1564091235]
 layout_mode = 1
@@ -714,9 +847,11 @@ offset_left = 0.1439991
 offset_top = 0.020085812
 offset_right = 0.11999512
 offset_bottom = 0.020881653
+theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 43
 text = "Easy"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/DifficultyRect" unique_id=179376584]
 layout_mode = 1

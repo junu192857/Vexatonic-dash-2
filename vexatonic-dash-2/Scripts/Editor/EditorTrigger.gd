@@ -20,7 +20,7 @@ func _init(p_type: TYPE, p_start: float, p_c: float, p_t: float, p_y: float) -> 
 
 func assign_node(p_node: Node2D):
 	node = p_node
-	if (type != Trigger.TYPE.BPM and type != Trigger.TYPE.Speed):
+	if (need_line()):
 		length_line = node.get_child(0)
 		sprite = node.get_child(1)
 	else:
@@ -29,9 +29,16 @@ func assign_node(p_node: Node2D):
 
 func show_data():
 	if (need_line()):
-		length_line.points = PackedVector2Array([
+		match type:
+			Trigger.TYPE.Move:
+				length_line.points = PackedVector2Array([
 				Vector2(0, 0),
 				Vector2(PositionCalculator.get_posx_from_time(t), c)
+				])
+			Trigger.TYPE.MoveX, Trigger.TYPE.Zoom:
+				length_line.points = PackedVector2Array([
+				Vector2(0, 0),
+				Vector2(PositionCalculator.get_posx_from_time(t), 0)
 				])
 	else:
 		valueText.text = "%.2f" % c
@@ -43,7 +50,7 @@ func show_line_preview(end_global_point: Vector2):
 				Vector2(0,0),
 				end_global_point - node.position
 			])
-		Trigger.TYPE.Zoom:
+		Trigger.TYPE.Zoom, Trigger.TYPE.MoveX:
 			length_line.points = PackedVector2Array([
 				Vector2(0,0),
 				Vector2.RIGHT * (end_global_point.x - node.position.x)
@@ -57,7 +64,7 @@ func set_new_data():
 		Trigger.TYPE.Move:
 			c = length_line.points[1].y
 			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
-		Trigger.TYPE.Zoom:
+		Trigger.TYPE.Zoom, Trigger.TYPE.MoveX:
 			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
 		_:
 			return

@@ -1,15 +1,16 @@
 [gd_scene format=3 uid="uid://dow41utu1rk5u"]
 
 [ext_resource type="Script" uid="uid://dwoyq1dcxhyuf" path="res://Scripts/Editor/EditorManager.gd" id="1_trcuy"]
-[ext_resource type="PackedScene" uid="uid://iksp3v0ubmg6" path="res://Prefabs/EditorNote.tscn" id="2_5v8xv"]
-[ext_resource type="PackedScene" uid="uid://br567btcie3o3" path="res://Prefabs/EditorConnector.tscn" id="3_brgpd"]
-[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="4_5v8xv"]
+[ext_resource type="PackedScene" uid="uid://iksp3v0ubmg6" path="res://Prefabs/Editor/EditorNote.tscn" id="2_5v8xv"]
+[ext_resource type="PackedScene" uid="uid://br567btcie3o3" path="res://Prefabs/Editor/EditorConnector.tscn" id="3_brgpd"]
+[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/EditorTriggers/Line.tscn" id="4_5v8xv"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
-[ext_resource type="PackedScene" uid="uid://bul34fxxophy1" path="res://Prefabs/MoveTrigger.tscn" id="5_qexec"]
-[ext_resource type="PackedScene" uid="uid://cq60k3h6dbxia" path="res://Prefabs/ZoomTrigger.tscn" id="6_847jc"]
-[ext_resource type="PackedScene" uid="uid://cw8p2v3afm85j" path="res://Prefabs/BPMTrigger.tscn" id="7_847jc"]
-[ext_resource type="PackedScene" uid="uid://dnbcvrxhsooaf" path="res://Prefabs/SpeedTrigger.tscn" id="8_ir51w"]
+[ext_resource type="PackedScene" uid="uid://bul34fxxophy1" path="res://Prefabs/EditorTriggers/MoveTrigger.tscn" id="5_qexec"]
+[ext_resource type="PackedScene" uid="uid://cq60k3h6dbxia" path="res://Prefabs/EditorTriggers/ZoomTrigger.tscn" id="6_847jc"]
+[ext_resource type="PackedScene" uid="uid://cw8p2v3afm85j" path="res://Prefabs/EditorTriggers/BPMTrigger.tscn" id="7_847jc"]
+[ext_resource type="PackedScene" uid="uid://dnbcvrxhsooaf" path="res://Prefabs/EditorTriggers/SpeedTrigger.tscn" id="8_ir51w"]
 [ext_resource type="Script" uid="uid://dofrhowavsi7y" path="res://Scripts/Editor/Timer.gd" id="9_847jc"]
+[ext_resource type="PackedScene" uid="uid://bolbw7dhn1fov" path="res://Prefabs/EditorTriggers/MoveXTrigger.tscn" id="9_fx05v"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_brgpd"]
 
@@ -26,6 +27,7 @@ MOVE_TRIGGER_SCENE = ExtResource("5_qexec")
 ZOOM_TRIGGER_SCENE = ExtResource("6_847jc")
 BPM_TRIGGER_SCENE = ExtResource("7_847jc")
 SPEED_TRIGGER_SCENE = ExtResource("8_ir51w")
+MOVEX_TRIGGER_SCENE = ExtResource("9_fx05v")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
 
@@ -179,10 +181,10 @@ text = "YellowLong"
 
 [node name="Button5" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=562787188]
 layout_mode = 0
-offset_left = 1199.0
-offset_top = 25.0
-offset_right = 1299.0
-offset_bottom = 125.0
+offset_left = 1261.0
+offset_top = 31.0
+offset_right = 1361.0
+offset_bottom = 131.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Modify
@@ -254,10 +256,10 @@ Camera"
 
 [node name="Button9" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1223151017]
 layout_mode = 0
-offset_left = 1074.0
-offset_top = 26.0
-offset_right = 1174.0
-offset_bottom = 126.0
+offset_left = 1139.0
+offset_top = 31.0
+offset_right = 1239.0
+offset_bottom = 131.0
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Modify
@@ -295,10 +297,10 @@ text = "Lane"
 
 [node name="Button2" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=228103161]
 layout_mode = 0
-offset_left = 1323.0
-offset_top = 24.0
-offset_right = 1423.0
-offset_bottom = 124.0
+offset_left = 1385.0
+offset_top = 31.0
+offset_right = 1485.0
+offset_bottom = 131.0
 pivot_offset = Vector2(0, 120)
 toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
@@ -342,6 +344,17 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Change
 Speed"
+
+[node name="MoveXTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1348858736]
+layout_mode = 0
+offset_left = 1020.0
+offset_top = 163.0
+offset_right = 1120.0
+offset_bottom = 263.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_dfuwn")
+text = "Move
+Camera_X"
 
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
@@ -788,6 +801,7 @@ script = ExtResource("9_847jc")
 [connection signal="toggled" from="CanvasLayer/NoteSelectorPanel/Button11" to="." method="_on_toggled_adjust"]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button12" to="." method="_on_select_note" binds= [14]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ChangeSpeedButton" to="." method="_on_select_note" binds= [35]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/MoveXTriggerButton" to="." method="_on_select_note" binds= [36]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]

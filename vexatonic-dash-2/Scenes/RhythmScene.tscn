@@ -1,26 +1,32 @@
 [gd_scene format=3 uid="uid://l50nt5bpgqai"]
 
 [ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/Ingame/RhythmManager.gd" id="2_wib5u"]
-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Ingame/Note.tscn" id="3_4pq8y"]
+[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Ingame/Character.tscn" id="3_wib5u"]
+[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/Ingame/LongNote.tscn" id="4_4pq8y"]
+[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Ingame/Connector.tscn" id="4_wjq5j"]
 [ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Camera/CameraManager.gd" id="6_4pq8y"]
-[ext_resource type="PackedScene" uid="uid://nkkobamofph3" path="res://Prefabs/SuregiConnector.tscn" id="6_ublex"]
-[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="7_frbmc"]
+[ext_resource type="PackedScene" uid="uid://nkkobamofph3" path="res://Prefabs/Ingame/SuregiConnector.tscn" id="6_ublex"]
+[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/EditorTriggers/Line.tscn" id="7_frbmc"]
 [ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/Ingame/IngameDataManager.gd" id="7_wjq5j"]
 [ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/Ingame/IngameUIManager.gd" id="8_pee8w"]
-[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/Ingame/JudgementText.tscn" id="9_qa11p"]
+[ext_resource type="Texture2D" uid="uid://cwewgb07d6uwe" path="res://Textures/IngameBackgroundMirrored.jpg" id="12_63m28"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_ublex"]
+[ext_resource type="Texture2D" uid="uid://r5si4bnkc62a" path="res://Textures/IngameBackground.jpg" id="13_g5yvx"]
+[ext_resource type="Script" uid="uid://en0omrumjk71" path="res://Scripts/Tutorial/TutorialManager.gd" id="15_t4mny"]
+[ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="16_r4r31"]
+[ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="16_rvley"]
+[ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="17_rvley"]
+[ext_resource type="FontFile" uid="uid://b4ulcao8amlsl" path="res://Fonts/SB_Window_Font/SB 어그로 M.ttf" id="18_qvaf3"]
+[ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="18_twb25"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
 metadata/_edit_vertical_guides_ = [-111.0]
 
-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("rightCover", "leftCover")]
+[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
 script = ExtResource("2_wib5u")
 CHARACTER_SCENE = ExtResource("3_wib5u")
-rightCover = NodePath("../CanvasLayer/Control/RightCover")
-leftCover = NodePath("../CanvasLayer/Control/LeftCover")
 NOTE_SCENE = ExtResource("3_4pq8y")
 LONG_NOTE_SCENE = ExtResource("4_4pq8y")
 CONNECTOR_SCENE = ExtResource("4_wjq5j")
@@ -37,18 +43,29 @@ ignore_rotation = false
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
 
-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder")]
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
 score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
 canvasLayer = NodePath("../../CanvasLayer")
 lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
 resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
+rightCover = NodePath("../../CanvasLayer/Control/RightCover")
+leftCover = NodePath("../../CanvasLayer/Control/LeftCover")
 
 [node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
 
 [node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("7_frbmc")]
 visible = false
+
+[node name="TutorialManager" type="Node2D" parent="RhythmManager" unique_id=2063788292 node_paths=PackedStringArray("storyManager")]
+script = ExtResource("15_t4mny")
+storyManager = NodePath("../../CanvasLayer/StoryControl")
+
+[node name="TutorialBGMPlayer" type="AudioStreamPlayer" parent="RhythmManager/TutorialManager" unique_id=1730706539]
+process_mode = 3
+stream = ExtResource("16_rvley")
+parameters/looping = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
 
@@ -60,25 +77,46 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=591227501]
+[node name="RightCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=791685082]
 visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.781
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.6398926
-offset_right = 0.15979004
-color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+pivot_offset_ratio = Vector2(1, 0)
+texture = ExtResource("12_63m28")
+expand_mode = 1
+stretch_mode = 1
+flip_h = true
 
-[node name="LeftCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=439301575]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/Control/RightCover" unique_id=603732571]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.83137256)
+
+[node name="LeftCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=276138114]
 visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.21900001
 anchor_bottom = 1.0
-offset_right = -0.480011
-color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+texture = ExtResource("13_g5yvx")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/Control/LeftCover" unique_id=493000574]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.83137256)
 
 [node name="ScorePanel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
 layout_mode = 1
@@ -96,8 +134,10 @@ anchor_right = 0.9
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 40
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 32
 text = "SCORE 0000000"
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LampTextHolder" type="Control" parent="CanvasLayer/Control" unique_id=442854916]
@@ -226,8 +266,13 @@ anchor_bottom = 0.592
 offset_top = -0.05999756
 offset_right = 0.5039673
 offset_bottom = -0.060028076
+theme_override_colors/font_color = Color(1, 0, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Vexatonic"
+vertical_alignment = 1
 
 [node name="SparklicLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1531845158]
 layout_mode = 1
@@ -239,8 +284,13 @@ anchor_bottom = 0.67800003
 offset_top = 0.2659912
 offset_right = 0.5039673
 offset_bottom = 0.2659607
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Sparklic"
+vertical_alignment = 1
 
 [node name="WildLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1998486912]
 layout_mode = 1
@@ -252,8 +302,13 @@ anchor_bottom = 0.76600003
 offset_top = -0.16400146
 offset_right = 0.5039673
 offset_bottom = -0.16400146
+theme_override_colors/font_color = Color(0.8890923, 0.6294428, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Wild"
+vertical_alignment = 1
 
 [node name="MissLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=616339394]
 layout_mode = 1
@@ -265,8 +320,12 @@ anchor_bottom = 0.85200006
 offset_top = 0.10797119
 offset_right = 0.5039673
 offset_bottom = 0.10797119
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("18_qvaf3")
 theme_override_font_sizes/font_size = 36
 text = "Miss"
+vertical_alignment = 1
 
 [node name="ScoreLabel" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder" unique_id=1297994137]
 layout_mode = 1
@@ -278,6 +337,7 @@ anchor_bottom = 0.23
 offset_left = -0.45603943
 offset_top = 0.20799255
 offset_right = -0.256073
+theme_override_fonts/font = ExtResource("18_twb25")
 theme_override_font_sizes/font_size = 36
 text = "Score_"
 
@@ -292,6 +352,7 @@ offset_left = -0.32000732
 offset_top = 0.13800049
 offset_right = 0.27197266
 offset_bottom = -0.23400879
+theme_override_fonts/font = ExtResource("18_twb25")
 theme_override_font_sizes/font_size = 30
 text = "Back To Main [Enter]"
 
@@ -360,8 +421,10 @@ offset_left = -0.4560547
 offset_top = 0.0059814453
 offset_right = 0.55996704
 offset_bottom = 0.16397095
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "Paint 100.0%"
+vertical_alignment = 1
 
 [node name="VexatonicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=373429698]
 layout_mode = 1
@@ -374,9 +437,11 @@ offset_left = -0.5120239
 offset_top = -0.05999756
 offset_right = -0.0079956055
 offset_bottom = -0.060028076
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="SparklicText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1365964631]
 layout_mode = 1
@@ -389,9 +454,11 @@ offset_left = -0.5120239
 offset_top = 0.2659912
 offset_right = -0.0079956055
 offset_bottom = 0.2659607
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="WildText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=26379827]
 layout_mode = 1
@@ -404,9 +471,11 @@ offset_left = -0.5120239
 offset_top = -0.16400146
 offset_right = -0.0079956055
 offset_bottom = -0.16400146
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="MissText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=1519663053]
 layout_mode = 1
@@ -419,9 +488,11 @@ offset_left = -0.5120239
 offset_top = 0.10797119
 offset_right = -0.0079956055
 offset_bottom = 0.10797119
+theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 36
 text = "1000"
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="RankText" type="Label" parent="CanvasLayer/Control/ResultPanelHolder/ResultPanel/VariableLabelHolder" unique_id=627003622]
 layout_mode = 1
@@ -470,6 +541,20 @@ theme_override_font_sizes/font_size = 42
 text = "PERFECT PAINT"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("17_rvley")]
+visible = false
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1570471814]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("13_g5yvx")
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
 [connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]

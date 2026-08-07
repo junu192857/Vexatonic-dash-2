@@ -1,5 +1,7 @@
 extends Node
 
+var blocked: bool = false
+
 # Directional keys
 signal pressed_up
 signal pressed_down
@@ -38,7 +40,17 @@ signal mouse_scrolled_up
 signal mouse_scrolled_down
 signal mouse_moved(position: Vector2)
 
+func _ready():
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+
+func _process(float):
+	if blocked:
+		blocked = false
+
 func _input(event):
+	if blocked:
+		return
+	
 	if event is InputEventKey:
 		match event.keycode:
 			KEY_UP:
@@ -52,7 +64,8 @@ func _input(event):
 			KEY_SPACE:
 				if event.pressed and not event.is_echo(): pressed_space.emit()
 			KEY_ENTER:
-				if event.pressed and not event.is_echo(): pressed_enter.emit()
+				if event.pressed and not event.is_echo():
+					pressed_enter.emit()
 			KEY_TAB:
 				if event.pressed: pressed_tab.emit()
 			KEY_DELETE:

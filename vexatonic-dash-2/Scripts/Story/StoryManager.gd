@@ -1,11 +1,12 @@
 extends Control
 
-@export var tutorialHolder: Control
+@export var storyHolder: Control
 @export var live2d: TextureRect
-@export var tutorial_script: Label
+@export var story_script: Label
 @export var enter_label: Label
-@export var tutorial_speaker: Label
-@export var script_path: String
+@export var story_speaker: Label
+
+var script_path: String
 
 var script_tween
 var script_lines: Array[String] = []
@@ -14,15 +15,19 @@ var is_typing: bool = false
 
 var phases: Array[Callable] = [
 	start_explanation,
-	start_tutorial_play,
+	quit_story,
 	hide_live2D,
 	show_live2D
 ]
 const CHARS_PER_SECOND = 30.0
 
-func _ready() -> void:
-	await get_tree().process_frame
+func start_story(path: String):
+	current_line = 0
+	script_lines = []
+	script_path = path
+	visible = true
 	_load_script()
+	start_explanation()
 
 func _load_script():
 	var file = FileAccess.open(script_path, FileAccess.READ)
@@ -48,15 +53,15 @@ func _show_line(index: int):
 				4:
 					change_live2D(0 if parts.size() < 3 else int(parts[2]))
 				_:
-					push_error("argument tarimasen for special phase")
+					push_error("need more argument for special phase")
 		return
 	is_typing = true
-	typewrite(tutorial_script, line, line.length() / CHARS_PER_SECOND)
+	typewrite(story_script, line, line.length() / CHARS_PER_SECOND)
 	script_tween.tween_callback(func(): is_typing = false)
 
 func _on_click():
 	if is_typing:
-		force_typewrite(tutorial_script)
+		force_typewrite(story_script)
 		is_typing = false
 	else:
 		current_line += 1
@@ -76,29 +81,28 @@ func force_typewrite(label: Label):
 
 
 func start_explanation():
-	InputManager.mouse_left_pressed.connect(_on_click)
-	InputManager.pressed_enter.connect(_on_click)
-	InputManager.pressed_l.connect(_on_click)
+	PausedInputManager.blocked = true
+	PausedInputManager.pressed_l.connect(_on_click)
+	PausedInputManager.pressed_enter.connect(_on_click)
 	get_tree().paused = true
-	tutorialHolder.visible = true
+	storyHolder.visible = true
 	_show_line(current_line)
 
-func start_tutorial_play():
-	if InputManager.mouse_left_pressed.is_connected(_on_click):
-		InputManager.mouse_left_pressed.disconnect(_on_click)
-	if InputManager.pressed_enter.is_connected(_on_click):
-		InputManager.pressed_enter.disconnect(_on_click)
-	if InputManager.pressed_l.is_connected(_on_click):
-		InputManager.pressed_l.disconnect(_on_click)
-	tutorialHolder.visible = false
+func quit_story():
+	if PausedInputManager.pressed_l.is_connected(_on_click):
+		PausedInputManager.pressed_l.disconnect(_on_click)
+	if PausedInputManager.pressed_enter.is_connected(_on_click):
+		PausedInputManager.pressed_enter.disconnect(_on_click)
+	storyHolder.visible = false
+	InputManager.blocked = true
 	get_tree().paused = false
 
 func hide_live2D():
-	tutorialHolder.get_node("Live2D").visible = false
+	storyHolder.get_node("Live2D").visible = false
 	_show_line(current_line)
 
 func show_live2D():
-	tutorialHolder.get_node("Live2D").visible = true
+	storyHolder.get_node("Live2D").visible = true
 	_show_line(current_line)
 
 func change_live2D(index: int):

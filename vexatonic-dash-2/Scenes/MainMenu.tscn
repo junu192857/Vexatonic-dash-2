@@ -2,13 +2,22 @@
 
 [ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_8saeu"]
 [ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_ghw46"]
+[ext_resource type="Texture2D" uid="uid://budl6ub3l3w1m" path="res://Textures/MainBackground.jpg" id="3_8um5k"]
 [ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="3_df05h"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="4_ghw46"]
+[ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_xim88"]
+[ext_resource type="Texture2D" uid="uid://b6da4bo2wovn0" path="res://Textures/Connector.jpg" id="6_koqhg"]
+[ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="7_koqhg"]
+[ext_resource type="Script" uid="uid://bmavuels06wvq" path="res://Scripts/MainMenu/GameEndButton.gd" id="8_loo7a"]
+[ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="9_cmrfp"]
+[ext_resource type="Script" uid="uid://cy352h4c1btsb" path="res://Scripts/MainMenu/ConversationButton.gd" id="10_rrcx7"]
+[ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="11_if7li"]
 
-[node name="MainMenu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("goTutorialPanel")]
+[node name="MainMenu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("goTutorialPanel", "storyManager")]
 script = ExtResource("1_8saeu")
 settingRectScene = ExtResource("2_ghw46")
 goTutorialPanel = NodePath("CanvasLayer/Control/GoTutorialPanel")
+storyManager = NodePath("CanvasLayer/StoryControl")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013899153]
 
@@ -20,83 +29,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GameStartButton" type="Button" parent="CanvasLayer/Control" unique_id=1664065325]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.37
-anchor_top = 0.586
-anchor_right = 0.65
-anchor_bottom = 0.661
-theme_override_font_sizes/font_size = 38
-text = "Game Start"
-script = ExtResource("3_df05h")
-
-[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameStartButton" unique_id=1443724895]
+[node name="Background" type="TextureRect" parent="CanvasLayer/Control" unique_id=1111416625]
+z_index = -5
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 1.0
+offset_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-border_color = Color(1, 1, 0, 1)
-border_width = 6.0
-editor_only = false
-
-[node name="GameEndButton" type="Button" parent="CanvasLayer/Control" unique_id=1244450197]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.37
-anchor_top = 0.82000005
-anchor_right = 0.65000004
-anchor_bottom = 0.89500004
-offset_left = 0.5999756
-offset_top = 0.39996338
-offset_right = 0.43981934
-offset_bottom = 0.39996338
-theme_override_font_sizes/font_size = 38
-text = "Game End"
-script = ExtResource("3_df05h")
-
-[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameEndButton" unique_id=1731334888]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-border_color = Color(1, 1, 0, 1)
-border_width = 6.0
-editor_only = false
-
-[node name="SettingButton" type="Button" parent="CanvasLayer/Control" unique_id=1151269989]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.37
-anchor_top = 0.70400006
-anchor_right = 0.65000004
-anchor_bottom = 0.77900004
-offset_top = -0.32006836
-offset_right = -0.16015625
-offset_bottom = -0.32006836
-theme_override_font_sizes/font_size = 38
-text = "Setting"
-script = ExtResource("3_df05h")
-
-[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=1490791374]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-border_color = Color(1, 1, 0, 1)
-border_width = 6.0
-editor_only = false
+texture = ExtResource("3_8um5k")
 
 [node name="NameLabel2" type="Label" parent="CanvasLayer/Control" unique_id=983177614]
 layout_mode = 1
@@ -109,6 +54,7 @@ offset_left = -0.6800537
 offset_top = -0.4000244
 offset_right = -0.44006348
 grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 120
 text = "Dash 2"
 horizontal_alignment = 1
@@ -125,9 +71,229 @@ offset_top = -0.5200043
 offset_right = -0.5999756
 offset_bottom = 0.16000366
 grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 120
 text = "Vexatonic"
 horizontal_alignment = 1
+
+[node name="MainMenuButtons" type="Control" parent="CanvasLayer/Control" unique_id=1351467104]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameStartButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=997546963]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.586
+anchor_right = 0.65
+anchor_bottom = 0.661
+texture = ExtResource("6_koqhg")
+expand_mode = 1
+script = ExtResource("3_df05h")
+
+[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=2103313793]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.1
+anchor_top = -0.2
+anchor_bottom = 1.2
+offset_left = -1.1444092e-05
+offset_top = -1.1444092e-05
+offset_right = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=822443628]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = -0.2
+anchor_right = 1.1
+anchor_bottom = 1.2
+offset_top = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=1443724895]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(0, 0, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=142133960]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_xim88")
+theme_override_font_sizes/font_size = 42
+text = "게임 시작!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SettingButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=1005545237]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.70400006
+anchor_right = 0.65000004
+anchor_bottom = 0.77900004
+offset_top = -0.32006836
+offset_right = -0.16015625
+offset_bottom = -0.32006836
+texture = ExtResource("6_koqhg")
+expand_mode = 1
+script = ExtResource("3_df05h")
+
+[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=1808488755]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.1
+anchor_top = -0.2
+anchor_bottom = 1.2
+offset_left = -2.2888184e-05
+offset_top = -1.1444092e-05
+offset_right = -2.2888184e-05
+texture = ExtResource("7_koqhg")
+
+[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=1938044614]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = -0.2
+anchor_right = 1.1
+anchor_bottom = 1.2
+offset_top = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=1490791374]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(0, 0, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=702702264]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_xim88")
+theme_override_font_sizes/font_size = 42
+text = "설정 만지기"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameEndButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=287439480]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.82000005
+anchor_right = 0.65000004
+anchor_bottom = 0.89500004
+offset_top = 0.39996338
+offset_right = 0.43981934
+offset_bottom = 0.39996338
+texture = ExtResource("6_koqhg")
+expand_mode = 1
+script = ExtResource("8_loo7a")
+
+[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=192832538]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.1
+anchor_top = -0.2
+anchor_bottom = 1.2
+offset_left = -2.2888184e-05
+offset_top = -1.1444092e-05
+offset_right = -2.2888184e-05
+texture = ExtResource("7_koqhg")
+
+[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=864577641]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = -0.2
+anchor_right = 1.1
+anchor_bottom = 1.2
+offset_top = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=1731334888]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(0, 0, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=916240549]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_xim88")
+theme_override_font_sizes/font_size = 42
+text = "게임 종료"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConversationButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=315845167]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.044000003
+anchor_top = 0.95600003
+anchor_right = 0.16100001
+anchor_bottom = 1.0020001
+offset_left = 0.51999664
+offset_top = 0.52001953
+offset_right = 0.87997437
+offset_bottom = -0.16015625
+pivot_offset_ratio = Vector2(0.5, 1)
+texture = ExtResource("4_ghw46")
+expand_mode = 1
+script = ExtResource("10_rrcx7")
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/ConversationButton" unique_id=1558157731]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("9_cmrfp")
+theme_override_font_sizes/font_size = 23
+text = "사야네와 랜덤대화 [A]"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GoTutorialPanel" type="TextureRect" parent="CanvasLayer/Control" unique_id=1717423707]
 visible = false
@@ -192,8 +358,8 @@ offset_bottom = 0.04798889
 theme_override_font_sizes/font_size = 27
 text = "No[Esc]"
 
-[connection signal="pressed" from="CanvasLayer/Control/GameStartButton" to="." method="_on_game_start"]
-[connection signal="pressed" from="CanvasLayer/Control/GameEndButton" to="." method="_on_game_end"]
-[connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
+[node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("11_if7li")]
+visible = false
+
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button" to="." method="_on_tutorial_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button2" to="." method="_on_game_start"]

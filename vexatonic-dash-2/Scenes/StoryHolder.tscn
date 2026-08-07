@@ -2,9 +2,12 @@
 
 [ext_resource type="Script" uid="uid://dopaax52q8kev" path="res://Scripts/Story/StoryManager.gd" id="1_paxo6"]
 [ext_resource type="Texture2D" uid="uid://b3r6by2y1fado" path="res://Textures/Sayane_Live2D.png" id="1_pcs6n"]
-[ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="2_paxo6"]
+[ext_resource type="Texture2D" uid="uid://br27ly8qk40tm" path="res://Textures/ScriptHolder.png" id="3_aew0f"]
+[ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="4_aew0f"]
+[ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_ufue0"]
+[ext_resource type="Texture2D" uid="uid://cjqovjb2djbkn" path="res://Textures/NameHolder.jpg" id="5_3e4bj"]
 
-[node name="StoryControl" type="Control" unique_id=194327749 node_paths=PackedStringArray("tutorialHolder", "live2d", "tutorial_script", "enter_label", "tutorial_speaker")]
+[node name="StoryControl" type="Control" unique_id=194327749 node_paths=PackedStringArray("storyHolder", "live2d", "story_script", "enter_label", "story_speaker")]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 15
@@ -13,21 +16,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_paxo6")
-tutorialHolder = NodePath("TutorialHolder")
-live2d = NodePath("TutorialHolder/Live2D")
-tutorial_script = NodePath("TutorialHolder/ScriptHolder/Script")
-enter_label = NodePath("TutorialHolder/ScriptHolder/EnterLabel")
-tutorial_speaker = NodePath("TutorialHolder/NameHolder/Speaker")
+storyHolder = NodePath("StoryHolder")
+live2d = NodePath("StoryHolder/Live2D")
+story_script = NodePath("StoryHolder/ScriptHolder/Script")
+enter_label = NodePath("StoryHolder/ScriptHolder/EnterLabel")
+story_speaker = NodePath("StoryHolder/NameHolder/Speaker")
 
-[node name="TutorialHolder" type="Panel" parent="." unique_id=125738451]
+[node name="StoryHolder" type="Panel" parent="." unique_id=125738451]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Live2D" type="TextureRect" parent="TutorialHolder" unique_id=1668585676]
+[node name="Live2D" type="TextureRect" parent="StoryHolder" unique_id=1668585676]
 layout_mode = 0
 offset_left = 765.0
 offset_top = 162.0
@@ -35,16 +38,16 @@ offset_right = 1152.0
 offset_bottom = 807.0
 texture = ExtResource("1_pcs6n")
 
-[node name="ScriptHolder" type="TextureRect" parent="TutorialHolder" unique_id=562684793]
+[node name="ScriptHolder" type="TextureRect" parent="StoryHolder" unique_id=562684793]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15
 anchor_top = 0.6
 anchor_right = 0.85
 anchor_bottom = 0.9
-texture = ExtResource("2_paxo6")
+texture = ExtResource("3_aew0f")
 
-[node name="Script" type="Label" parent="TutorialHolder/ScriptHolder" unique_id=1964866749]
+[node name="Script" type="Label" parent="StoryHolder/ScriptHolder" unique_id=1964866749]
 custom_minimum_size = Vector2(1209.368, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -56,11 +59,12 @@ offset_left = 0.6479988
 offset_top = 0.1159935
 offset_right = 0.41601563
 offset_bottom = -0.115997314
+theme_override_fonts/font = ExtResource("4_aew0f")
 theme_override_font_sizes/font_size = 36
-text = "Random Text"
+text = "스토리 로딩이 안 되는 버그를 발견하셨습니다! 개발자에게 제보해 주세요."
 autowrap_mode = 2
 
-[node name="EnterLabel" type="Label" parent="TutorialHolder/ScriptHolder" unique_id=397628069]
+[node name="EnterLabel" type="Label" parent="StoryHolder/ScriptHolder" unique_id=397628069]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.81100005
@@ -71,29 +75,38 @@ offset_left = 0.015991211
 offset_top = 0.052001953
 offset_right = 0.56799316
 offset_bottom = 0.031982422
+theme_override_fonts/font = ExtResource("4_aew0f")
 theme_override_font_sizes/font_size = 22
 text = "[L] 또는 [Enter]로 진행"
 
-[node name="NameHolder" type="Panel" parent="TutorialHolder" unique_id=1838767337]
+[node name="NameHolder" type="TextureRect" parent="StoryHolder" unique_id=1478125117]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.16700001
 anchor_top = 0.568
 anchor_right = 0.31800002
 anchor_bottom = 0.63900006
-offset_left = -0.64001465
-offset_top = -0.44000244
-offset_right = 0.4399414
-offset_bottom = -0.12005615
+offset_left = 11.359985
+offset_top = 6.5599976
+offset_right = 12.439941
+offset_bottom = 7.879944
+texture = ExtResource("5_3e4bj")
 
-[node name="Speaker" type="Label" parent="TutorialHolder/NameHolder" unique_id=644680094]
+[node name="Speaker" type="Label" parent="StoryHolder/NameHolder" unique_id=644680094]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_ufue0")
 theme_override_font_sizes/font_size = 49
 text = "사야네"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="StoryInputManager" type="Control" parent="." unique_id=564961498]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

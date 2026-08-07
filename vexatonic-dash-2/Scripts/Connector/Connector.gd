@@ -43,9 +43,9 @@ func _ready():
 	])
 	polygon.uv = PackedVector2Array([
 		Vector2(0,0),
-		Vector2(240,0),
-		Vector2(240,500),
-		Vector2(0,500)
+		Vector2(502,0),
+		Vector2(502,502),
+		Vector2(0,502)
 	])
 	set_color()
 	#if (data.color != -1):

@@ -11,8 +11,6 @@ var levelData: LevelData
 @onready var character_holder:Node2D = $CharacterHolder
 
 var characters: Array[Character]
-@export var rightCover: ColorRect
-@export var leftCover: ColorRect
 
 var time: float
 var need_refresh_tutorial: bool = true
@@ -32,7 +30,6 @@ var level_path: String
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
-	print("START")
 	InputManager.pressed_a.connect(func(): _on_pressed(0, true))
 	InputManager.released_a.connect(func(): _on_released(0, true))
 	InputManager.pressed_l.connect(func(): _on_pressed(0, false))
@@ -48,8 +45,6 @@ func _ready() -> void:
 	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
 	
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
-	if Setting.is_tutorial:
-		InputManager.process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	for i in range(4):
 		noteHolders.append(NoteHolder.new(i))
@@ -77,13 +72,11 @@ func _ready() -> void:
 	
 	cameraManager.set_triggers(levelData.triggers)
 	var stream = AudioStreamMP3.new()
-	print("MUSIC_PATH: " + levelData.metadata.music_path)
 	stream.data = FileAccess.get_file_as_bytes(level_path + "/" +  levelData.metadata.music_path)
 	musicPlayer.stream = stream
+	if Setting.is_tutorial:
+		musicPlayer.volume_db = -80.0
 	
-	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-		rightCover.visible = true
-		leftCover.visible = true
 		
 	
 	# 초기 캐릭터 및 판정선 생성
@@ -274,7 +267,6 @@ func place_initial_connector(lane: Lane):
 
 # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
 func place_final_connector(lane: Lane):
-	print("LANE SIZE: %d" % lane.notes.size())
 	if (!lane.notes.is_empty()):
 		var last_note_time = lane.notes[-1].get_data().end_time #find last note or marker
 		var connector_time = PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(last_note_time) + Setting.NOTE_WIDTH / 2.0)
