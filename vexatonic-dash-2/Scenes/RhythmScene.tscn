@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_ublex"]
 [ext_resource type="Texture2D" uid="uid://r5si4bnkc62a" path="res://Textures/IngameBackground.jpg" id="13_g5yvx"]
 [ext_resource type="Script" uid="uid://en0omrumjk71" path="res://Scripts/Tutorial/TutorialManager.gd" id="15_t4mny"]
+[ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="16_r4r31"]
 [ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="16_rvley"]
 [ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="17_rvley"]
 
@@ -131,8 +132,10 @@ anchor_right = 0.9
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 40
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 32
 text = "SCORE 0000000"
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LampTextHolder" type="Control" parent="CanvasLayer/Control" unique_id=442854916]
