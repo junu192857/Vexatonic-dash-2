@@ -1,0 +1,2083 @@
+From f72095c9400961868f3906bc6f45036b13c7cb90 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 7 Aug 2026 14:21:23 +0000
+Subject: [PATCH] Remove stray Godot editor autosave .tmp files and ignore them
+
+18 leftover autosave temp files under Scenes/ and Charts/ were
+accidentally committed; add *.tmp to .gitignore to prevent recurrence.
+---
+ .gitignore                                    |   3 +
+ .../Charts/test.csv3696532981.tmp             |  28 -
+ .../Scenes/Editor.tscn4030995614.tmp          | 716 ------------------
+ .../Scenes/RhythmScene.tscn1004450990.tmp     |  20 -
+ .../Scenes/RhythmScene.tscn1625911825.tmp     |  77 --
+ .../Scenes/RhythmScene.tscn1752438952.tmp     |  77 --
+ .../Scenes/RhythmScene.tscn18714547046.tmp    |  31 -
+ .../Scenes/RhythmScene.tscn18722245971.tmp    |  31 -
+ .../Scenes/RhythmScene.tscn2316292914.tmp     |  18 -
+ .../Scenes/RhythmScene.tscn2575086820.tmp     |  69 --
+ .../Scenes/RhythmScene.tscn2660331988.tmp     |  77 --
+ .../Scenes/RhythmScene.tscn2967996072.tmp     |  22 -
+ .../Scenes/RhythmScene.tscn2974050056.tmp     |  22 -
+ .../Scenes/RhythmScene.tscn3374258882.tmp     |  29 -
+ .../Scenes/RhythmScene.tscn3379178248.tmp     |  29 -
+ .../Scenes/RhythmScene.tscn3988507724.tmp     |  77 --
+ .../Scenes/RhythmScene.tscn4645031418.tmp     |  24 -
+ .../Scenes/RhythmScene.tscn7418528569.tmp     |  24 -
+ .../Scenes/SelectSong.tscn5172888069.tmp      | 543 -------------
+ 19 files changed, 3 insertions(+), 1914 deletions(-)
+ delete mode 100644 vexatonic-dash-2/Charts/test.csv3696532981.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/Editor.tscn4030995614.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn1004450990.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn1625911825.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn1752438952.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn18714547046.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn18722245971.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn2316292914.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn2575086820.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn2660331988.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn2967996072.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn2974050056.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn3374258882.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn3379178248.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn3988507724.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn4645031418.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/RhythmScene.tscn7418528569.tmp
+ delete mode 100644 vexatonic-dash-2/Scenes/SelectSong.tscn5172888069.tmp
+
+diff --git a/.gitignore b/.gitignore
+index 5a5c4ad..bfd4601 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -14,3 +14,6 @@ export_credentials.cfg
+ .mono/
+ data_*/
+ mono_crash.*.json
++
++# Godot editor autosave temp files
++*.tmp
+diff --git a/vexatonic-dash-2/Charts/test.csv3696532981.tmp b/vexatonic-dash-2/Charts/test.csv3696532981.tmp
+deleted file mode 100644
+index 68800bb..0000000
+--- a/vexatonic-dash-2/Charts/test.csv3696532981.tmp
++++ /dev/null
+@@ -1,28 +0,0 @@
+-# time  color  type  end_time  lane
+-0 0 0 0 0
+-1000 2 1 1400 0
+-1500 1 0 0 0
+-800 1 0 0 1
+-
+-# lane information: 오직 꺾이는 부분에 대한 정보만 가지고 있음.
+-# is_init: 처음부터 등장하는 lane인지의 여부. 만약 is_init = TRUE라면 init_time은 반드시 0일 것.
+-# LANE index is_init
+-# init_time init_height
+-# 관절_time 관절_height
+-# ....
+-# lane_end_time lane_end_height
+-# END
+-
+-LANE 0 1
+-0 0
+-500 100
+-1200 100
+-1500 0
+-3000 0
+-END
+-
+-LANE 1 0
+-700 100
+-1000 -200
+-4000 -200
+-END
+diff --git a/vexatonic-dash-2/Scenes/Editor.tscn4030995614.tmp b/vexatonic-dash-2/Scenes/Editor.tscn4030995614.tmp
+deleted file mode 100644
+index c54e03a..0000000
+--- a/vexatonic-dash-2/Scenes/Editor.tscn4030995614.tmp
++++ /dev/null
+@@ -1,716 +0,0 @@
+-[gd_scene format=3 uid="uid://dow41utu1rk5u"]
+-
+-[ext_resource type="Script" uid="uid://dwoyq1dcxhyuf" path="res://Scripts/Editor/EditorManager.gd" id="1_trcuy"]
+-[ext_resource type="PackedScene" uid="uid://iksp3v0ubmg6" path="res://Prefabs/EditorNote.tscn" id="2_5v8xv"]
+-[ext_resource type="PackedScene" uid="uid://br567btcie3o3" path="res://Prefabs/EditorConnector.tscn" id="3_brgpd"]
+-[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="4_5v8xv"]
+-[ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_6ykgs"]
+-[ext_resource type="Script" uid="uid://t0pjw10mpexc" path="res://Scripts/Editor/EditorInputHandler.gd" id="5_dfuwn"]
+-[ext_resource type="PackedScene" uid="uid://bul34fxxophy1" path="res://Prefabs/MoveTrigger.tscn" id="5_qexec"]
+-[ext_resource type="PackedScene" uid="uid://cq60k3h6dbxia" path="res://Prefabs/ZoomTrigger.tscn" id="6_847jc"]
+-
+-[sub_resource type="ButtonGroup" id="ButtonGroup_brgpd"]
+-
+-[sub_resource type="ButtonGroup" id="ButtonGroup_dfuwn"]
+-
+-[sub_resource type="ButtonGroup" id="ButtonGroup_5v8xv"]
+-
+-[node name="Editor" type="Node2D" unique_id=375391991]
+-script = ExtResource("1_trcuy")
+-NOTE_SCENE = ExtResource("2_5v8xv")
+-CONNECTOR_SCENE = ExtResource("3_brgpd")
+-LINE_SCENE = ExtResource("4_5v8xv")
+-MOVE_TRIGGER_SCENE = ExtResource("5_qexec")
+-ZOOM_TRIGGER_SCENE = ExtResource("6_847jc")
+-
+-[node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
+-
+-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1330927414]
+-texture = ExtResource("4_6ykgs")
+-
+-[node name="EditorInputHandler" type="Node2D" parent="." unique_id=1149392311]
+-script = ExtResource("5_dfuwn")
+-
+-[node name="LineHolder" type="Node2D" parent="." unique_id=510790869]
+-
+-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1936366698]
+-
+-[node name="SavePanel" type="Panel" parent="CanvasLayer" unique_id=214289469]
+-visible = false
+-anchors_preset = -1
+-anchor_left = 0.5
+-anchor_top = 0.5
+-anchor_right = 0.5
+-anchor_bottom = 0.5
+-offset_left = -200.0
+-offset_top = -100.0
+-offset_right = 200.0
+-offset_bottom = 140.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="QuitButton" type="Button" parent="CanvasLayer/SavePanel" unique_id=527542015]
+-layout_mode = 0
+-offset_left = 335.0
+-offset_top = 15.0
+-offset_right = 388.0
+-offset_bottom = 64.0
+-text = "Quit"
+-
+-[node name="SaveButton" type="Button" parent="CanvasLayer/SavePanel" unique_id=431638425]
+-layout_mode = 0
+-offset_left = 155.0
+-offset_top = 158.0
+-offset_right = 246.0
+-offset_bottom = 191.0
+-text = "Save!!"
+-
+-[node name="OnlyForNewSave" type="Control" parent="CanvasLayer/SavePanel" unique_id=1769331625]
+-anchors_preset = 0
+-
+-[node name="Label" type="Label" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=1518965152]
+-layout_mode = 0
+-offset_left = 129.0
+-offset_top = 23.0
+-offset_right = 286.0
+-offset_bottom = 46.0
+-text = "Enter Level Name!!"
+-
+-[node name="WarningLabel" type="Label" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=716578086]
+-layout_mode = 0
+-offset_left = 96.0
+-offset_top = 207.0
+-offset_right = 309.0
+-offset_bottom = 230.0
+-
+-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=316064508]
+-layout_mode = 0
+-offset_left = 120.0
+-offset_top = 56.0
+-offset_right = 280.0
+-offset_bottom = 96.0
+-pivot_offset = Vector2(80, 20)
+-
+-[node name="Button3" type="Button" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=455518065]
+-layout_mode = 0
+-offset_left = 235.0
+-offset_top = 106.0
+-offset_right = 278.0
+-offset_bottom = 150.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_brgpd")
+-text = "Vex"
+-
+-[node name="Button2" type="Button" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=1253078000]
+-layout_mode = 0
+-offset_left = 178.0
+-offset_top = 107.0
+-offset_right = 225.0
+-offset_bottom = 151.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_brgpd")
+-text = "Hard"
+-
+-[node name="Button" type="Button" parent="CanvasLayer/SavePanel/OnlyForNewSave" unique_id=272347291]
+-layout_mode = 0
+-offset_left = 126.0
+-offset_top = 106.0
+-offset_right = 169.0
+-offset_bottom = 150.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_brgpd")
+-text = "Easy"
+-
+-[node name="OnlyForLoaded" type="Control" parent="CanvasLayer/SavePanel" unique_id=432093991]
+-visible = false
+-anchors_preset = 0
+-offset_left = 42.0
+-offset_top = 73.0
+-offset_right = 42.0
+-offset_bottom = 73.0
+-
+-[node name="Label" type="Label" parent="CanvasLayer/SavePanel/OnlyForLoaded" unique_id=761252457]
+-layout_mode = 0
+-offset_left = 5.0
+-offset_top = 31.0
+-offset_right = 326.0
+-offset_bottom = 54.0
+-
+-[node name="NoteSelectorPanel" type="Panel" parent="CanvasLayer" unique_id=1195473622]
+-anchors_preset = -1
+-anchor_top = 0.7
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-offset_left = 20.0
+-offset_top = 20.0
+-offset_right = -20.0
+-offset_bottom = -20.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="RedoButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=151240166]
+-layout_mode = 0
+-offset_left = 1752.0
+-offset_top = 157.0
+-offset_right = 1852.0
+-offset_bottom = 257.0
+-text = "Redo"
+-
+-[node name="UndoButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=889295401]
+-layout_mode = 0
+-offset_left = 1753.0
+-offset_top = 28.0
+-offset_right = 1853.0
+-offset_bottom = 128.0
+-text = "Undo"
+-
+-[node name="Button6" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1549482070]
+-layout_mode = 0
+-offset_left = 478.0
+-offset_top = 163.0
+-offset_right = 578.0
+-offset_bottom = 263.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "YellowLong"
+-
+-[node name="Button5" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=562787188]
+-layout_mode = 0
+-offset_left = 1078.0
+-offset_top = 21.0
+-offset_right = 1178.0
+-offset_bottom = 121.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "Modify
+-Note"
+-
+-[node name="Button4" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=360759748]
+-layout_mode = 0
+-offset_left = 327.0
+-offset_top = 160.0
+-offset_right = 427.0
+-offset_bottom = 260.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "BlueLong"
+-
+-[node name="Button3" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1956327696]
+-layout_mode = 0
+-offset_left = 176.0
+-offset_top = 157.0
+-offset_right = 276.0
+-offset_bottom = 257.0
+-pivot_offset = Vector2(0, 120)
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "RedLong"
+-
+-[node name="Button10" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=444161378]
+-layout_mode = 0
+-offset_left = 327.0
+-offset_top = 31.0
+-offset_right = 427.0
+-offset_bottom = 131.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "BlueNote"
+-
+-[node name="ZoomTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1830663796]
+-layout_mode = 0
+-offset_left = 764.0
+-offset_top = 163.0
+-offset_right = 864.0
+-offset_bottom = 263.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "Zoom
+-Camera"
+-
+-[node name="MoveTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1121095990]
+-layout_mode = 0
+-offset_left = 763.0
+-offset_top = 33.0
+-offset_right = 863.0
+-offset_bottom = 133.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "Move
+-Camera"
+-
+-[node name="Button9" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1223151017]
+-layout_mode = 0
+-offset_left = 956.0
+-offset_top = 25.0
+-offset_right = 1056.0
+-offset_bottom = 125.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "Modify
+-Lane"
+-
+-[node name="Button8" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1578699209]
+-layout_mode = 0
+-offset_left = 476.0
+-offset_top = 31.0
+-offset_right = 576.0
+-offset_bottom = 131.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "YellowNote"
+-
+-[node name="Button7" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=203646748]
+-layout_mode = 0
+-offset_left = 177.0
+-offset_top = 29.0
+-offset_right = 277.0
+-offset_bottom = 129.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "RedNote"
+-
+-[node name="Button" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1835172047]
+-layout_mode = 0
+-offset_left = 30.0
+-offset_top = 28.0
+-offset_right = 130.0
+-offset_bottom = 128.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "Lane"
+-
+-[node name="Button2" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=228103161]
+-layout_mode = 0
+-offset_left = 1193.0
+-offset_top = 20.0
+-offset_right = 1293.0
+-offset_bottom = 120.0
+-pivot_offset = Vector2(0, 120)
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_dfuwn")
+-text = "Modify
+-Trigger"
+-
+-[node name="PlayMusicButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1614325007]
+-layout_mode = 0
+-offset_left = 1614.0
+-offset_top = 31.0
+-offset_right = 1708.0
+-offset_bottom = 127.0
+-text = "Play Music"
+-
+-[node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
+-anchors_preset = -1
+-anchor_left = 0.25
+-anchor_top = 0.25
+-anchor_right = 0.75
+-anchor_bottom = 0.75
+-offset_right = 40.0
+-offset_bottom = 40.0
+-
+-[node name="StartButton" type="Button" parent="CanvasLayer/InitialPanel" unique_id=1698511291]
+-visible = false
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.5
+-anchor_top = 1.0
+-anchor_right = 0.5
+-anchor_bottom = 1.0
+-offset_left = -100.0
+-offset_top = -100.0
+-offset_right = 100.0
+-offset_bottom = -20.0
+-grow_horizontal = 2
+-grow_vertical = 0
+-text = "Game Start!"
+-
+-[node name="MusicTimeBox" type="SpinBox" parent="CanvasLayer/InitialPanel" unique_id=912594053]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.5
+-anchor_top = 0.5
+-anchor_right = 0.5
+-anchor_bottom = 0.5
+-offset_left = 12.0
+-offset_top = -15.0
+-offset_right = 98.5
+-offset_bottom = 16.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-max_value = 1000.0
+-step = 0.01
+-custom_arrow_round = true
+-
+-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/InitialPanel/MusicTimeBox" unique_id=1876505132]
+-layout_mode = 0
+-offset_left = -91.875
+-offset_top = -0.5
+-offset_right = -23.375
+-offset_bottom = 30.5
+-text = "Length:"
+-
+-[node name="BPMBox" type="SpinBox" parent="CanvasLayer/InitialPanel" unique_id=1584789409]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.5
+-anchor_top = 0.5
+-anchor_right = 0.5
+-anchor_bottom = 0.5
+-offset_left = 11.0
+-offset_top = 30.0
+-offset_right = 97.5
+-offset_bottom = 61.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-max_value = 1000.0
+-step = 0.01
+-custom_arrow_round = true
+-
+-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/InitialPanel/BPMBox" unique_id=777879742]
+-layout_mode = 0
+-offset_left = -91.875
+-offset_top = -0.5
+-offset_right = -23.375
+-offset_bottom = 30.5
+-text = "BPM:"
+-
+-[node name="Button2" type="Button" parent="CanvasLayer/InitialPanel" unique_id=1399891099]
+-layout_mode = 0
+-offset_left = 819.0
+-offset_top = 25.0
+-offset_right = 973.0
+-offset_bottom = 93.0
+-text = "LoadTest"
+-
+-[node name="Button3" type="Button" parent="CanvasLayer/InitialPanel" unique_id=357968154]
+-layout_mode = 0
+-offset_left = 447.0
+-offset_top = 164.0
+-offset_right = 565.0
+-offset_bottom = 213.0
+-text = "Select Music"
+-
+-[node name="MusicText" type="Label" parent="CanvasLayer/InitialPanel" unique_id=1884758539]
+-layout_mode = 0
+-offset_left = 321.0
+-offset_top = 225.0
+-offset_right = 715.0
+-offset_bottom = 254.0
+-text = "Please select music using upper button"
+-horizontal_alignment = 1
+-
+-[node name="WarningLabel" type="Label" parent="CanvasLayer/InitialPanel" unique_id=135071618]
+-layout_mode = 0
+-offset_left = 302.0
+-offset_top = 388.0
+-offset_right = 636.0
+-offset_bottom = 424.0
+-horizontal_alignment = 1
+-
+-[node name="FileDialog" type="FileDialog" parent="CanvasLayer/InitialPanel" unique_id=923584041]
+-oversampling_override = 1.0
+-title = "Open a File"
+-position = Vector2i(0, 36)
+-file_mode = 0
+-access = 2
+-filters = PackedStringArray("*.mp3")
+-
+-[node name="SettingPanel" type="Panel" parent="CanvasLayer" unique_id=955210483]
+-anchors_preset = -1
+-anchor_left = 0.85
+-anchor_right = 1.0
+-anchor_bottom = 0.7
+-offset_left = 30.0
+-offset_top = 30.0
+-offset_right = -30.0
+-offset_bottom = -30.0
+-
+-[node name="SaveButton3" type="Button" parent="CanvasLayer/SettingPanel" unique_id=2131681375]
+-layout_mode = 0
+-offset_left = 13.0
+-offset_top = 599.0
+-offset_right = 113.0
+-offset_bottom = 686.0
+-text = "Debug Note"
+-
+-[node name="SaveButton2" type="Button" parent="CanvasLayer/SettingPanel" unique_id=900100908]
+-layout_mode = 0
+-offset_left = 118.0
+-offset_top = 599.0
+-offset_right = 218.0
+-offset_bottom = 686.0
+-text = "Debug Lane"
+-
+-[node name="SaveButton" type="Button" parent="CanvasLayer/SettingPanel" unique_id=377710792]
+-layout_mode = 0
+-offset_left = 119.0
+-offset_top = 15.0
+-offset_right = 210.0
+-offset_bottom = 102.0
+-text = "Save Chart"
+-
+-[node name="Button4" type="Button" parent="CanvasLayer/SettingPanel" unique_id=712316614]
+-layout_mode = 0
+-offset_left = 125.0
+-offset_top = 216.0
+-offset_right = 204.0
+-offset_bottom = 297.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "32bit"
+-
+-[node name="Button9" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1945090177]
+-layout_mode = 0
+-offset_left = 27.0
+-offset_top = 501.0
+-offset_right = 106.0
+-offset_bottom = 582.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "Free"
+-
+-[node name="Button8" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1357179055]
+-layout_mode = 0
+-offset_left = 126.0
+-offset_top = 408.0
+-offset_right = 205.0
+-offset_bottom = 489.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "48bit"
+-
+-[node name="Button7" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1021605455]
+-layout_mode = 0
+-offset_left = 27.0
+-offset_top = 406.0
+-offset_right = 106.0
+-offset_bottom = 487.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "24bit"
+-
+-[node name="Button5" type="Button" parent="CanvasLayer/SettingPanel" unique_id=299326015]
+-layout_mode = 0
+-offset_left = 25.0
+-offset_top = 310.0
+-offset_right = 104.0
+-offset_bottom = 391.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "6bit"
+-
+-[node name="Button6" type="Button" parent="CanvasLayer/SettingPanel" unique_id=80114778]
+-layout_mode = 0
+-offset_left = 126.0
+-offset_top = 311.0
+-offset_right = 205.0
+-offset_bottom = 392.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "12bit"
+-
+-[node name="Button2" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1236208991]
+-layout_mode = 0
+-offset_left = 23.0
+-offset_top = 119.0
+-offset_right = 102.0
+-offset_bottom = 200.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "4bit"
+-
+-[node name="Button3" type="Button" parent="CanvasLayer/SettingPanel" unique_id=336537621]
+-layout_mode = 0
+-offset_left = 24.0
+-offset_top = 216.0
+-offset_right = 103.0
+-offset_bottom = 297.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "16bit"
+-
+-[node name="Button" type="Button" parent="CanvasLayer/SettingPanel" unique_id=1637119483]
+-layout_mode = 0
+-offset_left = 124.0
+-offset_top = 121.0
+-offset_right = 203.0
+-offset_bottom = 202.0
+-toggle_mode = true
+-button_group = SubResource("ButtonGroup_5v8xv")
+-text = "8bit"
+-
+-[node name="LoadPanel" type="Panel" parent="CanvasLayer" unique_id=1101582062]
+-visible = false
+-offset_left = 677.0
+-offset_top = 345.0
+-offset_right = 1223.0
+-offset_bottom = 686.0
+-
+-[node name="LoadButton" type="Button" parent="CanvasLayer/LoadPanel" unique_id=1619523593]
+-visible = false
+-layout_mode = 0
+-offset_left = 202.0
+-offset_top = 270.0
+-offset_right = 367.0
+-offset_bottom = 318.0
+-text = "Load Chart"
+-
+-[node name="Button2" type="Button" parent="CanvasLayer/LoadPanel" unique_id=1744612057]
+-layout_mode = 0
+-offset_left = 201.0
+-offset_top = 37.0
+-offset_right = 363.0
+-offset_bottom = 89.0
+-text = "Find Chart..."
+-
+-[node name="FileDialog" type="FileDialog" parent="CanvasLayer/LoadPanel" unique_id=666052920]
+-title = "Open a File"
+-file_mode = 0
+-
+-[node name="LengthLabel" type="Label" parent="CanvasLayer/LoadPanel" unique_id=16729852]
+-layout_mode = 0
+-offset_left = 173.0
+-offset_top = 221.0
+-offset_right = 393.0
+-offset_bottom = 263.0
+-
+-[node name="MusicLabel" type="Label" parent="CanvasLayer/LoadPanel" unique_id=1562858408]
+-layout_mode = 0
+-offset_left = 177.0
+-offset_top = 161.0
+-offset_right = 397.0
+-offset_bottom = 203.0
+-
+-[node name="NameLabel" type="Label" parent="CanvasLayer/LoadPanel" unique_id=1971119977]
+-layout_mode = 0
+-offset_left = 172.0
+-offset_top = 104.0
+-offset_right = 392.0
+-offset_bottom = 146.0
+-
+-[node name="ModifyTriggerPanel" type="Panel" parent="CanvasLayer" unique_id=1808280723]
+-visible = false
+-anchors_preset = 8
+-anchor_left = 0.5
+-anchor_top = 0.5
+-anchor_right = 0.5
+-anchor_bottom = 0.5
+-offset_left = -294.0
+-offset_top = -218.0
+-offset_right = 294.0
+-offset_bottom = 194.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="NameLabel2" type="Label" parent="CanvasLayer/ModifyTriggerPanel" unique_id=78088283]
+-layout_mode = 0
+-offset_left = 199.0
+-offset_top = 54.0
+-offset_right = 396.0
+-offset_bottom = 97.0
+-text = "Modifying Trigger!!"
+-horizontal_alignment = 1
+-
+-[node name="LengthLabel" type="Label" parent="CanvasLayer/ModifyTriggerPanel" unique_id=848715025]
+-layout_mode = 0
+-offset_left = 97.0
+-offset_top = 210.0
+-offset_right = 294.0
+-offset_bottom = 253.0
+-text = "Length(ms):"
+-horizontal_alignment = 1
+-
+-[node name="SpinBox" type="SpinBox" parent="CanvasLayer/ModifyTriggerPanel/LengthLabel" unique_id=751379983]
+-layout_mode = 0
+-offset_left = 196.0
+-offset_top = -1.0
+-offset_right = 282.5
+-offset_bottom = 30.0
+-max_value = 1000000.0
+-step = 0.0
+-allow_lesser = true
+-
+-[node name="ValueLabel" type="Label" parent="CanvasLayer/ModifyTriggerPanel" unique_id=1506332063]
+-layout_mode = 0
+-offset_left = 110.0
+-offset_top = 127.0
+-offset_right = 279.0
+-offset_bottom = 170.0
+-text = "Value:"
+-horizontal_alignment = 1
+-
+-[node name="SpinBox" type="SpinBox" parent="CanvasLayer/ModifyTriggerPanel/ValueLabel" unique_id=102612557]
+-layout_mode = 0
+-offset_left = 186.0
+-offset_top = -3.0
+-offset_right = 272.5
+-offset_bottom = 28.0
+-min_value = -10000.0
+-max_value = 10000.0
+-step = 0.0
+-allow_greater = true
+-allow_lesser = true
+-
+-[node name="QuitButton" type="Button" parent="CanvasLayer/ModifyTriggerPanel" unique_id=1463966936]
+-layout_mode = 1
+-anchors_preset = 3
+-anchor_left = 1.0
+-anchor_top = 1.0
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-offset_left = -99.0
+-offset_top = -76.0
+-offset_right = -25.0
+-offset_bottom = -20.0
+-grow_horizontal = 0
+-grow_vertical = 0
+-text = "Finish"
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=787913441]
+-
+-[node name="x_axis_bar" type="ColorRect" parent="." unique_id=1732663918]
+-anchors_preset = 4
+-anchor_top = 0.5
+-anchor_bottom = 0.5
+-offset_right = 40.0
+-offset_bottom = 40.0
+-grow_vertical = 2
+-
+-[connection signal="pressed" from="CanvasLayer/SavePanel/QuitButton" to="." method="quit_save_panel"]
+-[connection signal="pressed" from="CanvasLayer/SavePanel/SaveButton" to="." method="save_chart"]
+-[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button3" to="." method="set_difficulty" binds= [2]]
+-[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button2" to="." method="set_difficulty" binds= [1]]
+-[connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button" to="." method="set_difficulty" binds= [0]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_note" binds= [13]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button5" to="." method="_on_select_note" binds= [22]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_note" binds= [12]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_note" binds= [11]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button10" to="." method="_on_select_note" binds= [2]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomTriggerButton" to="." method="_on_select_note" binds= [32]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/MoveTriggerButton" to="." method="_on_select_note" binds= [31]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button9" to="." method="_on_select_note" binds= [21]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button8" to="." method="_on_select_note" binds= [3]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_note" binds= [1]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_note" binds= [0]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button2" to="." method="_on_select_note" binds= [23]]
+-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/PlayMusicButton" to="." method="toggle_music"]
+-[connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
+-[connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
+-[connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]
+-[connection signal="file_selected" from="CanvasLayer/InitialPanel/FileDialog" to="." method="select_music"]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton3" to="." method="print_note_info"]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton2" to="." method="print_lane_info"]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/SaveButton" to="." method="open_save_panel"]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button4" to="." method="set_bit" binds= [32]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button9" to="." method="set_bit" binds= [0]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button8" to="." method="set_bit" binds= [48]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button7" to="." method="set_bit" binds= [24]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button5" to="." method="set_bit" binds= [6]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button6" to="." method="set_bit" binds= [12]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button2" to="." method="set_bit" binds= [4]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button3" to="." method="set_bit" binds= [16]]
+-[connection signal="pressed" from="CanvasLayer/SettingPanel/Button" to="." method="set_bit" binds= [8]]
+-[connection signal="pressed" from="CanvasLayer/LoadPanel/LoadButton" to="." method="finish_load_chart"]
+-[connection signal="pressed" from="CanvasLayer/LoadPanel/Button2" to="." method="find_chart"]
+-[connection signal="file_selected" from="CanvasLayer/LoadPanel/FileDialog" to="." method="select_chart"]
+-[connection signal="pressed" from="CanvasLayer/ModifyTriggerPanel/QuitButton" to="." method="quit_modify_panel"]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn1004450990.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn1004450990.tmp
+deleted file mode 100644
+index 0ef6403..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn1004450990.tmp
++++ /dev/null
+@@ -1,20 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="Character" type="AnimatedSprite2D" parent="." unique_id=165243957]
+-
+-[node name="Camera2D" type="Camera2D" parent="." unique_id=1505561183]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn1625911825.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn1625911825.tmp
+deleted file mode 100644
+index 758906c..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn1625911825.tmp
++++ /dev/null
+@@ -1,77 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Camera/CameraManager.gd" id="6_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="7_frbmc"]
+-[ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/IngameDataManager.gd" id="7_wjq5j"]
+-[ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/IngameUIManager.gd" id="8_pee8w"]
+-[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("character_holder")]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-character_holder = NodePath("CharacterHolder")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-ignore_rotation = false
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-script = ExtResource("7_wjq5j")
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer")]
+-script = ExtResource("8_pee8w")
+-JUDGEMENT_TEXT = ExtResource("9_qa11p")
+-score_text = NodePath("../../CanvasLayer/Control/Panel/ScoreText")
+-canvasLayer = NodePath("../../CanvasLayer")
+-
+-[node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
+-
+-[node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("7_frbmc")]
+-visible = false
+-
+-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
+-
+-[node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
+-layout_mode = 3
+-anchors_preset = 15
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_top = 0.1
+-anchor_right = 0.2
+-anchor_bottom = 0.15
+-grow_horizontal = 0
+-
+-[node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.1
+-anchor_right = 0.9
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-theme_override_font_sizes/font_size = 40
+-text = "SCORE 0000000"
+-vertical_alignment = 1
+-
+-[connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn1752438952.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn1752438952.tmp
+deleted file mode 100644
+index 758906c..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn1752438952.tmp
++++ /dev/null
+@@ -1,77 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Camera/CameraManager.gd" id="6_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="7_frbmc"]
+-[ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/IngameDataManager.gd" id="7_wjq5j"]
+-[ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/IngameUIManager.gd" id="8_pee8w"]
+-[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("character_holder")]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-character_holder = NodePath("CharacterHolder")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-ignore_rotation = false
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-script = ExtResource("7_wjq5j")
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer")]
+-script = ExtResource("8_pee8w")
+-JUDGEMENT_TEXT = ExtResource("9_qa11p")
+-score_text = NodePath("../../CanvasLayer/Control/Panel/ScoreText")
+-canvasLayer = NodePath("../../CanvasLayer")
+-
+-[node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
+-
+-[node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("7_frbmc")]
+-visible = false
+-
+-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
+-
+-[node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
+-layout_mode = 3
+-anchors_preset = 15
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_top = 0.1
+-anchor_right = 0.2
+-anchor_bottom = 0.15
+-grow_horizontal = 0
+-
+-[node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.1
+-anchor_right = 0.9
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-theme_override_font_sizes/font_size = 40
+-text = "SCORE 0000000"
+-vertical_alignment = 1
+-
+-[connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn18714547046.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn18714547046.tmp
+deleted file mode 100644
+index ed2c232..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn18714547046.tmp
++++ /dev/null
+@@ -1,31 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Scripts_without_Node/CameraManager.gd" id="6_4pq8y"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn18722245971.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn18722245971.tmp
+deleted file mode 100644
+index ed2c232..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn18722245971.tmp
++++ /dev/null
+@@ -1,31 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Scripts_without_Node/CameraManager.gd" id="6_4pq8y"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn2316292914.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn2316292914.tmp
+deleted file mode 100644
+index f8401be..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn2316292914.tmp
++++ /dev/null
+@@ -1,18 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="Character" type="AnimatedSprite2D" parent="." unique_id=165243957]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn2575086820.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn2575086820.tmp
+deleted file mode 100644
+index c515b4a..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn2575086820.tmp
++++ /dev/null
+@@ -1,69 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Scripts_without_Node/CameraManager.gd" id="6_4pq8y"]
+-[ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/IngameDataManager.gd" id="7_wjq5j"]
+-[ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/IngameUIManager.gd" id="8_pee8w"]
+-[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-script = ExtResource("7_wjq5j")
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer")]
+-script = ExtResource("8_pee8w")
+-JUDGEMENT_TEXT = ExtResource("9_qa11p")
+-score_text = NodePath("../../CanvasLayer/Control/Panel/ScoreText")
+-canvasLayer = NodePath("../../CanvasLayer")
+-
+-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
+-
+-[node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
+-layout_mode = 3
+-anchors_preset = 15
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_top = 0.1
+-anchor_right = 0.2
+-anchor_bottom = 0.15
+-grow_horizontal = 0
+-
+-[node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.1
+-anchor_right = 0.9
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-theme_override_font_sizes/font_size = 40
+-text = "SCORE 0000000"
+-vertical_alignment = 1
+-
+-[connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn2660331988.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn2660331988.tmp
+deleted file mode 100644
+index 61f5b4f..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn2660331988.tmp
++++ /dev/null
+@@ -1,77 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/CameraManager.gd" id="6_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="7_frbmc"]
+-[ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/IngameDataManager.gd" id="7_wjq5j"]
+-[ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/IngameUIManager.gd" id="8_pee8w"]
+-[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("character_holder")]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-character_holder = NodePath("CharacterHolder")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-ignore_rotation = false
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-script = ExtResource("7_wjq5j")
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer")]
+-script = ExtResource("8_pee8w")
+-JUDGEMENT_TEXT = ExtResource("9_qa11p")
+-score_text = NodePath("../../CanvasLayer/Control/Panel/ScoreText")
+-canvasLayer = NodePath("../../CanvasLayer")
+-
+-[node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
+-
+-[node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("7_frbmc")]
+-visible = false
+-
+-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
+-
+-[node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
+-layout_mode = 3
+-anchors_preset = 15
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_top = 0.1
+-anchor_right = 0.2
+-anchor_bottom = 0.15
+-grow_horizontal = 0
+-
+-[node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.1
+-anchor_right = 0.9
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-theme_override_font_sizes/font_size = 40
+-text = "SCORE 0000000"
+-vertical_alignment = 1
+-
+-[connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn2967996072.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn2967996072.tmp
+deleted file mode 100644
+index 4c5a910..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn2967996072.tmp
++++ /dev/null
+@@ -1,22 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="Character" type="AnimatedSprite2D" parent="." unique_id=165243957]
+-
+-[node name="Camera2D" type="Camera2D" parent="." unique_id=1505561183]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn2974050056.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn2974050056.tmp
+deleted file mode 100644
+index 4c5a910..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn2974050056.tmp
++++ /dev/null
+@@ -1,22 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="Character" type="AnimatedSprite2D" parent="." unique_id=165243957]
+-
+-[node name="Camera2D" type="Camera2D" parent="." unique_id=1505561183]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn3374258882.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn3374258882.tmp
+deleted file mode 100644
+index 6d69379..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn3374258882.tmp
++++ /dev/null
+@@ -1,29 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Scripts_without_Node/CameraManager.gd" id="6_4pq8y"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn3379178248.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn3379178248.tmp
+deleted file mode 100644
+index 6d69379..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn3379178248.tmp
++++ /dev/null
+@@ -1,29 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Scripts_without_Node/CameraManager.gd" id="6_4pq8y"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn3988507724.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn3988507724.tmp
+deleted file mode 100644
+index e17db7d..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn3988507724.tmp
++++ /dev/null
+@@ -1,77 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/Ingame/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://d0y0ul7d65y02" path="res://Prefabs/LongNote.tscn" id="4_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="Script" uid="uid://dh4rkft3uto03" path="res://Scripts/Camera/CameraManager.gd" id="6_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://byq2jrarp145t" path="res://Prefabs/Line.tscn" id="7_frbmc"]
+-[ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/Ingame/IngameDataManager.gd" id="7_wjq5j"]
+-[ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/Ingame/IngameUIManager.gd" id="8_pee8w"]
+-[ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/JudgementText.tscn" id="9_qa11p"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-metadata/_edit_vertical_guides_ = [-111.0]
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("character_holder")]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-character_holder = NodePath("CharacterHolder")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-LONG_NOTE_SCENE = ExtResource("4_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-
+-[node name="CameraManager" type="Node2D" parent="RhythmManager" unique_id=1014908795]
+-script = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="RhythmManager/CameraManager" unique_id=298517082]
+-ignore_rotation = false
+-
+-[node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
+-script = ExtResource("7_wjq5j")
+-
+-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer")]
+-script = ExtResource("8_pee8w")
+-JUDGEMENT_TEXT = ExtResource("9_qa11p")
+-score_text = NodePath("../../CanvasLayer/Control/Panel/ScoreText")
+-canvasLayer = NodePath("../../CanvasLayer")
+-
+-[node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
+-
+-[node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("7_frbmc")]
+-visible = false
+-
+-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
+-
+-[node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
+-layout_mode = 3
+-anchors_preset = 15
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="Panel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_top = 0.1
+-anchor_right = 0.2
+-anchor_bottom = 0.15
+-grow_horizontal = 0
+-
+-[node name="ScoreText" type="Label" parent="CanvasLayer/Control/Panel" unique_id=519592229]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.1
+-anchor_right = 0.9
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-theme_override_font_sizes/font_size = 40
+-text = "SCORE 0000000"
+-vertical_alignment = 1
+-
+-[connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn4645031418.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn4645031418.tmp
+deleted file mode 100644
+index 9fa0ef5..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn4645031418.tmp
++++ /dev/null
+@@ -1,24 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="AudioStream" uid="uid://c2hh0bkkfx6no" path="res://Sounds/Conquest - Blacksmith (freetouse.com).mp3" id="6_4pq8y"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-stream = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="." unique_id=1505561183]
+diff --git a/vexatonic-dash-2/Scenes/RhythmScene.tscn7418528569.tmp b/vexatonic-dash-2/Scenes/RhythmScene.tscn7418528569.tmp
+deleted file mode 100644
+index 9fa0ef5..0000000
+--- a/vexatonic-dash-2/Scenes/RhythmScene.tscn7418528569.tmp
++++ /dev/null
+@@ -1,24 +0,0 @@
+-[gd_scene format=3 uid="uid://l50nt5bpgqai"]
+-
+-[ext_resource type="Script" uid="uid://cj82pa1wtw71v" path="res://Scripts/Test.gd" id="1_7jauh"]
+-[ext_resource type="Script" uid="uid://d3surnw8o8126" path="res://Scripts/RhythmManager.gd" id="2_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://byjtw0yjya7ia" path="res://Prefabs/Note.tscn" id="3_4pq8y"]
+-[ext_resource type="PackedScene" uid="uid://db3llundjhedf" path="res://Prefabs/Character.tscn" id="3_wib5u"]
+-[ext_resource type="PackedScene" uid="uid://cw54hy54u4o3h" path="res://Prefabs/Connector.tscn" id="4_wjq5j"]
+-[ext_resource type="AudioStream" uid="uid://c2hh0bkkfx6no" path="res://Sounds/Conquest - Blacksmith (freetouse.com).mp3" id="6_4pq8y"]
+-
+-[node name="RhythmScene" type="Node2D" unique_id=2112385734]
+-
+-[node name="TestNode" type="Node2D" parent="." unique_id=1757446354]
+-script = ExtResource("1_7jauh")
+-
+-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
+-script = ExtResource("2_wib5u")
+-CHARACTER_SCENE = ExtResource("3_wib5u")
+-NOTE_SCENE = ExtResource("3_4pq8y")
+-CONNECTOR_SCENE = ExtResource("4_wjq5j")
+-
+-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="RhythmManager" unique_id=787445567]
+-stream = ExtResource("6_4pq8y")
+-
+-[node name="Camera2D" type="Camera2D" parent="." unique_id=1505561183]
+diff --git a/vexatonic-dash-2/Scenes/SelectSong.tscn5172888069.tmp b/vexatonic-dash-2/Scenes/SelectSong.tscn5172888069.tmp
+deleted file mode 100644
+index bb7f464..0000000
+--- a/vexatonic-dash-2/Scenes/SelectSong.tscn5172888069.tmp
++++ /dev/null
+@@ -1,543 +0,0 @@
+-[gd_scene format=3 uid="uid://b2otcnfrfthpg"]
+-
+-[ext_resource type="Script" uid="uid://c5hopjpuog4j4" path="res://Scripts/SelectSong/SelectManager.gd" id="1_03mcv"]
+-[ext_resource type="Script" uid="uid://bocovfv3c0cfm" path="res://Scripts/SelectSong/InputManager.gd" id="2_lgpy4"]
+-[ext_resource type="Script" uid="uid://pgxarv2aqaf0" path="res://Scripts/SelectSong/SongHolder.gd" id="2_uvoqn"]
+-[ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
+-[ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
+-[ext_resource type="Script" uid="uid://c4ftuyjsig7p7" path="res://Scenes/SettingHolder.gd" id="5_mdyll"]
+-
+-[node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("leftSongHolder", "middleSongHolder", "rightSongHolder", "songDataHolder", "settingHolder")]
+-script = ExtResource("1_03mcv")
+-leftSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/LeftSongHolder")
+-middleSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder")
+-rightSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightSongHolder")
+-songDataHolder = NodePath("CanvasLayer/Control/SongDataHolder/Holder")
+-settingHolder = NodePath("CanvasLayer/Control/SettingHolder")
+-
+-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1950427340]
+-
+-[node name="Control" type="Control" parent="CanvasLayer" unique_id=399368785]
+-layout_mode = 3
+-anchors_preset = 15
+-anchor_right = 1.0
+-anchor_bottom = 1.0
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="SongSelectionHolder" type="Control" parent="CanvasLayer/Control" unique_id=2007234695]
+-layout_mode = 1
+-anchor_top = 0.15
+-anchor_right = 1.0
+-anchor_bottom = 0.4
+-grow_horizontal = 2
+-grow_vertical = 2
+-
+-[node name="RightSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1067336742]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.75
+-anchor_right = 1.15
+-anchor_bottom = 1.0
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-script = ExtResource("2_uvoqn")
+-
+-[node name="ArtistName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1734224746]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.072000004
+-anchor_top = 0.5
+-anchor_right = 0.521
+-anchor_bottom = 0.73700005
+-offset_left = -0.29600525
+-offset_top = -3.0
+-offset_right = -0.12802124
+-offset_bottom = 0.009994507
+-theme_override_font_sizes/font_size = 41
+-text = "ArtistName"
+-
+-[node name="SongName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1889389553]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.069000006
+-anchor_top = 0.133
+-anchor_right = 0.551
+-anchor_bottom = 0.46300003
+-offset_left = 0.0079956055
+-offset_top = 0.09000015
+-offset_right = -0.16799927
+-offset_bottom = -0.010009766
+-theme_override_font_sizes/font_size = 57
+-text = "SongName"
+-
+-[node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=1107589057]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.638
+-anchor_top = 0.33
+-anchor_right = 0.88500005
+-anchor_bottom = 0.915
+-offset_left = 0.015991211
+-offset_top = -0.1000061
+-offset_right = 0.3199463
+-offset_bottom = -0.05000305
+-theme_override_font_sizes/font_size = 116
+-text = "10"
+-horizontal_alignment = 1
+-
+-[node name="Level" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightSongHolder" unique_id=620266547]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.642
+-anchor_top = 0.07
+-anchor_right = 0.88900006
+-anchor_bottom = 0.356
+-offset_left = -0.056030273
+-offset_top = 0.10000038
+-offset_right = 0.2479248
+-offset_bottom = -0.12000275
+-theme_override_font_sizes/font_size = 56
+-text = "Level"
+-horizontal_alignment = 1
+-
+-[node name="MiddleSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1490555348]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.3
+-anchor_right = 0.7
+-anchor_bottom = 1.0
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-script = ExtResource("2_uvoqn")
+-
+-[node name="ArtistName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=270844541]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.072000004
+-anchor_top = 0.5
+-anchor_right = 0.521
+-anchor_bottom = 0.73700005
+-offset_left = -0.29600525
+-offset_top = -3.0
+-offset_right = -0.12802124
+-offset_bottom = 0.009994507
+-theme_override_font_sizes/font_size = 41
+-text = "ArtistName"
+-
+-[node name="SongName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=1056657985]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.069000006
+-anchor_top = 0.133
+-anchor_right = 0.551
+-anchor_bottom = 0.46300003
+-offset_left = 0.0079956055
+-offset_top = 0.09000015
+-offset_right = -0.16799927
+-offset_bottom = -0.010009766
+-theme_override_font_sizes/font_size = 57
+-text = "SongName"
+-
+-[node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=1214240176]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.638
+-anchor_top = 0.33
+-anchor_right = 0.88500005
+-anchor_bottom = 0.915
+-offset_left = 0.015991211
+-offset_top = -0.1000061
+-offset_right = 0.3199463
+-offset_bottom = -0.05000305
+-theme_override_font_sizes/font_size = 116
+-text = "10"
+-horizontal_alignment = 1
+-
+-[node name="Level" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder" unique_id=908510415]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.642
+-anchor_top = 0.07
+-anchor_right = 0.88900006
+-anchor_bottom = 0.356
+-offset_left = -0.056030273
+-offset_top = 0.10000038
+-offset_right = 0.2479248
+-offset_bottom = -0.12000275
+-theme_override_font_sizes/font_size = 56
+-text = "Level"
+-horizontal_alignment = 1
+-
+-[node name="LeftSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1649229551]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = -0.15
+-anchor_right = 0.25
+-anchor_bottom = 1.0
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-script = ExtResource("2_uvoqn")
+-
+-[node name="ArtistName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=810402549]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.072000004
+-anchor_top = 0.5
+-anchor_right = 0.521
+-anchor_bottom = 0.73700005
+-offset_left = -0.29600525
+-offset_top = -3.0
+-offset_right = -0.12802124
+-offset_bottom = 0.009994507
+-theme_override_font_sizes/font_size = 41
+-text = "ArtistName"
+-
+-[node name="SongName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=819261192]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.069000006
+-anchor_top = 0.133
+-anchor_right = 0.551
+-anchor_bottom = 0.46300003
+-offset_left = 0.0079956055
+-offset_top = 0.09000015
+-offset_right = -0.16799927
+-offset_bottom = -0.010009766
+-theme_override_font_sizes/font_size = 57
+-text = "SongName"
+-
+-[node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=38239312]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.638
+-anchor_top = 0.33
+-anchor_right = 0.88500005
+-anchor_bottom = 0.915
+-offset_left = 0.015991211
+-offset_top = -0.1000061
+-offset_right = 0.3199463
+-offset_bottom = -0.05000305
+-theme_override_font_sizes/font_size = 116
+-text = "10"
+-horizontal_alignment = 1
+-
+-[node name="Level" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftSongHolder" unique_id=2143622352]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.642
+-anchor_top = 0.07
+-anchor_right = 0.88900006
+-anchor_bottom = 0.356
+-offset_left = -0.056030273
+-offset_top = 0.10000038
+-offset_right = 0.2479248
+-offset_bottom = -0.12000275
+-theme_override_font_sizes/font_size = 56
+-text = "Level"
+-horizontal_alignment = 1
+-
+-[node name="SongConnector2" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=613698824]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.7
+-anchor_top = -0.1
+-anchor_right = 0.75
+-anchor_bottom = 1.1
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-
+-[node name="SongConnector1" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=692109525]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.25
+-anchor_top = -0.1
+-anchor_right = 0.3
+-anchor_bottom = 1.1
+-offset_left = -0.120025635
+-offset_right = -0.080078125
+-offset_bottom = -0.049987793
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-
+-[node name="SongDataHolder" type="Control" parent="CanvasLayer/Control" unique_id=1382802090]
+-layout_mode = 1
+-anchor_left = 0.1
+-anchor_top = 0.5
+-anchor_right = 0.6
+-anchor_bottom = 1.0
+-offset_left = 0.23999023
+-offset_top = -0.32000732
+-
+-[node name="Leg1" type="TextureRect" parent="CanvasLayer/Control/SongDataHolder" unique_id=24810228]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.2
+-anchor_top = -0.1
+-anchor_right = 0.3
+-anchor_bottom = 1.0
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-
+-[node name="Leg2" type="TextureRect" parent="CanvasLayer/Control/SongDataHolder" unique_id=1817479889]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.7
+-anchor_top = -0.1
+-anchor_right = 0.8
+-anchor_bottom = 1.0
+-offset_top = 0.35200882
+-offset_bottom = 0.3519287
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-
+-[node name="Holder" type="TextureRect" parent="CanvasLayer/Control/SongDataHolder" unique_id=1686494308]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = -0.127
+-anchor_right = 1.095
+-anchor_bottom = 0.70000005
+-offset_left = -0.35046387
+-offset_right = -0.1772461
+-offset_bottom = -3.0517578e-05
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-script = ExtResource("4_gjw2d")
+-
+-[node name="BestJudge" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=598159039]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.057000004
+-anchor_top = 0.432
+-anchor_right = 0.32900003
+-anchor_bottom = 0.638
+-offset_left = 0.05368042
+-offset_top = -0.072769165
+-offset_right = 0.082977295
+-offset_bottom = 0.013092041
+-theme_override_font_sizes/font_size = 57
+-text = "Vexatonic!"
+-
+-[node name="BestScore" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1883576132]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.055000003
+-anchor_top = 0.15400001
+-anchor_right = 0.33200002
+-anchor_bottom = 0.36
+-offset_left = -0.026794434
+-offset_top = 0.0735054
+-offset_right = -0.43603516
+-offset_bottom = 0.1593628
+-theme_override_font_sizes/font_size = 57
+-text = "Best Score"
+-
+-[node name="VexatonicValue" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1834441864]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.36
+-anchor_top = 0.45
+-anchor_right = 0.65
+-anchor_bottom = 0.65
+-offset_left = -0.45303345
+-offset_top = 0.11349487
+-offset_right = 0.34796143
+-offset_bottom = -0.12158203
+-theme_override_font_sizes/font_size = 50
+-text = "1,314 / 1,314"
+-horizontal_alignment = 2
+-
+-[node name="ScoreValue" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1309190163]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.36
+-anchor_top = 0.15
+-anchor_right = 0.65
+-anchor_bottom = 0.38
+-offset_top = -0.17004395
+-offset_right = 0.1749878
+-offset_bottom = -0.026885986
+-theme_override_font_sizes/font_size = 62
+-text = "1,000,000"
+-horizontal_alignment = 2
+-
+-[node name="Rank" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=2040935189]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.702
+-anchor_top = 0.136
+-anchor_right = 0.957
+-anchor_bottom = 0.87600005
+-offset_left = -0.44604492
+-offset_top = -0.118457794
+-offset_right = -0.56103516
+-offset_bottom = -0.0042419434
+-theme_override_font_sizes/font_size = 200
+-text = "S"
+-horizontal_alignment = 1
+-vertical_alignment = 1
+-
+-[node name="PaintLamp" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=954083490]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.39400002
+-anchor_top = 0.707
+-anchor_right = 0.66200006
+-anchor_bottom = 0.89000005
+-offset_left = -0.16201782
+-offset_top = -0.0843811
+-offset_right = 0.473938
+-offset_bottom = 0.020629883
+-theme_override_font_sizes/font_size = 44
+-text = "Perfect Paint"
+-horizontal_alignment = 1
+-
+-[node name="FCFVlamp" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=840062009]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.060000002
+-anchor_top = 0.707
+-anchor_right = 0.328
+-anchor_bottom = 0.89000005
+-offset_left = -0.38000488
+-offset_top = -0.0843811
+-offset_right = 0.25598145
+-offset_bottom = 0.020629883
+-theme_override_font_sizes/font_size = 44
+-text = "Full Vexatonic"
+-horizontal_alignment = 1
+-
+-[node name="StartButton" type="Button" parent="CanvasLayer/Control" unique_id=330670203]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.8
+-anchor_top = 0.85
+-anchor_right = 1.0
+-anchor_bottom = 0.95
+-offset_right = -0.32006836
+-theme_override_font_sizes/font_size = 66
+-text = "Start!!!"
+-
+-[node name="SettingHolder" type="TextureRect" parent="CanvasLayer/Control" unique_id=350180774]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.70000005
+-anchor_top = 0.5
+-anchor_right = 1.0
+-anchor_bottom = 0.8
+-offset_left = -0.32019043
+-offset_top = -0.16003418
+-texture = ExtResource("3_74yen")
+-expand_mode = 1
+-script = ExtResource("5_mdyll")
+-
+-[node name="JudgeOffset" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1430260253]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.119
+-anchor_top = 0.62100005
+-anchor_right = 0.62200004
+-anchor_bottom = 0.86
+-offset_left = -0.26202393
+-offset_top = -0.14335632
+-offset_right = -0.1510315
+-offset_bottom = 0.13470459
+-theme_override_font_sizes/font_size = 45
+-text = "Judge_Offset"
+-
+-[node name="SoundOffset" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=2025918682]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.119
+-anchor_top = 0.38
+-anchor_right = 0.62200004
+-anchor_bottom = 0.62
+-offset_left = -0.26202393
+-offset_top = 0.0067367554
+-offset_right = -103.15103
+-offset_bottom = -0.039352417
+-theme_override_font_sizes/font_size = 45
+-text = "Sound_Offset"
+-
+-[node name="Speed" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1621748373]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.119
+-anchor_top = 0.108
+-anchor_right = 0.44300002
+-anchor_bottom = 0.321
+-offset_left = -0.26202393
+-offset_top = 8.150749
+-offset_right = 0.010269165
+-offset_bottom = 8.10466
+-theme_override_font_sizes/font_size = 45
+-text = "Speed"
+-
+-[node name="SpeedValue" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1290855835]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.646
+-anchor_top = 0.132
+-anchor_right = 0.90300006
+-anchor_bottom = 0.34500003
+-theme_override_font_sizes/font_size = 45
+-text = "2.0"
+-horizontal_alignment = 2
+-
+-[node name="JudgeOffsetValue" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1831197387]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.646
+-anchor_top = 0.62100005
+-anchor_right = 0.90300006
+-anchor_bottom = 0.83300006
+-offset_left = 0.017303467
+-offset_top = -0.14335632
+-offset_right = -0.09698486
+-offset_bottom = 0.13470459
+-theme_override_font_sizes/font_size = 45
+-text = "-30"
+-horizontal_alignment = 2
+-
+-[node name="SoundOffsetValue2" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=9550399]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.646
+-anchor_top = 0.38000003
+-anchor_right = 0.901
+-anchor_bottom = 0.59300005
+-offset_left = 0.017303467
+-offset_top = -0.0207901
+-offset_right = 1.0556641
+-offset_bottom = -0.06687927
+-theme_override_font_sizes/font_size = 45
+-text = "-30"
+-horizontal_alignment = 2
+-
+-[node name="DifficultyRect" type="ColorRect" parent="CanvasLayer/Control" unique_id=765677216]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_top = 0.030000001
+-anchor_right = 0.15
+-anchor_bottom = 0.1
+-offset_top = -0.32000732
+-offset_bottom = -0.2800064
+-color = Color(0, 0, 0, 1)
+-
+-[node name="Difficulty" type="Label" parent="CanvasLayer/Control/DifficultyRect" unique_id=1564091235]
+-layout_mode = 1
+-anchors_preset = -1
+-anchor_left = 0.05
+-anchor_top = 0.1
+-anchor_right = 0.5
+-anchor_bottom = 0.9
+-offset_left = 0.1439991
+-offset_top = 0.020085812
+-offset_right = 0.11999512
+-offset_bottom = 0.020881653
+-theme_override_font_sizes/font_size = 43
+-text = "Easy"
+-horizontal_alignment = 1
+-
+-[node name="InputManager" type="Node2D" parent="." unique_id=1806121724]
+-script = ExtResource("2_lgpy4")
+-- 
+2.43.0
+
