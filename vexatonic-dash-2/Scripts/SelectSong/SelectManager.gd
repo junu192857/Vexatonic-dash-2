@@ -9,6 +9,7 @@ extends Node2D
 @export var songDataHolder: SongDataHolder
 @export var settingHolder: SettingHolder
 @onready var difficultyRect: TextureRect = $CanvasLayer/Control/DifficultyRect
+@onready var loadingPanel: LoadingPanel = $LoadingPanelLayer
 @export var startButton : TextureRect
 
 
@@ -33,6 +34,7 @@ var song_list: Array[LevelMetaData] = []
 var current_index: int = 0
 
 var can_start: bool = false
+var is_leaving: bool = false
 
 func _ready() -> void:
 	InputManager.pressed_a.connect(_on_move_left)
@@ -222,9 +224,11 @@ func _on_change_difficulty():
 
 func _on_game_start():
 	if not setting_open:
-		if can_start:
+		if can_start and not is_leaving:
+			is_leaving = true
 			var meta = _get_metadata(0)
 			Setting.selected_chart_dir = CHARTS_DIR + "/" + meta.name
+			await loadingPanel.close()
 			get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
 	else:
 		close_setting()

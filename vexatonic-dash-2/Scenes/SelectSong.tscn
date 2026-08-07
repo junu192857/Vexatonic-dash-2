@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://c182j04qnntpm" path="res://Textures/signs.jpg" id="8_hlphe"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="8_puwos"]
 [ext_resource type="Script" uid="uid://dembd4cn3s2i0" path="res://Scripts/SelectSong/DifficultyRectColor.gd" id="12_mp2i7"]
+[ext_resource type="Script" path="res://Scripts/UI/LoadingPanel.gd" id="13_ldpnl"]
 
 [sub_resource type="Gradient" id="Gradient_hlphe"]
 
@@ -1156,6 +1157,7 @@ horizontal_alignment = 1
 
 [node name="LoadingPanelLayer" type="CanvasLayer" parent="." unique_id=725987781]
 layer = 2
+script = ExtResource("13_ldpnl")
 
 [node name="Control" type="Control" parent="LoadingPanelLayer" unique_id=2005643529]
 layout_mode = 3

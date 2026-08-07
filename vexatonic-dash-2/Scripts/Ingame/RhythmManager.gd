@@ -9,6 +9,7 @@ var levelData: LevelData
 @onready var line = $CharacterHolder/Line
 @onready var lineSprite = $CharacterHolder/Line/Sprite2D
 @onready var character_holder:Node2D = $CharacterHolder
+@onready var loadingPanel: LoadingPanel = $"../LoadingPanelLayer"
 
 var characters: Array[Character]
 
@@ -89,6 +90,7 @@ func _ready() -> void:
 	
 	
 	time_start_tick = Time.get_ticks_msec()
+	loadingPanel.call_deferred("open")
 
 func place_character(lane: Lane):
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
