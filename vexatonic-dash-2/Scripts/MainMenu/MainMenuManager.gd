@@ -108,4 +108,5 @@ func close_setting():
 	state = MainMenuState.Main
 
 func open_random_conversation():
-	pass
+	var random_int = randi() % 2
+	storyManager.start_story("res://Scripts/MainMenu/RandomConversation/%d.txt" % random_int)

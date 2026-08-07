@@ -12,9 +12,7 @@ func _ready() -> void:
 		return
 	await get_tree().process_frame
 	$TutorialBGMPlayer.play()
-	storyManager.visible = true
-	storyManager._load_script()
-	storyManager.start_explanation()
+	storyManager.start_story(SCRIPT_PATH)
 	print("starting tutorial..")
 
 func _process(_delta: float) -> void:

@@ -20,9 +20,11 @@ var phases: Array[Callable] = [
 ]
 const CHARS_PER_SECOND = 30.0
 
-func _ready() -> void:
-	await get_tree().process_frame
+func start_story(path: String):
+	script_path = path
+	visible = true
 	_load_script()
+	start_explanation()
 
 func _load_script():
 	var file = FileAccess.open(script_path, FileAccess.READ)

@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="7_koqhg"]
 [ext_resource type="Script" uid="uid://bmavuels06wvq" path="res://Scripts/MainMenu/GameEndButton.gd" id="8_loo7a"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="9_cmrfp"]
-[ext_resource type="Script" uid="uid://dopaax52q8kev" path="res://Scripts/Story/StoryManager.gd" id="11_if7li"]
+[ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="11_if7li"]
 
 [sub_resource type="Gradient" id="Gradient_koqhg"]
 offsets = PackedFloat32Array(0.025974026)
@@ -23,15 +23,9 @@ gradient = SubResource("Gradient_koqhg")
 script = ExtResource("1_8saeu")
 settingRectScene = ExtResource("2_ghw46")
 goTutorialPanel = NodePath("CanvasLayer/Control/GoTutorialPanel")
-storyManager = NodePath("CanvasLayer/StoryManager")
+storyManager = NodePath("CanvasLayer/StoryControl")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013899153]
-
-[node name="StoryManager" type="Control" parent="CanvasLayer" unique_id=2091723251]
-process_mode = 3
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("11_if7li")
 
 [node name="Control" type="Control" parent="CanvasLayer" unique_id=2129972978]
 layout_mode = 3
@@ -361,5 +355,9 @@ text = "사야네와 랜덤대화"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("11_if7li")]
+visible = false
+
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button" to="." method="_on_tutorial_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button2" to="." method="_on_game_start"]
+[connection signal="pressed" from="CanvasLayer/Control/TextureButton" to="." method="open_random_conversation"]
