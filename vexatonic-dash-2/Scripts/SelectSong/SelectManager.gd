@@ -17,6 +17,9 @@ var settingRect
 
 var setting_open: bool = false
 var is_animating: bool = false
+var slide_tween: Tween
+var slide_origin_x: float
+var slide_dir_pending: int
 
 const CHARTS_DIR = "user://Charts"
 
@@ -34,12 +37,12 @@ func _ready() -> void:
 	InputManager.pressed_right.connect(func(): if not setting_open: settingHolder.change_value(true))
 	InputManager.pressed_f10.connect(_on_enter_setting)
 	InputManager.pressed_esc.connect(_on_return_to_main)
-	
+
 	settingRect = settingRectScene.instantiate()
 	$CanvasLayer/Control.add_child(settingRect)
 	settingRect.visible = false
 	settingRect.close_setting.connect(close_setting)
-	
+
 	_ensure_user_charts()
 	_scan_charts()
 	if song_list.is_empty():
@@ -168,21 +171,30 @@ func _on_move_right():
 	_slide_and_refresh(-1)
 
 func _slide_and_refresh(slide_dir: int):
-	if setting_open or is_animating:
+	if setting_open:
 		return
+	if is_animating:
+		_force_finish_slide()
 	is_animating = true
+	slide_dir_pending = slide_dir
+	slide_origin_x = songSelectionHolder.position.x
 	var slot_width = get_viewport().get_visible_rect().size.x * 0.45
-	var origin_x = songSelectionHolder.position.x
-	var tween = create_tween()
-	tween.tween_property(songSelectionHolder, "position:x", origin_x + slide_dir * slot_width, 0.3)
-	tween.tween_callback(func():
-		current_index = (current_index - slide_dir + song_list.size()) % song_list.size()
-		_refresh_holders()
-		_refresh_song_data()
-		_refresh_start_button()
-		songSelectionHolder.position.x = origin_x
-		is_animating = false
-	)
+	slide_tween = create_tween()
+	slide_tween.tween_property(songSelectionHolder, "position:x", slide_origin_x + slide_dir * slot_width, 0.3)
+	slide_tween.tween_callback(_on_slide_finished)
+
+func _force_finish_slide():
+	if slide_tween and slide_tween.is_valid():
+		slide_tween.kill()
+	_on_slide_finished()
+
+func _on_slide_finished():
+	current_index = (current_index - slide_dir_pending + song_list.size()) % song_list.size()
+	_refresh_holders()
+	_refresh_song_data()
+	_refresh_start_button()
+	songSelectionHolder.position.x = slide_origin_x
+	is_animating = false
 
 func _on_change_difficulty():
 	if not setting_open:
@@ -198,8 +210,8 @@ func _on_game_start():
 			get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
 	else:
 		close_setting()
-		
-		
+
+
 func _can_start() -> bool:
 	var meta = _get_metadata(0)
 	var chart_dir = CHARTS_DIR + "/" + meta.name
@@ -216,7 +228,7 @@ func _can_start() -> bool:
 
 func _refresh_start_button():
 	startButton.disabled = not _can_start()
-	
+
 func _on_enter_setting():
 	settingButton.disabled = true
 	startButton.disabled = true
@@ -232,6 +244,6 @@ func close_setting():
 	settingHolder.refresh()
 	settingButton.disabled = false
 	startButton.disabled = false
-	
+
 func _on_return_to_main():
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
