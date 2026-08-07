@@ -15,19 +15,6 @@
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="8_puwos"]
 [ext_resource type="Script" uid="uid://dembd4cn3s2i0" path="res://Scripts/SelectSong/DifficultyRectColor.gd" id="12_mp2i7"]
 
-[sub_resource type="Gradient" id="Gradient_n78af"]
-colors = PackedColorArray(0, 0, 0, 1, 0.5330367, 0.5330367, 0.5330367, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_mxlqr"]
-gradient = SubResource("Gradient_n78af")
-
-[sub_resource type="Gradient" id="Gradient_mjwro"]
-offsets = PackedFloat32Array(1)
-colors = PackedColorArray(0.46618086, 0.4661808, 0.4661808, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_vyi73"]
-gradient = SubResource("Gradient_mjwro")
-
 [sub_resource type="Gradient" id="Gradient_hlphe"]
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_hlphe"]
@@ -51,7 +38,7 @@ colors = PackedColorArray(0.6014544, 0.00026500793, 0.60145015, 1, 1, 0.35763314
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_kc5mb"]
 gradient = SubResource("Gradient_kc5mb")
 
-[node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("songSelectionHolder", "leftmostSongHolder", "leftSongHolder", "middleSongHolder", "rightSongHolder", "rightmostSongHolder", "songDataHolder", "settingHolder")]
+[node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("songSelectionHolder", "leftmostSongHolder", "leftSongHolder", "middleSongHolder", "rightSongHolder", "rightmostSongHolder", "songDataHolder", "settingHolder", "startButton")]
 script = ExtResource("1_03mcv")
 songSelectionHolder = NodePath("CanvasLayer/Control/SongSelectionHolder")
 leftmostSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder")
@@ -61,6 +48,7 @@ rightSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightSongHol
 rightmostSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder")
 songDataHolder = NodePath("CanvasLayer/Control/SongDataHolder/Holder")
 settingHolder = NodePath("CanvasLayer/Control/SettingHolder")
+startButton = NodePath("CanvasLayer/Control/StartButton")
 settingRectScene = ExtResource("2_mdyll")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1950427340]
@@ -889,20 +877,19 @@ theme_override_font_sizes/font_size = 44
 text = "Full Vexatonic"
 horizontal_alignment = 1
 
-[node name="SettingButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=362854101]
+[node name="SettingButton" type="TextureRect" parent="CanvasLayer/Control" unique_id=156459136]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.8
+anchor_left = 0.80200005
 anchor_top = 0.029000001
-anchor_right = 0.998
+anchor_right = 1.0020001
 anchor_bottom = 0.12900001
-offset_left = -4.0
+offset_left = 0.15991211
 offset_top = -0.3200016
-offset_right = -0.16003418
+offset_right = 0.15979004
 offset_bottom = -0.3199463
-texture_normal = SubResource("GradientTexture2D_mxlqr")
-ignore_texture_size = true
-stretch_mode = 0
+texture = SubResource("GradientTexture2D_hlphe")
+expand_mode = 1
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=730083471]
 layout_mode = 1
@@ -949,16 +936,14 @@ text = "Settings"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StartButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=465525343]
+[node name="StartButton" type="TextureRect" parent="CanvasLayer/Control" unique_id=297324074]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.8
 anchor_top = 0.85
 anchor_right = 1.0
 anchor_bottom = 0.95
-texture_normal = SubResource("GradientTexture2D_mxlqr")
-texture_disabled = SubResource("GradientTexture2D_vyi73")
-stretch_mode = 0
+texture = SubResource("GradientTexture2D_hlphe")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/StartButton" unique_id=1333744545]
 layout_mode = 1
@@ -1168,15 +1153,3 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Tab"
 horizontal_alignment = 1
-
-[node name="Button" type="Button" parent="CanvasLayer/Control/DifficultyRect" unique_id=1187594719]
-modulate = Color(1, 1, 1, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
-[connection signal="pressed" from="CanvasLayer/Control/DifficultyRect/Button" to="." method="_on_change_difficulty"]

@@ -9,9 +9,7 @@ extends Node2D
 @export var songDataHolder: SongDataHolder
 @export var settingHolder: SettingHolder
 @onready var difficultyRect: TextureRect = $CanvasLayer/Control/DifficultyRect
-@onready var settingButton: TextureButton = $CanvasLayer/Control/SettingButton
-@onready var startButton: TextureButton = $CanvasLayer/Control/StartButton
-
+@export var startButton : TextureRect
 
 
 @export var settingRectScene: PackedScene
@@ -33,6 +31,8 @@ const CHARTS_DIR = "user://Charts"
 
 var song_list: Array[LevelMetaData] = []
 var current_index: int = 0
+
+var can_start: bool = false
 
 func _ready() -> void:
 	InputManager.pressed_a.connect(_on_move_left)
@@ -61,7 +61,6 @@ func _ready() -> void:
 				current_index = i
 				break
 	_refresh_all()
-	_refresh_start_button()
 
 func _ensure_user_charts():
 	# user://Charts가 이미 있으면 건너뜀
@@ -148,6 +147,7 @@ func _refresh_all():
 	_refresh_difficulty()
 	_refresh_holders()
 	_refresh_song_data()
+	_refresh_can_start()
 	settingHolder.refresh()
 
 func _count_notes(chart_path: String) -> int:
@@ -201,19 +201,28 @@ func _on_slide_finished():
 	current_index = (current_index - slide_dir_pending + song_list.size()) % song_list.size()
 	_refresh_holders()
 	_refresh_song_data()
-	_refresh_start_button()
+	_refresh_can_start()
 	songSelectionHolder.position.x = slide_origin_x
 	is_animating = false
+
+func _refresh_can_start():
+	if (_can_start()):
+		can_start = true
+		startButton.modulate = Color(1,1,1)
+
+	else:
+		can_start = false
+		startButton.modulate = Color(0,0,0,0.5)
+
 
 func _on_change_difficulty():
 	if not setting_open:
 		Setting.selected_difficulty = (Setting.selected_difficulty + 1) % 3
 		_refresh_all()
-		_refresh_start_button()
 
 func _on_game_start():
 	if not setting_open:
-		if not startButton.disabled:
+		if can_start:
 			var meta = _get_metadata(0)
 			Setting.selected_chart_dir = CHARTS_DIR + "/" + meta.name
 			get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
@@ -235,12 +244,7 @@ func _can_start() -> bool:
 		return false
 	return true
 
-func _refresh_start_button():
-	startButton.disabled = not _can_start()
-
 func _on_enter_setting():
-	settingButton.disabled = true
-	startButton.disabled = true
 	Setting.load()
 	settingRect._initialize()
 	settingRect.visible = true
@@ -251,8 +255,6 @@ func close_setting():
 	Setting.save()
 	setting_open = false
 	settingHolder.refresh()
-	settingButton.disabled = false
-	startButton.disabled = false
 
 func _on_return_to_main():
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
