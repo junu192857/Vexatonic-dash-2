@@ -1,5 +1,6 @@
 extends Node2D
 
+@export var songSelectionHolder: Control
 @export var leftSongHolder: SongHolder
 @export var middleSongHolder: SongHolder
 @export var rightSongHolder: SongHolder
