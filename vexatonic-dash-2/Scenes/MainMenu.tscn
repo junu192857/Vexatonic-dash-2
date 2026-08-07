@@ -265,7 +265,6 @@ text = "Vexatonic"
 horizontal_alignment = 1
 
 [node name="GoTutorialPanel" type="TextureRect" parent="CanvasLayer/Control" unique_id=1717423707]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3

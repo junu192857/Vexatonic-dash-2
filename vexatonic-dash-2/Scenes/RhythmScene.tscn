@@ -11,17 +11,19 @@
 [ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/Ingame/IngameDataManager.gd" id="7_wjq5j"]
 [ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/Ingame/IngameUIManager.gd" id="8_pee8w"]
 [ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/Ingame/JudgementText.tscn" id="9_qa11p"]
+[ext_resource type="Texture2D" uid="uid://cwewgb07d6uwe" path="res://Textures/IngameBackgroundMirrored.jpg" id="12_63m28"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_ublex"]
-
+[ext_resource type="Texture2D" uid="uid://r5si4bnkc62a" path="res://Textures/IngameBackground.jpg" id="13_g5yvx"]
+[ext_resource type="Script" uid="uid://en0omrumjk71" path="res://Scripts/Tutorial/TutorialManager.gd" id="15_t4mny"]
+[ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="16_rvley"]
+[ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="17_rvley"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
 metadata/_edit_vertical_guides_ = [-111.0]
 
-[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519 node_paths=PackedStringArray("rightCover", "leftCover")]
+[node name="RhythmManager" type="Node2D" parent="." unique_id=912655519]
 script = ExtResource("2_wib5u")
 CHARACTER_SCENE = ExtResource("3_wib5u")
-rightCover = NodePath("../CanvasLayer/Control/RightCover")
-leftCover = NodePath("../CanvasLayer/Control/LeftCover")
 NOTE_SCENE = ExtResource("3_4pq8y")
 LONG_NOTE_SCENE = ExtResource("4_4pq8y")
 CONNECTOR_SCENE = ExtResource("4_wjq5j")
@@ -51,6 +53,15 @@ resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
 [node name="Line" parent="RhythmManager/CharacterHolder" unique_id=1871678190 instance=ExtResource("7_frbmc")]
 visible = false
 
+[node name="TutorialManager" type="Node2D" parent="RhythmManager" unique_id=2063788292 node_paths=PackedStringArray("storyManager")]
+script = ExtResource("15_t4mny")
+storyManager = NodePath("../../CanvasLayer/StoryControl")
+
+[node name="TutorialBGMPlayer" type="AudioStreamPlayer" parent="RhythmManager/TutorialManager" unique_id=1730706539]
+process_mode = 3
+stream = ExtResource("16_rvley")
+parameters/looping = true
+
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
 
 [node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
@@ -61,25 +72,46 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="RightCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=591227501]
+[node name="RightCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=791685082]
 visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.781
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.6398926
-offset_right = 0.15979004
-color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+pivot_offset_ratio = Vector2(1, 0)
+texture = ExtResource("12_63m28")
+expand_mode = 1
+stretch_mode = 1
+flip_h = true
 
-[node name="LeftCover" type="ColorRect" parent="CanvasLayer/Control" unique_id=439301575]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/Control/RightCover" unique_id=603732571]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.83137256)
+
+[node name="LeftCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=276138114]
 visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.21900001
 anchor_bottom = 1.0
-offset_right = -0.480011
-color = Color(0.47788018, 0.47788012, 0.47788012, 1)
+texture = ExtResource("13_g5yvx")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/Control/LeftCover" unique_id=493000574]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.83137256)
 
 [node name="ScorePanel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
 layout_mode = 1
@@ -471,6 +503,21 @@ theme_override_font_sizes/font_size = 42
 text = "PERFECT PAINT"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("17_rvley")]
+visible = false
+script_path = "res://Scripts/Tutorial/script.txt"
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1570471814]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("13_g5yvx")
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
 [connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]
