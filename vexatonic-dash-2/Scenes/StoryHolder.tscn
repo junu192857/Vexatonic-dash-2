@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://dopaax52q8kev" path="res://Scripts/Story/StoryManager.gd" id="1_paxo6"]
 [ext_resource type="Texture2D" uid="uid://b3r6by2y1fado" path="res://Textures/Sayane_Live2D.png" id="1_pcs6n"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="2_paxo6"]
+[ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="4_aew0f"]
+[ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_ufue0"]
 
 [node name="StoryControl" type="Control" unique_id=194327749 node_paths=PackedStringArray("storyHolder", "live2d", "story_script", "enter_label", "story_speaker")]
 process_mode = 3
@@ -56,6 +58,7 @@ offset_left = 0.6479988
 offset_top = 0.1159935
 offset_right = 0.41601563
 offset_bottom = -0.115997314
+theme_override_fonts/font = ExtResource("4_aew0f")
 theme_override_font_sizes/font_size = 36
 text = "Random Text"
 autowrap_mode = 2
@@ -71,6 +74,7 @@ offset_left = 0.015991211
 offset_top = 0.052001953
 offset_right = 0.56799316
 offset_bottom = 0.031982422
+theme_override_fonts/font = ExtResource("4_aew0f")
 theme_override_font_sizes/font_size = 22
 text = "[L] 또는 [Enter]로 진행"
 
@@ -93,6 +97,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_ufue0")
 theme_override_font_sizes/font_size = 49
 text = "사야네"
 horizontal_alignment = 1

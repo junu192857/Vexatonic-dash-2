@@ -1,10 +1,14 @@
 extends Node
 
+
+@export var settingRectScene: PackedScene
+@export var goTutorialPanel: TextureRect
+@export var storyManager: Control
+
 var button_array: Array
 var index: int
-@export var settingRectScene: PackedScene
 var settingRect
-@export var goTutorialPanel: TextureRect
+
 enum MainMenuState {Main, SettingOpen, EnteringTutorial }
 var state : MainMenuState
 

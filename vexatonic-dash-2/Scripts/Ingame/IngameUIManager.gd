@@ -22,7 +22,11 @@ extends Node
 
 func _ready():
 	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-		pass
+		leftCover.visible = true
+		rightCover.visible = true
+	else:
+		leftCover.visible = false
+		rightCover.visible = false
 	
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:

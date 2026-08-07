@@ -23,6 +23,7 @@ config/icon="res://icon.svg"
 SettingLoader="*uid://hqkfmofjf5hs"
 InputManager="*res://Scripts/Autoloads/InputManager.gd"
 PositionCalculator="*uid://d0oinqdkgv3q8"
+PausedInputManager="*uid://daelebkyjhm30"
 
 [debug]
 

@@ -40,13 +40,15 @@ ignore_rotation = false
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
 
-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder")]
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
 score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
 canvasLayer = NodePath("../../CanvasLayer")
 lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
 resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
+rightCover = NodePath("../../CanvasLayer/Control/RightCover")
+leftCover = NodePath("../../CanvasLayer/Control/LeftCover")
 
 [node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
 

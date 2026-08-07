@@ -19,12 +19,19 @@ colors = PackedColorArray(0, 0.3019608, 0, 1)
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_mks8r"]
 gradient = SubResource("Gradient_koqhg")
 
-[node name="MainMenu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("goTutorialPanel")]
+[node name="MainMenu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("goTutorialPanel", "storyManager")]
 script = ExtResource("1_8saeu")
 settingRectScene = ExtResource("2_ghw46")
 goTutorialPanel = NodePath("CanvasLayer/Control/GoTutorialPanel")
+storyManager = NodePath("CanvasLayer/StoryManager")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013899153]
+
+[node name="StoryManager" type="Control" parent="CanvasLayer" unique_id=2091723251]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("11_if7li")
 
 [node name="Control" type="Control" parent="CanvasLayer" unique_id=2129972978]
 layout_mode = 3
@@ -353,12 +360,6 @@ theme_override_font_sizes/font_size = 26
 text = "사야네와 랜덤대화"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="StoryManager" type="Control" parent="." unique_id=2091723251]
-process_mode = 3
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("11_if7li")
 
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button" to="." method="_on_tutorial_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button2" to="." method="_on_game_start"]
