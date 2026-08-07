@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/Ingame/JudgementText.tscn" id="9_qa11p"]
 [ext_resource type="Texture2D" uid="uid://cwewgb07d6uwe" path="res://Textures/IngameBackgroundMirrored.jpg" id="12_63m28"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_ublex"]
-[ext_resource type="Texture2D" uid="uid://r5si4bnkc62a" path="res://Textures/IngameBackground.jpg" id="13_g5yvx"]
+[ext_resource type="Texture2D" uid="uid://bs17oeapa4q3o" path="res://Textures/IngameBackground.jpg" id="13_g5yvx"]
 [ext_resource type="Script" uid="uid://en0omrumjk71" path="res://Scripts/Tutorial/TutorialManager.gd" id="15_t4mny"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="16_r4r31"]
 [ext_resource type="AudioStream" uid="uid://cg2p5s23yrb8h" path="res://Songs/mickeyscat-moment-of-peace-mickeyscat-554494.mp3" id="16_rvley"]
@@ -555,6 +555,30 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("13_g5yvx")
+
+[node name="LoadingPanelLayer" type="CanvasLayer" parent="." unique_id=761816360]
+layer = 2
+
+[node name="Control" type="Control" parent="LoadingPanelLayer" unique_id=793883333]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftPanel" type="ColorRect" parent="LoadingPanelLayer/Control" unique_id=1841104858]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.5
+anchor_bottom = 1.0
+
+[node name="RightPanel" type="ColorRect" parent="LoadingPanelLayer/Control" unique_id=441096841]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.5
+anchor_bottom = 1.0
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
 [connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]
