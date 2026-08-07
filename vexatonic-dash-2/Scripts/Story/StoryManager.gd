@@ -5,7 +5,8 @@ extends Control
 @export var story_script: Label
 @export var enter_label: Label
 @export var story_speaker: Label
-@export var script_path: String
+
+var script_path: String
 
 var script_tween
 var script_lines: Array[String] = []
@@ -21,6 +22,8 @@ var phases: Array[Callable] = [
 const CHARS_PER_SECOND = 30.0
 
 func start_story(path: String):
+	current_line = 0
+	script_lines = []
 	script_path = path
 	visible = true
 	_load_script()
@@ -34,7 +37,6 @@ func _load_script():
 		var line = file.get_line()
 		if not line.is_empty():
 			script_lines.append(line)
-	current_line = 0
 
 func _show_line(index: int):
 	if index >= script_lines.size():

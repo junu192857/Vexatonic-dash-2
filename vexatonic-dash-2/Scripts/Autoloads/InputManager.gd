@@ -66,7 +66,6 @@ func _input(event):
 			KEY_ENTER:
 				if event.pressed and not event.is_echo():
 					pressed_enter.emit()
-					print("EMIT FROM NORMAL INPUTMANAGER")
 			KEY_TAB:
 				if event.pressed: pressed_tab.emit()
 			KEY_DELETE:
