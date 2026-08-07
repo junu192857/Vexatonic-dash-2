@@ -12,8 +12,16 @@ extends Node2D
 @onready var settingButton: TextureButton = $CanvasLayer/Control/SettingButton
 @onready var startButton: TextureButton = $CanvasLayer/Control/StartButton
 
+
+
 @export var settingRectScene: PackedScene
 var settingRect
+
+const DIFFICULTY_COLORS: Array[Color] = [
+  Color(0.6, 1.0, 0.4),
+  Color(1.0, 0.65, 0.2),
+  Color(0.8, 0.4, 1.0),
+]
 
 var setting_open: bool = false
 var is_animating: bool = false
@@ -127,6 +135,7 @@ func _refresh_difficulty():
 	var diff = Setting.selected_difficulty
 	difficultyRect.set_gradient_texture(diff)
 	difficultyRect.get_node("Difficulty").text = Setting.DIFFICULTY_NAMES[diff]
+	songSelectionHolder.modulate = DIFFICULTY_COLORS[diff]
 
 func _refresh_song_data():
 	var meta = _get_metadata(0)
