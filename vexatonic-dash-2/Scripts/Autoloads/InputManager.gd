@@ -38,6 +38,9 @@ signal mouse_scrolled_up
 signal mouse_scrolled_down
 signal mouse_moved(position: Vector2)
 
+func _ready():
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+
 func _input(event):
 	if event is InputEventKey:
 		match event.keycode:
@@ -52,7 +55,9 @@ func _input(event):
 			KEY_SPACE:
 				if event.pressed and not event.is_echo(): pressed_space.emit()
 			KEY_ENTER:
-				if event.pressed and not event.is_echo(): pressed_enter.emit()
+				if event.pressed and not event.is_echo():
+					pressed_enter.emit()
+					print("EMIT FROM NORMAL INPUTMANAGER")
 			KEY_TAB:
 				if event.pressed: pressed_tab.emit()
 			KEY_DELETE:

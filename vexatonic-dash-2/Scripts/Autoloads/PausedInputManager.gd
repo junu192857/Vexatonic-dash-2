@@ -17,3 +17,4 @@ func _input(event):
 			KEY_ENTER:
 				if event.pressed and not event.is_echo():
 					pressed_enter.emit()
+					print("EMIT FROM PAUSED INPUTMANAGER")

@@ -13,9 +13,9 @@ enum MainMenuState {Main, SettingOpen, EnteringTutorial }
 var state : MainMenuState
 
 func _ready():
-	button_array.append($CanvasLayer/Control/GameStartButton)
-	button_array.append($CanvasLayer/Control/SettingButton)
-	button_array.append($CanvasLayer/Control/GameEndButton)
+	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
+	
+	button_array = $CanvasLayer/Control/MainMenuButtons.get_children()
 	index = 0
 	_refresh_selection()
 	InputManager.pressed_up.connect(_on_pressed_up)
@@ -61,6 +61,8 @@ func _on_pressed_enter():
 				_on_enter_setting()
 			2:
 				_on_game_end()
+			3:
+				open_random_conversation()
 
 func _on_pressed_esc():
 	if state == MainMenuState.SettingOpen:

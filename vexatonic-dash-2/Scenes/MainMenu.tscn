@@ -10,14 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="7_koqhg"]
 [ext_resource type="Script" uid="uid://bmavuels06wvq" path="res://Scripts/MainMenu/GameEndButton.gd" id="8_loo7a"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="9_cmrfp"]
+[ext_resource type="Script" uid="uid://cy352h4c1btsb" path="res://Scripts/MainMenu/ConversationButton.gd" id="10_rrcx7"]
 [ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="11_if7li"]
-
-[sub_resource type="Gradient" id="Gradient_koqhg"]
-offsets = PackedFloat32Array(0.025974026)
-colors = PackedColorArray(0, 0.3019608, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_mks8r"]
-gradient = SubResource("Gradient_koqhg")
 
 [node name="MainMenu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("goTutorialPanel", "storyManager")]
 script = ExtResource("1_8saeu")
@@ -48,189 +42,6 @@ offset_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_8um5k")
-
-[node name="GameStartButton" type="TextureRect" parent="CanvasLayer/Control" unique_id=997546963]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.37
-anchor_top = 0.586
-anchor_right = 0.65
-anchor_bottom = 0.661
-texture = ExtResource("6_koqhg")
-expand_mode = 1
-script = ExtResource("3_df05h")
-
-[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/GameStartButton" unique_id=2103313793]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.1
-anchor_top = -0.2
-anchor_bottom = 1.2
-offset_left = -1.1444092e-05
-offset_top = -1.1444092e-05
-offset_right = -1.1444092e-05
-texture = ExtResource("7_koqhg")
-
-[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/GameStartButton" unique_id=822443628]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_top = -0.2
-anchor_right = 1.1
-anchor_bottom = 1.2
-offset_top = -1.1444092e-05
-texture = ExtResource("7_koqhg")
-
-[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameStartButton" unique_id=1443724895]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-border_color = Color(0, 0, 0, 1)
-border_width = 6.0
-editor_only = false
-
-[node name="Label" type="Label" parent="CanvasLayer/Control/GameStartButton" unique_id=142133960]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("4_xim88")
-theme_override_font_sizes/font_size = 42
-text = "게임 시작!"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="GameEndButton" type="TextureRect" parent="CanvasLayer/Control" unique_id=287439480]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.37
-anchor_top = 0.82000005
-anchor_right = 0.65000004
-anchor_bottom = 0.89500004
-offset_left = 0.5999756
-offset_top = 0.39996338
-offset_right = 0.43981934
-offset_bottom = 0.39996338
-texture = ExtResource("6_koqhg")
-expand_mode = 1
-script = ExtResource("8_loo7a")
-
-[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/GameEndButton" unique_id=192832538]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.1
-anchor_top = -0.2
-anchor_bottom = 1.2
-offset_left = -2.2888184e-05
-offset_top = -1.1444092e-05
-offset_right = -2.2888184e-05
-texture = ExtResource("7_koqhg")
-
-[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/GameEndButton" unique_id=864577641]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_top = -0.2
-anchor_right = 1.1
-anchor_bottom = 1.2
-offset_top = -1.1444092e-05
-texture = ExtResource("7_koqhg")
-
-[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/GameEndButton" unique_id=1731334888]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-border_color = Color(0, 0, 0, 1)
-border_width = 6.0
-editor_only = false
-
-[node name="Label" type="Label" parent="CanvasLayer/Control/GameEndButton" unique_id=916240549]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("4_xim88")
-theme_override_font_sizes/font_size = 42
-text = "게임 종료"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SettingButton" type="TextureRect" parent="CanvasLayer/Control" unique_id=1005545237]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.37
-anchor_top = 0.70400006
-anchor_right = 0.65000004
-anchor_bottom = 0.77900004
-offset_top = -0.32006836
-offset_right = -0.16015625
-offset_bottom = -0.32006836
-texture = ExtResource("6_koqhg")
-expand_mode = 1
-script = ExtResource("3_df05h")
-
-[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/SettingButton" unique_id=1808488755]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.1
-anchor_top = -0.2
-anchor_bottom = 1.2
-offset_left = -2.2888184e-05
-offset_top = -1.1444092e-05
-offset_right = -2.2888184e-05
-texture = ExtResource("7_koqhg")
-
-[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/SettingButton" unique_id=1938044614]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_top = -0.2
-anchor_right = 1.1
-anchor_bottom = 1.2
-offset_top = -1.1444092e-05
-texture = ExtResource("7_koqhg")
-
-[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=1490791374]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-border_color = Color(0, 0, 0, 1)
-border_width = 6.0
-editor_only = false
-
-[node name="Label" type="Label" parent="CanvasLayer/Control/SettingButton" unique_id=702702264]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("4_xim88")
-theme_override_font_sizes/font_size = 42
-text = "설정 만지기"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="NameLabel2" type="Label" parent="CanvasLayer/Control" unique_id=983177614]
 layout_mode = 1
@@ -265,7 +76,228 @@ theme_override_font_sizes/font_size = 120
 text = "Vexatonic"
 horizontal_alignment = 1
 
+[node name="MainMenuButtons" type="Control" parent="CanvasLayer/Control" unique_id=1351467104]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameStartButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=997546963]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.586
+anchor_right = 0.65
+anchor_bottom = 0.661
+texture = ExtResource("6_koqhg")
+expand_mode = 1
+script = ExtResource("3_df05h")
+
+[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=2103313793]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.1
+anchor_top = -0.2
+anchor_bottom = 1.2
+offset_left = -1.1444092e-05
+offset_top = -1.1444092e-05
+offset_right = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=822443628]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = -0.2
+anchor_right = 1.1
+anchor_bottom = 1.2
+offset_top = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=1443724895]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(0, 0, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/GameStartButton" unique_id=142133960]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_xim88")
+theme_override_font_sizes/font_size = 42
+text = "게임 시작!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SettingButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=1005545237]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.70400006
+anchor_right = 0.65000004
+anchor_bottom = 0.77900004
+offset_top = -0.32006836
+offset_right = -0.16015625
+offset_bottom = -0.32006836
+texture = ExtResource("6_koqhg")
+expand_mode = 1
+script = ExtResource("3_df05h")
+
+[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=1808488755]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.1
+anchor_top = -0.2
+anchor_bottom = 1.2
+offset_left = -2.2888184e-05
+offset_top = -1.1444092e-05
+offset_right = -2.2888184e-05
+texture = ExtResource("7_koqhg")
+
+[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=1938044614]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = -0.2
+anchor_right = 1.1
+anchor_bottom = 1.2
+offset_top = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=1490791374]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(0, 0, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/SettingButton" unique_id=702702264]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_xim88")
+theme_override_font_sizes/font_size = 42
+text = "설정 만지기"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameEndButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=287439480]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.82000005
+anchor_right = 0.65000004
+anchor_bottom = 0.89500004
+offset_left = 0.5999756
+offset_top = 0.39996338
+offset_right = 0.43981934
+offset_bottom = 0.39996338
+texture = ExtResource("6_koqhg")
+expand_mode = 1
+script = ExtResource("8_loo7a")
+
+[node name="LeftNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=192832538]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.1
+anchor_top = -0.2
+anchor_bottom = 1.2
+offset_left = -2.2888184e-05
+offset_top = -1.1444092e-05
+offset_right = -2.2888184e-05
+texture = ExtResource("7_koqhg")
+
+[node name="RightNoteTexture" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=864577641]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = -0.2
+anchor_right = 1.1
+anchor_bottom = 1.2
+offset_top = -1.1444092e-05
+texture = ExtResource("7_koqhg")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=1731334888]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(0, 0, 0, 1)
+border_width = 6.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/GameEndButton" unique_id=916240549]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_xim88")
+theme_override_font_sizes/font_size = 42
+text = "게임 종료"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConversationButton" type="TextureRect" parent="CanvasLayer/Control/MainMenuButtons" unique_id=315845167]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.044000003
+anchor_top = 0.95600003
+anchor_right = 0.16100001
+anchor_bottom = 1.0020001
+offset_left = 0.51999664
+offset_top = 0.52001953
+offset_right = 0.87997437
+offset_bottom = -0.16015625
+pivot_offset_ratio = Vector2(0.5, 1)
+texture = ExtResource("4_ghw46")
+expand_mode = 1
+script = ExtResource("10_rrcx7")
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/ConversationButton" unique_id=1558157731]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("9_cmrfp")
+theme_override_font_sizes/font_size = 23
+text = "사야네와 랜덤대화 [A]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="GoTutorialPanel" type="TextureRect" parent="CanvasLayer/Control" unique_id=1717423707]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -327,37 +359,8 @@ offset_bottom = 0.04798889
 theme_override_font_sizes/font_size = 27
 text = "No[Esc]"
 
-[node name="TextureButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=1780819678]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.044000003
-anchor_top = 0.95600003
-anchor_right = 0.16100001
-anchor_bottom = 1.0020001
-offset_left = 0.51999664
-offset_top = 0.52001953
-offset_right = 0.87997437
-offset_bottom = -0.16015625
-texture_normal = SubResource("GradientTexture1D_mks8r")
-ignore_texture_size = true
-stretch_mode = 0
-
-[node name="Label" type="Label" parent="CanvasLayer/Control/TextureButton" unique_id=1558157731]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("9_cmrfp")
-theme_override_font_sizes/font_size = 26
-text = "사야네와 랜덤대화"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("11_if7li")]
 visible = false
 
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button" to="." method="_on_tutorial_start"]
 [connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button2" to="." method="_on_game_start"]
-[connection signal="pressed" from="CanvasLayer/Control/TextureButton" to="." method="open_random_conversation"]
