@@ -6,8 +6,9 @@
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="4_aew0f"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_ufue0"]
 [ext_resource type="Texture2D" uid="uid://cikxpl0yi6tc8" path="res://Textures/NameHolder.jpg" id="5_3e4bj"]
+[ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="7_wh80o"]
 
-[node name="StoryControl" type="Control" unique_id=194327749 node_paths=PackedStringArray("storyHolder", "live2d", "story_script", "enter_label", "story_speaker")]
+[node name="StoryControl" type="Control" unique_id=194327749 node_paths=PackedStringArray("storyHolder", "live2d", "storyScript", "enterLabel", "storySpeaker", "skipLabel")]
 process_mode = 3
 layout_mode = 3
 anchors_preset = 15
@@ -18,9 +19,10 @@ grow_vertical = 2
 script = ExtResource("1_paxo6")
 storyHolder = NodePath("StoryHolder")
 live2d = NodePath("StoryHolder/Live2D")
-story_script = NodePath("StoryHolder/ScriptHolder/Script")
-enter_label = NodePath("StoryHolder/ScriptHolder/EnterLabel")
-story_speaker = NodePath("StoryHolder/NameHolder/Speaker")
+storyScript = NodePath("StoryHolder/ScriptHolder/Script")
+enterLabel = NodePath("StoryHolder/ScriptHolder/EnterLabel")
+storySpeaker = NodePath("StoryHolder/NameHolder/Speaker")
+skipLabel = NodePath("StoryHolder/ScriptHolder/SkipLabel")
 
 [node name="StoryHolder" type="Panel" parent="." unique_id=125738451]
 layout_mode = 1
@@ -67,17 +69,36 @@ autowrap_mode = 2
 [node name="EnterLabel" type="Label" parent="StoryHolder/ScriptHolder" unique_id=397628069]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.81100005
-anchor_top = 0.827
-anchor_right = 0.97800004
-anchor_bottom = 0.93200004
-offset_left = 0.015991211
-offset_top = 0.052001953
-offset_right = 0.56799316
-offset_bottom = 0.031982422
+anchor_left = 0.781
+anchor_top = 0.80200005
+anchor_right = 0.94900006
+anchor_bottom = 0.90700006
+offset_left = 0.3359375
+offset_top = 0.15197754
+offset_right = -0.4560547
+offset_bottom = 0.13198853
 theme_override_fonts/font = ExtResource("4_aew0f")
 theme_override_font_sizes/font_size = 22
-text = "[L] 또는 [Enter]로 진행"
+text = "진행 [L/Enter]"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SkipLabel" type="Label" parent="StoryHolder/ScriptHolder" unique_id=564252949]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.78700006
+anchor_top = 0.086
+anchor_right = 0.9480001
+anchor_bottom = 0.19100001
+offset_left = 0.27197266
+offset_top = 0.13599968
+offset_right = -0.11206055
+offset_bottom = 0.1159935
+theme_override_fonts/font = ExtResource("4_aew0f")
+theme_override_font_sizes/font_size = 22
+text = "닫기 [Esc]"
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="NameHolder" type="TextureRect" parent="StoryHolder" unique_id=1478125117]
 layout_mode = 1
@@ -105,6 +126,34 @@ theme_override_font_sizes/font_size = 49
 text = "사야네"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="SelectButton1" type="TextureRect" parent="StoryHolder" unique_id=1578338293]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.25500003
+anchor_top = 0.395
+anchor_right = 0.402
+anchor_bottom = 0.455
+offset_left = -0.6000366
+offset_top = 0.3999939
+offset_right = -0.84002686
+offset_bottom = -0.4000244
+texture = ExtResource("7_wh80o")
+expand_mode = 1
+
+[node name="SelectButton2" type="TextureRect" parent="StoryHolder" unique_id=1388242806]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.601
+anchor_top = 0.395
+anchor_right = 0.74700004
+anchor_bottom = 0.455
+offset_left = -0.92004395
+offset_top = 0.3999939
+offset_right = 0.7598877
+offset_bottom = -0.4000244
+texture = ExtResource("7_wh80o")
+expand_mode = 1
 
 [node name="StoryInputManager" type="Control" parent="." unique_id=564961498]
 anchors_preset = 0

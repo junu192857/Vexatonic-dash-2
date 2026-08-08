@@ -2,9 +2,12 @@ extends Control
 
 @export var storyHolder: Control
 @export var live2d: TextureRect
-@export var story_script: Label
-@export var enter_label: Label
-@export var story_speaker: Label
+@export var storyScript: Label
+@export var enterLabel: Label
+@export var storySpeaker: Label
+@export var skipLabel: Label
+@export var leftButton: TextureRect
+@export var rightButton: TextureRect
 
 var script_path: String
 
@@ -21,11 +24,18 @@ var phases: Array[Callable] = [
 ]
 const CHARS_PER_SECOND = 30.0
 
-func start_story(path: String):
+signal story_end
+
+func start_story(path: String, skipable: bool):
 	current_line = 0
 	script_lines = []
 	script_path = path
 	visible = true
+	skipLabel.visible = skipable
+	if skipable and not PausedInputManager.pressed_esc.is_connected(quit_story):
+		PausedInputManager.pressed_esc.connect(quit_story)
+	elif not skipable and PausedInputManager.pressed_esc.is_connected(quit_story):
+		PausedInputManager.pressed_esc.disconnect(quit_story)
 	_load_script()
 	start_explanation()
 
@@ -52,16 +62,20 @@ func _show_line(index: int):
 			match(index):
 				4:
 					change_live2D(0 if parts.size() < 3 else int(parts[2]))
+				5:
+					change_name("버그" if parts.size() < 3 else parts[2])
+				6:
+					show_buttons(parts[2], parts[3])
 				_:
 					push_error("need more argument for special phase")
 		return
 	is_typing = true
-	typewrite(story_script, line, line.length() / CHARS_PER_SECOND)
+	typewrite(storyScript, line, line.length() / CHARS_PER_SECOND)
 	script_tween.tween_callback(func(): is_typing = false)
 
 func _on_click():
 	if is_typing:
-		force_typewrite(story_script)
+		force_typewrite(storyScript)
 		is_typing = false
 	else:
 		current_line += 1
@@ -96,6 +110,7 @@ func quit_story():
 	storyHolder.visible = false
 	InputManager.blocked = true
 	get_tree().paused = false
+	story_end.emit()
 
 func hide_live2D():
 	storyHolder.get_node("Live2D").visible = false
@@ -112,3 +127,10 @@ func change_live2D(index: int):
 		_:
 			pass
 	show_live2D()
+
+func change_name(speaker: String):
+	storySpeaker.text = speaker
+	_show_line(current_line)
+
+func show_buttons(leftText: String, rightText: String):
+	pass
