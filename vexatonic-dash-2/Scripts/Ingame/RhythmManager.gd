@@ -27,6 +27,7 @@ var noteHolders: Array[NoteHolder]
 const COUNTDOWN_TIME = 3000
 var level_path: String
 
+var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
@@ -89,6 +90,10 @@ func _ready() -> void:
 	
 	
 	time_start_tick = Time.get_ticks_msec()
+	
+	await get_tree().create_timer(0.34).timeout
+	
+	TransitionOverlay.open()
 
 func place_character(lane: Lane):
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):

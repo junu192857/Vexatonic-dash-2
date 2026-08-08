@@ -71,11 +71,5 @@ static func load() -> void:
 	selected_difficulty = cfg.get_value(SECTION, "selected_difficulty", 0)
 	tutorial_played = cfg.get_value(SECTION, "tutorial_played", false)
 
-static func get_posx_from_time(time: float) -> float:
-	return time * PX_PER_MS * speed
-	
-static func get_time_from_posx(posx_float: float) -> float:
-	return posx_float / (PX_PER_MS * speed)
-
 static func change_difficulty():
 	selected_difficulty = (selected_difficulty + 1) % 3

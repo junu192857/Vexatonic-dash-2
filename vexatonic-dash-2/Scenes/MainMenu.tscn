@@ -6,17 +6,16 @@
 [ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="3_df05h"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="4_ghw46"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_xim88"]
-[ext_resource type="Texture2D" uid="uid://b6da4bo2wovn0" path="res://Textures/Connector.jpg" id="6_koqhg"]
+[ext_resource type="Texture2D" uid="uid://bmp7buy6slvnu" path="res://Textures/Connector.jpg" id="6_koqhg"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="7_koqhg"]
 [ext_resource type="Script" uid="uid://bmavuels06wvq" path="res://Scripts/MainMenu/GameEndButton.gd" id="8_loo7a"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="9_cmrfp"]
 [ext_resource type="Script" uid="uid://cy352h4c1btsb" path="res://Scripts/MainMenu/ConversationButton.gd" id="10_rrcx7"]
 [ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="11_if7li"]
 
-[node name="MainMenu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("goTutorialPanel", "storyManager")]
+[node name="MainMenu" type="Node2D" unique_id=1665967289 node_paths=PackedStringArray("storyManager")]
 script = ExtResource("1_8saeu")
 settingRectScene = ExtResource("2_ghw46")
-goTutorialPanel = NodePath("CanvasLayer/Control/GoTutorialPanel")
 storyManager = NodePath("CanvasLayer/StoryControl")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013899153]
@@ -295,71 +294,5 @@ text = "사야네와 랜덤대화 [A]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GoTutorialPanel" type="TextureRect" parent="CanvasLayer/Control" unique_id=1717423707]
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.3
-anchor_top = 0.69500005
-anchor_right = 0.7
-anchor_bottom = 0.89500004
-offset_left = 0.39996338
-offset_top = 0.39996338
-offset_right = 0.39990234
-offset_bottom = 0.39996338
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("4_ghw46")
-expand_mode = 1
-
-[node name="Information" type="Label" parent="CanvasLayer/Control/GoTutorialPanel" unique_id=1746981035]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.15
-anchor_top = 0.15
-anchor_right = 0.85
-anchor_bottom = 0.569
-offset_left = -0.11200714
-offset_top = -2.840004
-offset_right = -0.35205078
-offset_bottom = 0.09600067
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 28
-text = "Vexatonic Dash가 처음이신 분 같네요!
-튜토리얼을 플레이할까요??"
-horizontal_alignment = 1
-
-[node name="Button" type="Button" parent="CanvasLayer/Control/GoTutorialPanel" unique_id=63078892]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.115
-anchor_top = 0.597
-anchor_right = 0.335
-anchor_bottom = 0.85600007
-offset_left = 0.28004456
-offset_top = 0.04800415
-offset_right = -0.07992554
-offset_bottom = 0.10398865
-theme_override_font_sizes/font_size = 27
-text = "Yes [Enter]"
-
-[node name="Button2" type="Button" parent="CanvasLayer/Control/GoTutorialPanel" unique_id=1447517536]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.66200006
-anchor_top = 0.588
-anchor_right = 0.882
-anchor_bottom = 0.84700006
-offset_left = 0.184021
-offset_top = -0.008003235
-offset_right = -0.17590332
-offset_bottom = 0.04798889
-theme_override_font_sizes/font_size = 27
-text = "No[Esc]"
-
 [node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("11_if7li")]
 visible = false
-
-[connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button" to="." method="_on_tutorial_start"]
-[connection signal="pressed" from="CanvasLayer/Control/GoTutorialPanel/Button2" to="." method="_on_game_start"]

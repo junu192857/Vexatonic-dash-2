@@ -2,9 +2,12 @@ extends Control
 
 @export var storyHolder: Control
 @export var live2d: TextureRect
-@export var story_script: Label
-@export var enter_label: Label
-@export var story_speaker: Label
+@export var storyScript: Label
+@export var enterLabel: Label
+@export var storySpeaker: Label
+@export var skipLabel: Label
+@export var leftButton: TextureRect
+@export var rightButton: TextureRect
 
 var script_path: String
 
@@ -21,13 +24,27 @@ var phases: Array[Callable] = [
 ]
 const CHARS_PER_SECOND = 30.0
 
-func start_story(path: String):
+signal story_end
+signal _on_select_left
+signal _on_select_right
+
+func start_story(path: String, skipable: bool):
 	current_line = 0
 	script_lines = []
 	script_path = path
 	visible = true
+	skipLabel.visible = skipable
+	if skipable and not PausedInputManager.pressed_esc.is_connected(quit_story):
+		PausedInputManager.pressed_esc.connect(quit_story)
+	elif not skipable and PausedInputManager.pressed_esc.is_connected(quit_story):
+		PausedInputManager.pressed_esc.disconnect(quit_story)
+	initialize()
 	_load_script()
 	start_explanation()
+
+func initialize():
+	live2d.texture = load("res://Textures/Sayane_Live2D.png")
+	storySpeaker.text = "사야네"
 
 func _load_script():
 	var file = FileAccess.open(script_path, FileAccess.READ)
@@ -52,16 +69,20 @@ func _show_line(index: int):
 			match(index):
 				4:
 					change_live2D(0 if parts.size() < 3 else int(parts[2]))
+				5:
+					change_name("버그" if parts.size() < 3 else parts[2])
+				6:
+					show_buttons(parts[2], parts[3])
 				_:
 					push_error("need more argument for special phase")
 		return
 	is_typing = true
-	typewrite(story_script, line, line.length() / CHARS_PER_SECOND)
+	typewrite(storyScript, line, line.length() / CHARS_PER_SECOND)
 	script_tween.tween_callback(func(): is_typing = false)
 
 func _on_click():
 	if is_typing:
-		force_typewrite(story_script)
+		force_typewrite(storyScript)
 		is_typing = false
 	else:
 		current_line += 1
@@ -93,9 +114,19 @@ func quit_story():
 		PausedInputManager.pressed_l.disconnect(_on_click)
 	if PausedInputManager.pressed_enter.is_connected(_on_click):
 		PausedInputManager.pressed_enter.disconnect(_on_click)
+	if PausedInputManager.pressed_a.is_connected(_on_press_select_left):
+		PausedInputManager.pressed_a.disconnect(_on_press_select_left)
+	if PausedInputManager.pressed_d.is_connected(_on_press_select_right):
+		PausedInputManager.pressed_d.disconnect(_on_press_select_right)
+	if script_tween and script_tween.is_valid():
+		script_tween.kill()
+	leftButton.visible = false
+	rightButton.visible = false
 	storyHolder.visible = false
 	InputManager.blocked = true
+
 	get_tree().paused = false
+	story_end.emit()
 
 func hide_live2D():
 	storyHolder.get_node("Live2D").visible = false
@@ -112,3 +143,56 @@ func change_live2D(index: int):
 		_:
 			pass
 	show_live2D()
+
+func change_name(speaker: String):
+	storySpeaker.text = speaker
+	_show_line(current_line)
+
+const BUTTON_ENTER_DURATION = 0.06
+
+func show_buttons(leftText: String, rightText: String):
+	leftButton.get_node("Label").text = leftText
+	rightButton.get_node("Label").text = rightText
+	_animate_button_in(leftButton)
+	_animate_button_in(rightButton)
+	if PausedInputManager.pressed_l.is_connected(_on_click):
+		PausedInputManager.pressed_l.disconnect(_on_click)
+	if PausedInputManager.pressed_enter.is_connected(_on_click):
+		PausedInputManager.pressed_enter.disconnect(_on_click)
+	PausedInputManager.pressed_a.connect(_on_press_select_left)
+	PausedInputManager.pressed_d.connect(_on_press_select_right)
+
+# 버튼이 아래에서 위로 이동하며 0.5배에서 1배로 커지는 등장 연출
+func _animate_button_in(button: TextureRect):
+	button.pivot_offset = button.size / 2.0
+	button.scale = Vector2(0.5, 0.5)
+	var target_position = button.position
+	button.position = target_position + Vector2(0, button.size.y)
+	button.visible = true
+	var tween = create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.set_parallel(true)
+	tween.tween_property(button, "scale", Vector2(1.0, 1.0), BUTTON_ENTER_DURATION)
+	tween.tween_property(button, "position", target_position, BUTTON_ENTER_DURATION)
+
+func _on_press_select_left():
+	_hide_buttons()
+	_on_select_left.emit()
+	_show_line(current_line)
+
+func _on_press_select_right():
+	_hide_buttons()
+	_on_select_right.emit()
+	_show_line(current_line)
+
+func _hide_buttons():
+	leftButton.visible = false
+	rightButton.visible = false
+	if PausedInputManager.pressed_a.is_connected(_on_press_select_left):
+		PausedInputManager.pressed_a.disconnect(_on_press_select_left)
+	if PausedInputManager.pressed_d.is_connected(_on_press_select_right):
+		PausedInputManager.pressed_d.disconnect(_on_press_select_right)
+	if not PausedInputManager.pressed_l.is_connected(_on_click):
+		PausedInputManager.pressed_l.connect(_on_click)
+	if not PausedInputManager.pressed_enter.is_connected(_on_click):
+		PausedInputManager.pressed_enter.connect(_on_click)

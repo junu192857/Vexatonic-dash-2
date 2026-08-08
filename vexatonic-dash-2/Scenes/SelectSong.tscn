@@ -6,25 +6,14 @@
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="3_74yen"]
 [ext_resource type="Texture2D" uid="uid://budl6ub3l3w1m" path="res://Textures/MainBackground.jpg" id="3_puwos"]
 [ext_resource type="Script" uid="uid://xde8pk17yxlv" path="res://Scripts/SelectSong/SongDataHolder.gd" id="4_gjw2d"]
+[ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="4_kc5mb"]
+[ext_resource type="Texture2D" uid="uid://bmp7buy6slvnu" path="res://Textures/Connector.jpg" id="5_2hg7p"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="5_7150g"]
 [ext_resource type="Script" uid="uid://c4ftuyjsig7p7" path="res://Scripts/SelectSong/SettingHolder.gd" id="5_mdyll"]
 [ext_resource type="Script" uid="uid://vu1ylxgvkxim" path="res://Scripts/SelectSong/ScrollLabel.gd" id="5_wt3iw"]
 [ext_resource type="Texture2D" uid="uid://c182j04qnntpm" path="res://Textures/signs.jpg" id="8_hlphe"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="8_puwos"]
 [ext_resource type="Script" uid="uid://dembd4cn3s2i0" path="res://Scripts/SelectSong/DifficultyRectColor.gd" id="12_mp2i7"]
-
-[sub_resource type="Gradient" id="Gradient_n78af"]
-colors = PackedColorArray(0, 0, 0, 1, 0.5330367, 0.5330367, 0.5330367, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_mxlqr"]
-gradient = SubResource("Gradient_n78af")
-
-[sub_resource type="Gradient" id="Gradient_mjwro"]
-offsets = PackedFloat32Array(1)
-colors = PackedColorArray(0.46618086, 0.4661808, 0.4661808, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_vyi73"]
-gradient = SubResource("Gradient_mjwro")
 
 [sub_resource type="Gradient" id="Gradient_hlphe"]
 
@@ -49,13 +38,17 @@ colors = PackedColorArray(0.6014544, 0.00026500793, 0.60145015, 1, 1, 0.35763314
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_kc5mb"]
 gradient = SubResource("Gradient_kc5mb")
 
-[node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("leftSongHolder", "middleSongHolder", "rightSongHolder", "songDataHolder", "settingHolder")]
+[node name="SelectSong" type="Node2D" unique_id=1796845870 node_paths=PackedStringArray("songSelectionHolder", "leftmostSongHolder", "leftSongHolder", "middleSongHolder", "rightSongHolder", "rightmostSongHolder", "songDataHolder", "settingHolder", "startButton")]
 script = ExtResource("1_03mcv")
+songSelectionHolder = NodePath("CanvasLayer/Control/SongSelectionHolder")
+leftmostSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder")
 leftSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/LeftSongHolder")
 middleSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/MiddleSongHolder")
 rightSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightSongHolder")
+rightmostSongHolder = NodePath("CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder")
 songDataHolder = NodePath("CanvasLayer/Control/SongDataHolder/Holder")
 settingHolder = NodePath("CanvasLayer/Control/SettingHolder")
+startButton = NodePath("CanvasLayer/Control/StartButton")
 settingRectScene = ExtResource("2_mdyll")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1950427340]
@@ -89,7 +82,7 @@ anchor_left = 0.7
 anchor_top = -0.1
 anchor_right = 0.75
 anchor_bottom = 1.1
-texture = ExtResource("3_74yen")
+texture = ExtResource("4_kc5mb")
 expand_mode = 1
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SongSelectionHolder/SongConnector2" unique_id=301566015]
@@ -102,7 +95,7 @@ anchor_bottom = 0.6
 offset_top = -0.009994507
 offset_right = 0.2878418
 offset_bottom = -0.07774353
-border_color = Color(1, 1, 1, 1)
+border_color = Color(0, 0, 0, 1)
 border_width = 3.0
 editor_only = false
 
@@ -116,6 +109,7 @@ offset_right = 0.6800537
 offset_bottom = -0.49224854
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 32
 text = "D"
 horizontal_alignment = 1
@@ -131,7 +125,7 @@ anchor_bottom = 1.1
 offset_left = -0.120025635
 offset_right = -0.080078125
 offset_bottom = -0.049987793
-texture = ExtResource("3_74yen")
+texture = ExtResource("4_kc5mb")
 expand_mode = 1
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SongSelectionHolder/SongConnector1" unique_id=867464183]
@@ -144,7 +138,7 @@ anchor_bottom = 0.6
 offset_top = -0.009994507
 offset_right = 0.2878418
 offset_bottom = -0.07774353
-border_color = Color(1, 1, 1, 1)
+border_color = Color(0, 0, 0, 1)
 border_width = 3.0
 editor_only = false
 
@@ -158,8 +152,87 @@ offset_right = 0.6800537
 offset_bottom = -0.49224854
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 32
 text = "A"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SongConnector3" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1760271817]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.15
+anchor_top = -0.1
+anchor_right = 1.2
+anchor_bottom = 1.1
+texture = ExtResource("4_kc5mb")
+expand_mode = 1
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SongSelectionHolder/SongConnector3" unique_id=106998548]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.4
+anchor_right = 0.8
+anchor_bottom = 0.6
+offset_top = -0.009994507
+offset_right = 0.2878418
+offset_bottom = -0.07774353
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/SongConnector3/ReferenceRect" unique_id=148755704]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.5700073
+offset_right = 0.6800537
+offset_bottom = -0.49224854
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "D"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SongConnector4" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=845531762]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.2
+anchor_top = -0.1
+anchor_right = -0.15
+anchor_bottom = 1.1
+texture = ExtResource("4_kc5mb")
+expand_mode = 1
+
+[node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SongSelectionHolder/SongConnector4" unique_id=1898482688]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.4
+anchor_right = 0.8
+anchor_bottom = 0.6
+offset_top = -0.009994507
+offset_right = 0.2878418
+offset_bottom = -0.07774353
+border_color = Color(1, 1, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/SongConnector4/ReferenceRect" unique_id=1157614645]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.5700073
+offset_right = 0.6800537
+offset_bottom = -0.49224854
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "D"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -169,7 +242,7 @@ anchors_preset = -1
 anchor_left = 0.75
 anchor_right = 1.15
 anchor_bottom = 1.0
-texture = ExtResource("3_74yen")
+texture = ExtResource("5_2hg7p")
 expand_mode = 1
 script = ExtResource("2_uvoqn")
 
@@ -184,6 +257,7 @@ offset_left = -0.29600525
 offset_top = -3.0
 offset_right = -0.12802124
 offset_bottom = 0.009994507
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
@@ -200,6 +274,7 @@ offset_left = 0.015991211
 offset_top = -0.1000061
 offset_right = 0.3199463
 offset_bottom = -0.05000305
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 116
 text = "10"
 horizontal_alignment = 1
@@ -215,6 +290,7 @@ offset_left = -0.056030273
 offset_top = 0.10000038
 offset_right = 0.2479248
 offset_bottom = -0.12000275
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 56
 text = "Level"
@@ -241,6 +317,7 @@ script = ExtResource("5_wt3iw")
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
 vertical_alignment = 1
@@ -249,6 +326,7 @@ vertical_alignment = 1
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
 vertical_alignment = 1
@@ -259,7 +337,7 @@ anchors_preset = -1
 anchor_left = 0.3
 anchor_right = 0.7
 anchor_bottom = 1.0
-texture = ExtResource("3_74yen")
+texture = ExtResource("5_2hg7p")
 expand_mode = 1
 script = ExtResource("2_uvoqn")
 
@@ -274,6 +352,7 @@ offset_left = -0.29600525
 offset_top = -3.0
 offset_right = -0.12802124
 offset_bottom = 0.009994507
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
@@ -290,6 +369,7 @@ offset_left = 0.015991211
 offset_top = -0.1000061
 offset_right = 0.3199463
 offset_bottom = -0.05000305
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 116
 text = "10"
 horizontal_alignment = 1
@@ -305,6 +385,7 @@ offset_left = -0.056030273
 offset_top = 0.10000038
 offset_right = 0.2479248
 offset_bottom = -0.12000275
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 56
 text = "Level"
@@ -331,6 +412,7 @@ script = ExtResource("5_wt3iw")
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
 vertical_alignment = 1
@@ -339,6 +421,7 @@ vertical_alignment = 1
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
 vertical_alignment = 1
@@ -349,7 +432,7 @@ anchors_preset = -1
 anchor_left = -0.15
 anchor_right = 0.25
 anchor_bottom = 1.0
-texture = ExtResource("3_74yen")
+texture = ExtResource("5_2hg7p")
 expand_mode = 1
 script = ExtResource("2_uvoqn")
 
@@ -364,6 +447,7 @@ offset_left = -0.29600525
 offset_top = -3.0
 offset_right = -0.12802124
 offset_bottom = 0.009994507
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 41
 text = "ArtistName"
@@ -380,6 +464,7 @@ offset_left = 0.015991211
 offset_top = -0.1000061
 offset_right = 0.3199463
 offset_bottom = -0.05000305
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 116
 text = "10"
 horizontal_alignment = 1
@@ -395,6 +480,7 @@ offset_left = -0.056030273
 offset_top = 0.10000038
 offset_right = 0.2479248
 offset_bottom = -0.12000275
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 56
 text = "Level"
@@ -421,6 +507,7 @@ script = ExtResource("5_wt3iw")
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
 vertical_alignment = 1
@@ -429,6 +516,197 @@ vertical_alignment = 1
 layout_mode = 0
 offset_right = 1.0
 offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
+
+[node name="LeftmostSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=2007622169]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.6
+anchor_right = -0.2
+anchor_bottom = 1.0
+texture = ExtResource("5_2hg7p")
+expand_mode = 1
+script = ExtResource("2_uvoqn")
+
+[node name="ArtistName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder" unique_id=629658291]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.072000004
+anchor_top = 0.5
+anchor_right = 0.521
+anchor_bottom = 0.73700005
+offset_left = -0.29600525
+offset_top = -3.0
+offset_right = -0.12802124
+offset_bottom = 0.009994507
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 41
+text = "ArtistName"
+vertical_alignment = 1
+
+[node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder" unique_id=395474434]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.638
+anchor_top = 0.33
+anchor_right = 0.88500005
+anchor_bottom = 0.915
+offset_left = 0.015991211
+offset_top = -0.1000061
+offset_right = 0.3199463
+offset_bottom = -0.05000305
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 116
+text = "10"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder" unique_id=192295054]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.642
+anchor_top = 0.07
+anchor_right = 0.88900006
+anchor_bottom = 0.356
+offset_left = -0.056030273
+offset_top = 0.10000038
+offset_right = 0.2479248
+offset_bottom = -0.12000275
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 56
+text = "Level"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder" unique_id=1492401266]
+custom_minimum_size = Vector2(400, 80)
+custom_maximum_size = Vector2(400, 80)
+layout_mode = 1
+anchor_left = 0.057000004
+anchor_top = 0.163
+anchor_right = 0.578
+anchor_bottom = 0.45900002
+offset_left = 0.22399902
+offset_top = -0.010002136
+offset_right = 0.0960083
+offset_bottom = 0.069992065
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_wt3iw")
+
+[node name="Label1" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder/SongName" unique_id=2031785403]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/LeftmostSongHolder/SongName" unique_id=326653839]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
+
+[node name="RightmostSongHolder" type="TextureRect" parent="CanvasLayer/Control/SongSelectionHolder" unique_id=1978694187]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.2
+anchor_right = 1.6
+anchor_bottom = 1.0
+texture = ExtResource("5_2hg7p")
+expand_mode = 1
+script = ExtResource("2_uvoqn")
+
+[node name="ArtistName" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder" unique_id=1182415614]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.072000004
+anchor_top = 0.5
+anchor_right = 0.521
+anchor_bottom = 0.73700005
+offset_left = -0.29600525
+offset_top = -3.0
+offset_right = -0.12802124
+offset_bottom = 0.009994507
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 41
+text = "ArtistName"
+vertical_alignment = 1
+
+[node name="LevelNumber" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder" unique_id=98659976]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.638
+anchor_top = 0.33
+anchor_right = 0.88500005
+anchor_bottom = 0.915
+offset_left = 0.015991211
+offset_top = -0.1000061
+offset_right = 0.3199463
+offset_bottom = -0.05000305
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 116
+text = "10"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder" unique_id=721436027]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.642
+anchor_top = 0.07
+anchor_right = 0.88900006
+anchor_bottom = 0.356
+offset_left = -0.056030273
+offset_top = 0.10000038
+offset_right = 0.2479248
+offset_bottom = -0.12000275
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 56
+text = "Level"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SongName" type="Control" parent="CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder" unique_id=641031315]
+custom_minimum_size = Vector2(400, 80)
+custom_maximum_size = Vector2(400, 80)
+layout_mode = 1
+anchor_left = 0.057000004
+anchor_top = 0.163
+anchor_right = 0.578
+anchor_bottom = 0.45900002
+offset_left = 0.22399902
+offset_top = -0.010002136
+offset_right = 0.0960083
+offset_bottom = 0.069992065
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_wt3iw")
+
+[node name="Label1" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder/SongName" unique_id=687986893]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_7150g")
+theme_override_font_sizes/font_size = 57
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="CanvasLayer/Control/SongSelectionHolder/RightmostSongHolder/SongName" unique_id=1723953498]
+layout_mode = 0
+offset_right = 1.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 57
 vertical_alignment = 1
@@ -599,20 +877,19 @@ theme_override_font_sizes/font_size = 44
 text = "Full Vexatonic"
 horizontal_alignment = 1
 
-[node name="SettingButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=362854101]
+[node name="SettingButton" type="TextureRect" parent="CanvasLayer/Control" unique_id=156459136]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.8
+anchor_left = 0.80200005
 anchor_top = 0.029000001
-anchor_right = 0.998
+anchor_right = 1.0020001
 anchor_bottom = 0.12900001
-offset_left = -4.0
+offset_left = 0.15991211
 offset_top = -0.3200016
-offset_right = -0.16003418
+offset_right = 0.15979004
 offset_bottom = -0.3199463
-texture_normal = SubResource("GradientTexture2D_mxlqr")
-ignore_texture_size = true
-stretch_mode = 0
+texture = SubResource("GradientTexture2D_hlphe")
+expand_mode = 1
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/SettingButton" unique_id=730083471]
 layout_mode = 1
@@ -659,16 +936,14 @@ text = "Settings"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StartButton" type="TextureButton" parent="CanvasLayer/Control" unique_id=465525343]
+[node name="StartButton" type="TextureRect" parent="CanvasLayer/Control" unique_id=297324074]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.8
 anchor_top = 0.85
 anchor_right = 1.0
 anchor_bottom = 0.95
-texture_normal = SubResource("GradientTexture2D_mxlqr")
-texture_disabled = SubResource("GradientTexture2D_vyi73")
-stretch_mode = 0
+texture = SubResource("GradientTexture2D_hlphe")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="CanvasLayer/Control/StartButton" unique_id=1333744545]
 layout_mode = 1
@@ -878,15 +1153,3 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Tab"
 horizontal_alignment = 1
-
-[node name="Button" type="Button" parent="CanvasLayer/Control/DifficultyRect" unique_id=1187594719]
-modulate = Color(1, 1, 1, 0)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[connection signal="pressed" from="CanvasLayer/Control/SettingButton" to="." method="_on_enter_setting"]
-[connection signal="pressed" from="CanvasLayer/Control/DifficultyRect/Button" to="." method="_on_change_difficulty"]

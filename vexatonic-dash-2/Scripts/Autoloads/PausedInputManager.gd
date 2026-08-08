@@ -11,6 +11,9 @@ func _process(float):
 
 signal pressed_l
 signal pressed_enter
+signal pressed_esc
+signal pressed_a
+signal pressed_d
 
 func _input(event):
 	if blocked:
@@ -23,3 +26,12 @@ func _input(event):
 			KEY_ENTER:
 				if event.pressed and not event.is_echo():
 					pressed_enter.emit()
+			KEY_ESCAPE:
+				if event.pressed and not event.is_echo():
+					pressed_esc.emit()
+			KEY_A:
+				if event.pressed and not event.is_echo():
+					pressed_a.emit()
+			KEY_D:
+				if event.pressed and not event.is_echo():
+					pressed_d.emit()

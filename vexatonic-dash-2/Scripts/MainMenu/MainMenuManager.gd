@@ -2,14 +2,13 @@ extends Node
 
 
 @export var settingRectScene: PackedScene
-@export var goTutorialPanel: TextureRect
 @export var storyManager: Control
 
 var button_array: Array
 var index: int
 var settingRect
 
-enum MainMenuState {Main, SettingOpen, EnteringTutorial }
+enum MainMenuState {Main, SettingOpen}
 var state : MainMenuState
 
 func _ready():
@@ -22,6 +21,7 @@ func _ready():
 	InputManager.pressed_down.connect(_on_pressed_down)
 	InputManager.pressed_enter.connect(_on_pressed_enter)
 	InputManager.pressed_esc.connect(_on_pressed_esc)
+	InputManager.pressed_a.connect(open_random_conversation)
 	settingRect = settingRectScene.instantiate()
 	$CanvasLayer/Control.add_child(settingRect)
 	settingRect.visible = false
@@ -51,8 +51,6 @@ func _on_pressed_down():
 func _on_pressed_enter():
 	if state == MainMenuState.SettingOpen:
 		close_setting()
-	elif state == MainMenuState.EnteringTutorial:
-		_on_tutorial_start()
 	else:
 		match index:
 			0:
@@ -67,14 +65,11 @@ func _on_pressed_enter():
 func _on_pressed_esc():
 	if state == MainMenuState.SettingOpen:
 		close_setting()
-	elif state == MainMenuState.EnteringTutorial:
-		close_tutorial_warning()
-		_on_game_start()
 
 # =================== 설정 창 ===================
 
 func _on_game_start():
-	if (!Setting.tutorial_played):
+	if (not Setting.tutorial_played):
 		open_tutorial_warning()
 	else:
 		Setting.is_tutorial = false
@@ -84,6 +79,7 @@ func _on_tutorial_start():
 	Setting.is_tutorial = true
 	Setting.speed = 1.0
 	Setting.gamemode = Setting.GAMEMODE.Normal_Character
+	await TransitionOverlay.close()
 	get_tree().change_scene_to_file("res://Scenes/RhythmScene.tscn")
 
 func _on_game_end():
@@ -97,12 +93,9 @@ func _on_enter_setting():
 
 func open_tutorial_warning():
 	Setting.tutorial_played = true
-	goTutorialPanel.visible = true
-	state = MainMenuState.EnteringTutorial
-
-func close_tutorial_warning():
-	goTutorialPanel.visible = false
-	state = MainMenuState.Main
+	if (not storyManager._on_select_left.is_connected(_on_tutorial_start)):
+		storyManager._on_select_left.connect(_on_tutorial_start)
+	storyManager.start_story("res://Scripts/MainMenu/GoTutorial.txt", true)
 
 func close_setting():
 	settingRect.visible = false
@@ -111,4 +104,4 @@ func close_setting():
 
 func open_random_conversation():
 	var random_int = randi() % 3
-	storyManager.start_story("res://Scripts/MainMenu/RandomConversation/%d.txt" % random_int)
+	storyManager.start_story("res://Scripts/MainMenu/RandomConversation/%d.txt" % random_int, true)
