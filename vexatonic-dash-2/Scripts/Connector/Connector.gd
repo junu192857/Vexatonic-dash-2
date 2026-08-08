@@ -16,16 +16,16 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 	var calculated_delta_y: float = 0.0
 	var start_height
 	if p_lane != null:
-		start_height = p_lane.get_height(PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(start_time) - Setting.NOTE_WIDTH)) if first else \
-					   p_lane.get_height(start_time)
-					
+		start_height = Setting.mirror_y(p_lane.get_height(PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(start_time) - Setting.NOTE_WIDTH))) if first else \
+					   Setting.mirror_y(p_lane.get_height(start_time))
+
 # 다음 keyframe이 나오기 전까지만 찍도록 end_time 조정
 		for kf in p_lane.keyframes:
 			if kf.kf.x > start_time:
 				if kf.kf.x >= end_time: #이게 마지막 connector인 경우.
-					calculated_delta_y = p_lane.get_height(end_time) - start_height
+					calculated_delta_y = Setting.mirror_y(p_lane.get_height(end_time)) - start_height
 				else: # 앞으로 connector가 더 나오는 경우.
-					calculated_delta_y = kf.kf.y - start_height
+					calculated_delta_y = Setting.mirror_y(kf.kf.y) - start_height
 					end_time = kf.kf.x
 				break
 	c_end_time = end_time

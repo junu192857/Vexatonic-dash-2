@@ -124,3 +124,7 @@ static func load() -> void:
 
 static func change_difficulty():
 	selected_difficulty = (selected_difficulty + 1) % 3
+
+# mirror_mode가 켜져 있으면 y좌표(또는 y 방향 변화량)를 반전. 렌더링 전용 - 채보 데이터 자체는 건드리지 않음
+static func mirror_y(y: float) -> float:
+	return -y if mirror_mode else y
