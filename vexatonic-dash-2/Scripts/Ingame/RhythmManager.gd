@@ -90,6 +90,9 @@ func _ready() -> void:
 	
 	
 	time_start_tick = Time.get_ticks_msec()
+	
+	await get_tree().create_timer(0.34).timeout
+	
 	TransitionOverlay.open()
 
 func place_character(lane: Lane):
