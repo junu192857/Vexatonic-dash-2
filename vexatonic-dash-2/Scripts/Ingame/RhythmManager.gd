@@ -9,7 +9,6 @@ var levelData: LevelData
 @onready var line = $CharacterHolder/Line
 @onready var lineSprite = $CharacterHolder/Line/Sprite2D
 @onready var character_holder:Node2D = $CharacterHolder
-@onready var loadingPanel: LoadingPanel = $"../LoadingPanelLayer"
 
 var characters: Array[Character]
 
@@ -28,6 +27,7 @@ var noteHolders: Array[NoteHolder]
 const COUNTDOWN_TIME = 3000
 var level_path: String
 
+var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# ==== Parsing & Lanes, NoteDatas 정렬
@@ -90,7 +90,7 @@ func _ready() -> void:
 	
 	
 	time_start_tick = Time.get_ticks_msec()
-	loadingPanel.call_deferred("open")
+	TransitionOverlay.open()
 
 func place_character(lane: Lane):
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):

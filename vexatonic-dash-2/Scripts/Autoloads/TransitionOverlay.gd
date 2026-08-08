@@ -1,16 +1,36 @@
-class_name LoadingPanel
 extends CanvasLayer
-
-@onready var left_panel: ColorRect = $Control/LeftPanel
-@onready var right_panel: ColorRect = $Control/RightPanel
 
 const OPEN_LEFT = Vector2(-0.5, 0.0)
 const OPEN_RIGHT = Vector2(1.0, 1.5)
 const CLOSED_LEFT = Vector2(0.0, 0.5)
 const CLOSED_RIGHT = Vector2(0.5, 1.0)
 
+var left_panel: ColorRect
+var right_panel: ColorRect
+
 signal closed
 signal opened
+
+# 씬 전환 중에도 파괴되지 않도록 코드로 자식 생성 (특정 씬에 속하지 않음)
+func _ready() -> void:
+	layer = 128
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
+	var control = Control.new()
+	control.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(control)
+
+	left_panel = ColorRect.new()
+	left_panel.anchor_bottom = 1.0
+	left_panel.anchor_left = OPEN_LEFT.x
+	left_panel.anchor_right = OPEN_LEFT.y
+	control.add_child(left_panel)
+
+	right_panel = ColorRect.new()
+	right_panel.anchor_bottom = 1.0
+	right_panel.anchor_left = OPEN_RIGHT.x
+	right_panel.anchor_right = OPEN_RIGHT.y
+	control.add_child(right_panel)
 
 # 화면 중앙으로 모여 화면을 가림
 func close(duration: float = 0.4) -> void:

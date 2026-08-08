@@ -20,7 +20,6 @@
 [ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="17_rvley"]
 [ext_resource type="FontFile" uid="uid://b4ulcao8amlsl" path="res://Fonts/SB_Window_Font/SB 어그로 M.ttf" id="18_qvaf3"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="18_twb25"]
-[ext_resource type="Script" uid="uid://dnyjem6ghu220" path="res://Scripts/UI/LoadingPanel.gd" id="19_ldpnl"]
 
 [node name="RhythmScene" type="Node2D" unique_id=2112385734]
 metadata/_edit_vertical_guides_ = [-111.0]
@@ -556,31 +555,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("13_g5yvx")
-
-[node name="LoadingPanelLayer" type="CanvasLayer" parent="." unique_id=761816360]
-layer = 2
-script = ExtResource("19_ldpnl")
-
-[node name="Control" type="Control" parent="LoadingPanelLayer" unique_id=793883333]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="LeftPanel" type="ColorRect" parent="LoadingPanelLayer/Control" unique_id=1841104858]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 0.5
-anchor_bottom = 1.0
-
-[node name="RightPanel" type="ColorRect" parent="LoadingPanelLayer/Control" unique_id=441096841]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5
-anchor_right = 1.0
-anchor_bottom = 1.0
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
 [connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]
