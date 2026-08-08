@@ -248,6 +248,8 @@ func _can_start() -> bool:
 	return true
 
 func _on_enter_setting():
+	if setting_open:
+		return
 	Setting.load()
 	settingRect._initialize()
 	settingRect.visible = true
@@ -260,4 +262,7 @@ func close_setting():
 	settingHolder.refresh()
 
 func _on_return_to_main():
-	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+	if setting_open:
+		close_setting()
+	else:
+		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
