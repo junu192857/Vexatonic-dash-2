@@ -140,9 +140,7 @@ func _refresh_difficulty():
 func _refresh_song_data():
 	var meta = _get_metadata(0)
 	var chart_dir = CHARTS_DIR + "/" + meta.name
-	var chart_path = chart_dir + "/" + Setting.DIFFICULTY_NAMES[Setting.selected_difficulty] + ".txt"
-	var total = _count_notes(chart_path)
-	songDataHolder.load_play_data(chart_dir, total)
+	songDataHolder.load_play_data(chart_dir)
 
 func _refresh_all():
 	_refresh_difficulty()
@@ -248,6 +246,8 @@ func _can_start() -> bool:
 	return true
 
 func _on_enter_setting():
+	if setting_open:
+		return
 	Setting.load()
 	settingRect._initialize()
 	settingRect.visible = true
@@ -260,4 +260,7 @@ func close_setting():
 	settingHolder.refresh()
 
 func _on_return_to_main():
-	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+	if setting_open:
+		close_setting()
+	else:
+		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")

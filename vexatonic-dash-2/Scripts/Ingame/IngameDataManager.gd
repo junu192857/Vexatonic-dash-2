@@ -111,6 +111,7 @@ func _get_rank(final_score_int: int) -> Rank:
 func on_song_end(chart_path: String) -> void:
 	var final_score = roundi(score + calculate_longNote_score(pressed_long_length))
 	var paint = roundi(calculate_longNote_score(pressed_long_length)) == 10000
+	var paint_ratio = pressed_long_length / total_long_length if total_long_length > 0 else 1.0
 	var rank = _get_rank(final_score)
 
 	var cfg = ConfigFile.new()
@@ -122,6 +123,7 @@ func on_song_end(chart_path: String) -> void:
 	var old_lamp  = cfg.get_value(s, "combo_lamp", ComboLamp.None)
 	var old_paint = cfg.get_value(s, "paint_lamp", false)
 	var old_rank  = cfg.get_value(s, "rank",       Rank.None)
+	var old_paint_ratio = cfg.get_value(s, "best_paint_ratio", 0.0)
 
 	if final_score > old_score:
 		cfg.set_value(s, "best_score", final_score)
@@ -133,6 +135,8 @@ func on_song_end(chart_path: String) -> void:
 		cfg.set_value(s, "paint_lamp", true)
 	if int(rank) > old_rank:
 		cfg.set_value(s, "rank", int(rank))
+	if paint_ratio > old_paint_ratio:
+		cfg.set_value(s, "best_paint_ratio", paint_ratio)
 
 	cfg.save(PLAY_DATA_PATH)
 
