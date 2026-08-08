@@ -69,7 +69,7 @@ func _on_pressed_esc():
 # =================== 설정 창 ===================
 
 func _on_game_start():
-	if (true):
+	if (not Setting.tutorial_played):
 		open_tutorial_warning()
 	else:
 		Setting.is_tutorial = false
