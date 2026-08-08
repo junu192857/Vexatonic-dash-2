@@ -759,7 +759,7 @@ texture = ExtResource("8_hlphe")
 expand_mode = 1
 script = ExtResource("4_gjw2d")
 
-[node name="BestJudge" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=598159039]
+[node name="PaintLabel" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=598159039]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.057000004
@@ -773,7 +773,7 @@ offset_bottom = 0.013092041
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 50
-text = "Vexatonics"
+text = "Paint"
 vertical_alignment = 1
 
 [node name="BestScore" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1883576132]
@@ -793,7 +793,7 @@ theme_override_font_sizes/font_size = 50
 text = "Best Score"
 vertical_alignment = 1
 
-[node name="VexatonicValue" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1834441864]
+[node name="PaintValue" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1834441864]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.36
@@ -807,7 +807,7 @@ offset_bottom = -0.12158203
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 50
-text = "1,314 / 1,314"
+text = "100.0%"
 horizontal_alignment = 2
 vertical_alignment = 1
 
