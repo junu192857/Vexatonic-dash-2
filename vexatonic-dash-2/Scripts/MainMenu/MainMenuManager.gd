@@ -69,7 +69,7 @@ func _on_pressed_esc():
 # =================== 설정 창 ===================
 
 func _on_game_start():
-	if (true):
+	if (not Setting.tutorial_played):
 		open_tutorial_warning()
 	else:
 		Setting.is_tutorial = false
@@ -93,6 +93,7 @@ func _on_enter_setting():
 
 func open_tutorial_warning():
 	Setting.tutorial_played = true
+	storyManager._on_select_left.connect(_on_tutorial_start)
 	storyManager.start_story("res://Scripts/MainMenu/GoTutorial.txt", true)
 
 func close_setting():

@@ -25,6 +25,8 @@ var phases: Array[Callable] = [
 const CHARS_PER_SECOND = 30.0
 
 signal story_end
+signal _on_select_left
+signal _on_select_right
 
 func start_story(path: String, skipable: bool):
 	current_line = 0
@@ -107,6 +109,12 @@ func quit_story():
 		PausedInputManager.pressed_l.disconnect(_on_click)
 	if PausedInputManager.pressed_enter.is_connected(_on_click):
 		PausedInputManager.pressed_enter.disconnect(_on_click)
+	if PausedInputManager.pressed_a.is_connected(_on_press_select_left):
+		PausedInputManager.pressed_a.disconnect(_on_press_select_left)
+	if PausedInputManager.pressed_d.is_connected(_on_press_select_right):
+		PausedInputManager.pressed_d.disconnect(_on_press_select_right)
+	leftButton.visible = false
+	rightButton.visible = false
 	storyHolder.visible = false
 	InputManager.blocked = true
 	get_tree().paused = false
@@ -133,4 +141,35 @@ func change_name(speaker: String):
 	_show_line(current_line)
 
 func show_buttons(leftText: String, rightText: String):
-	pass
+	leftButton.get_node("Label").text = leftText
+	rightButton.get_node("Label").text = rightText
+	leftButton.visible = true
+	rightButton.visible = true
+	if PausedInputManager.pressed_l.is_connected(_on_click):
+		PausedInputManager.pressed_l.disconnect(_on_click)
+	if PausedInputManager.pressed_enter.is_connected(_on_click):
+		PausedInputManager.pressed_enter.disconnect(_on_click)
+	PausedInputManager.pressed_a.connect(_on_press_select_left)
+	PausedInputManager.pressed_d.connect(_on_press_select_right)
+
+func _on_press_select_left():
+	_hide_buttons()
+	_on_select_left.emit()
+	_show_line(current_line)
+
+func _on_press_select_right():
+	_hide_buttons()
+	_on_select_right.emit()
+	_show_line(current_line)
+
+func _hide_buttons():
+	leftButton.visible = false
+	rightButton.visible = false
+	if PausedInputManager.pressed_a.is_connected(_on_press_select_left):
+		PausedInputManager.pressed_a.disconnect(_on_press_select_left)
+	if PausedInputManager.pressed_d.is_connected(_on_press_select_right):
+		PausedInputManager.pressed_d.disconnect(_on_press_select_right)
+	if not PausedInputManager.pressed_l.is_connected(_on_click):
+		PausedInputManager.pressed_l.connect(_on_click)
+	if not PausedInputManager.pressed_enter.is_connected(_on_click):
+		PausedInputManager.pressed_enter.connect(_on_click)

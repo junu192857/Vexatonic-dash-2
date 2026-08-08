@@ -130,6 +130,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LeftButton" type="TextureRect" parent="StoryHolder" unique_id=1578338293]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25500003
@@ -143,7 +144,20 @@ offset_bottom = -0.4000244
 texture = ExtResource("7_wh80o")
 expand_mode = 1
 
+[node name="Label" type="Label" parent="StoryHolder/LeftButton" unique_id=1578338294]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_aew0f")
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="RightButton" type="TextureRect" parent="StoryHolder" unique_id=1388242806]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.601
@@ -156,6 +170,18 @@ offset_right = 0.7598877
 offset_bottom = -0.4000244
 texture = ExtResource("7_wh80o")
 expand_mode = 1
+
+[node name="Label" type="Label" parent="StoryHolder/RightButton" unique_id=1388242807]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_aew0f")
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="StoryInputManager" type="Control" parent="." unique_id=564961498]
 anchors_preset = 0
