@@ -3,7 +3,9 @@
 [ext_resource type="Texture2D" uid="uid://lqnydpuw4b0t" path="res://Textures/WhiteLine.jpg" id="1_j6t3t"]
 [ext_resource type="Script" uid="uid://c1k3mc7hr7e1o" path="res://Scripts/Setting/SettingRectManager.gd" id="2_bp10e"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="3_pt10n"]
+[ext_resource type="Texture2D" uid="uid://dyj55uf4ovxct" path="res://Textures/SettingRect/UnselectedCategory.jpg" id="4_24lqt"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="4_r54wl"]
+[ext_resource type="Texture2D" uid="uid://ht4mmco3foxv" path="res://Textures/SettingRect/SelectedCategory.jpg" id="4_wprsd"]
 
 [node name="SettingRect" type="TextureRect" unique_id=1770777012]
 anchors_preset = -1
@@ -13,6 +15,8 @@ anchor_right = 0.8
 anchor_bottom = 0.8
 texture = ExtResource("1_j6t3t")
 script = ExtResource("2_bp10e")
+unselected_category_texture = ExtResource("4_24lqt")
+selected_category_texture = ExtResource("4_wprsd")
 
 [node name="CategoryLabels" type="Control" parent="." unique_id=534727636]
 layout_mode = 1
@@ -237,7 +241,7 @@ anchor_bottom = 0.261
 offset_left = -0.008003235
 offset_top = -0.28800964
 offset_bottom = -0.12800598
-texture = ExtResource("4_r54wl")
+texture = ExtResource("4_24lqt")
 expand_mode = 1
 
 [node name="Label" type="Label" parent="GameplayButton" unique_id=1167157220]
@@ -264,7 +268,7 @@ offset_left = -0.197052
 offset_top = 0.18798828
 offset_right = -0.18902588
 offset_bottom = -0.3000183
-texture = ExtResource("4_r54wl")
+texture = ExtResource("4_24lqt")
 expand_mode = 1
 
 [node name="Label" type="Label" parent="SoundButton" unique_id=115003473]

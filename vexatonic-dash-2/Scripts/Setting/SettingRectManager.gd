@@ -5,6 +5,9 @@ signal close_setting
 enum SettingItem { Speed, SoundOffset, JudgeOffset, Gamemode, ScoreDisplay }
 var setting_index: int = 0
 
+@export var unselected_category_texture: Texture2D
+@export var selected_category_texture: Texture2D
+
 const SETTING_INFO = [
 	"노트 속도를 설정합니다.\n1.0~3.0 사이의 값을 권장합니다.",
 	"음악 싱크를 설정합니다.\nFast가 많다면 (+)방향, Late가 많다면 (-)방향으로 조절하세요.",
