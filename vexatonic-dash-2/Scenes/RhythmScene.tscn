@@ -67,6 +67,17 @@ process_mode = 3
 stream = ExtResource("16_rvley")
 parameters/looping = true
 
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1570471814]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("13_g5yvx")
+
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
 
 [node name="Control" type="Control" parent="CanvasLayer" unique_id=1678141502]
@@ -123,20 +134,50 @@ layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.1
 anchor_right = 0.18
-anchor_bottom = 0.15
+anchor_bottom = 0.20600002
 offset_right = 0.3199768
+offset_bottom = -0.480011
 
 [node name="ScoreText" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=519592229]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
-anchor_right = 0.9
-anchor_bottom = 1.0
+anchor_right = 0.90000004
+anchor_bottom = 0.404
+offset_right = -3.0517578e-05
+offset_bottom = -0.055999756
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 32
 text = "SCORE 0000000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ForcedStopLabel" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=1758996143]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.386
+anchor_right = 1.0
+anchor_bottom = 0.614
+offset_top = -0.0040016174
+offset_bottom = 0.0039978027
+theme_override_fonts/font = ExtResource("16_r4r31")
+text = "SSS 미만 시 강제종료"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ForcedStopLabel2" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=1855834486]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.64000005
+anchor_right = 1.0
+anchor_bottom = 0.98200005
+offset_top = 0.039993286
+offset_bottom = 0.051994324
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 32
+text = "앞으로 1000000"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -231,6 +272,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ResultPanelHolder" type="ColorRect" parent="CanvasLayer/Control" unique_id=2075620177]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -544,17 +586,6 @@ vertical_alignment = 1
 
 [node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("17_rvley")]
 visible = false
-
-[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1570471814]
-layer = -1
-
-[node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("13_g5yvx")
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
 [connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]
