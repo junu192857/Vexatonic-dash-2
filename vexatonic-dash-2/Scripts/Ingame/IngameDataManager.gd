@@ -4,7 +4,7 @@ const MAX_NOTE_SCORE = 990000.0
 const MAX_LONG_BONUS = 10000.0
 const PLAY_DATA_PATH = "user://play_data.cfg"
 
-enum ComboLamp { None = 0, FullCombo = 1, FullVexatonic = 2 }
+enum ComboLamp { None = 0, FullCombo = 1, FullVexatonic = 2, GameOver = 3 }
 enum Rank { None = 0, D = 1, C = 2, B = 3, A = 4, AA = 5, AAA = 6, S = 7, SS = 8, SSS = 9, V = 10 }
 
 
@@ -65,6 +65,7 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 	
 	if total_note_calls > 0 and pressed_note_count >= total_note_calls:
 		all_notes_cleared.emit()
+
 		
 
 func set_total_notes(noteDatas: Array[NoteData]):
@@ -91,17 +92,29 @@ func calculate_longNote_score(pressed: float):
 		return 0.45 * MAX_LONG_BONUS + (ratio - 0.9) * 5.5 * MAX_LONG_BONUS
 	
 func _get_rank(final_score_int: int) -> Rank:
-	if final_score_int >= 1000000:	return Rank.V
-	if final_score_int >= 997500:	return Rank.SSS
-	if final_score_int >= 995000:	return Rank.SS
-	if final_score_int >= 990000:	return Rank.S
-	if final_score_int >= 980000:	return Rank.AAA
-	if final_score_int >= 970000:	return Rank.AA
-	if final_score_int >= 950000:	return Rank.A
-	if final_score_int >= 900000:	return Rank.B
-	if final_score_int >= 750000:	return Rank.C
+	if final_score_int >= _get_rank_border(Rank.V):	return Rank.V
+	if final_score_int >= _get_rank_border(Rank.SSS):	return Rank.SSS
+	if final_score_int >= _get_rank_border(Rank.SS):	return Rank.SS
+	if final_score_int >= _get_rank_border(Rank.S):	return Rank.S
+	if final_score_int >= _get_rank_border(Rank.AAA):	return Rank.AAA
+	if final_score_int >= _get_rank_border(Rank.AA):	return Rank.AA
+	if final_score_int >= _get_rank_border(Rank.A):	return Rank.A
+	if final_score_int >= _get_rank_border(Rank.B):	return Rank.B
+	if final_score_int >= _get_rank_border(Rank.C):	return Rank.C
 	return Rank.D
 
+func _get_rank_border(rank: Rank) -> int:
+	match rank:
+		Rank.V: return 1000000
+		Rank.SSS: return 997500
+		Rank.SS: return 995000
+		Rank.S: return 990000
+		Rank.AAA: return 980000
+		Rank.AA: return 970000
+		Rank.A: return 950000
+		Rank.B: return 900000
+		Rank.C: return 750000
+		_: return 0
 
 func on_song_end(chart_path: String) -> void:
 	var final_score = roundi(score + calculate_longNote_score(pressed_long_length))

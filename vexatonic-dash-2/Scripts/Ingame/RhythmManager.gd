@@ -311,8 +311,8 @@ func end_game():
 	var result = $IngameDataManager.get_result_data()
 	$IngameUIManager.show_result_2(result)
 
-
-
+func game_over():
+	end_game()
 
 #================================== Input Reading =================================
 
