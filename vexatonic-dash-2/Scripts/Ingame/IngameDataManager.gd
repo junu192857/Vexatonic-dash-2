@@ -58,15 +58,10 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 		total_long_length_current += note.get_data().end_time - note.get_data().time
 	
 	var current_score = score + calculate_longNote_score(pressed_long_length)
+	var possible_score = get_possible_max(score, pressed_long_length)
 	var status
-	match Setting.score_display:
-		Setting.SCORE_DISPLAY.Increasing:
-			status = GameStatus.new(judgement, current_score, combo, note, fastslow, _combo_lamp == ComboLamp.None)
-			status_updated.emit(status)
-		Setting.SCORE_DISPLAY.Decreasing:
-			var possible_score = get_possible_max(score, pressed_long_length)
-			status = GameStatus.new(judgement, possible_score, combo, note, fastslow, _combo_lamp == ComboLamp.None)
-			status_updated.emit(status)
+	status = GameStatus.new(judgement, current_score, possible_score, combo, note, fastslow, _combo_lamp == ComboLamp.None)
+	status_updated.emit(status)
 	
 	if total_note_calls > 0 and pressed_note_count >= total_note_calls:
 		all_notes_cleared.emit()

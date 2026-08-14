@@ -133,17 +133,17 @@ color = Color(0, 0, 0, 0.83137256)
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.1
-anchor_right = 0.18
-anchor_bottom = 0.20600002
-offset_right = 0.3199768
-offset_bottom = -0.480011
+anchor_right = 0.172
+anchor_bottom = 0.23600002
+offset_right = 15.679962
+offset_bottom = -99.88002
 
 [node name="ScoreText" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=519592229]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
 anchor_right = 0.90000004
-anchor_bottom = 0.404
+anchor_bottom = 1.0
 offset_right = -3.0517578e-05
 offset_bottom = -0.055999756
 grow_horizontal = 2
@@ -154,31 +154,49 @@ text = "SCORE 0000000"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ForcedStopLabel" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=1758996143]
+[node name="ForcedStopPanel" type="ColorRect" parent="CanvasLayer/Control/ScorePanel" unique_id=631450857]
 visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.386
+anchor_top = 1.0
+anchor_right = 0.99700004
+anchor_bottom = 1.5960001
+offset_right = 0.117767334
+offset_bottom = -0.012001038
+color = Color(0.91227055, 4.7168137e-06, 6.738305e-07, 0.6)
+
+[node name="ForcedStopInfo" type="Label" parent="CanvasLayer/Control/ScorePanel/ForcedStopPanel" unique_id=1438789805]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.614
-offset_top = 8.995998
-offset_bottom = 9.003998
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_fonts/font = ExtResource("16_r4r31")
 text = "SSS 미만 시 강제종료:"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ForcedStopLabel2" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=1855834486]
+[node name="ForcedStopScorePanel" type="ColorRect" parent="CanvasLayer/Control/ScorePanel" unique_id=717095095]
 visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.64000005
+anchor_top = 1.0
+anchor_right = 0.99700004
+anchor_bottom = 1.5960001
+offset_top = 28.0
+offset_right = 0.117767334
+offset_bottom = 27.987999
+color = Color(0.91227055, 4.7168137e-06, 6.738305e-07, 0.6)
+
+[node name="ForcedStopInfo" type="Label" parent="CanvasLayer/Control/ScorePanel/ForcedStopScorePanel" unique_id=1138581811]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.98200005
-offset_top = 0.039993286
-offset_bottom = 0.051994324
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_fonts/font = ExtResource("16_r4r31")
-theme_override_font_sizes/font_size = 24
 text = "앞으로 1000000"
 horizontal_alignment = 1
 vertical_alignment = 1

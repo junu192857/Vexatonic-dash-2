@@ -50,8 +50,16 @@ func refresh_UI():
 
 
 func _on_status_update(status: GameStatus) -> void:
-	var rounded = roundi(status.score)
+	# 스코어 표시
+	var rounded
+	match Setting.score_display:
+		Setting.SCORE_DISPLAY.Increasing:
+			rounded = roundi(status.score)
+		Setting.SCORE_DISPLAY.Decreasing:
+			rounded = roundi(status.possible_score)
 	score_text.text = "SCORE %07d" % rounded
+	
+	# 판정 텍스트 표시
 	var judgement_text = JUDGEMENT_TEXT.instantiate()
 	canvasLayer.add_child(judgement_text)
 	judgement_text.global_position = get_note_position(status.note)
@@ -61,6 +69,8 @@ func _on_status_update(status: GameStatus) -> void:
 	tween.tween_property(judgement_text, "position:y", judgement_text.position.y - 100, 0.6)
 	tween.parallel().tween_property(judgement_text, "modulate:a", 0.0, 0.6)
 	tween.tween_callback(judgement_text.queue_free)
+	
+	#(필요 시) 강제종료 기준 스코어 표시
 
 const RANK_NAMES = ["", "D", "C", "B", "A", "AA", "AAA", "S", "SS", "SSS", "V"]
 
