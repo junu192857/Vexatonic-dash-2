@@ -26,8 +26,9 @@ const GAMEMODE_INFO = [
 	"TypeB: 판정선이 보입니다.",
 	"TypeC: 노트가 위에서 내려옵니다. 판정선이 보이고 하얀색 플랫폼이 보이지 않습니다."
 ]
-const TRACK_SKIP_LABELS = ["FVPP", "FV", "FC", "SSS", "SS", "S", "최고기록"]
+const TRACK_SKIP_LABELS = ["Off", "FVPP", "FV", "FC", "SSS", "SS", "S", "최고기록"]
 const TRACK_SKIP_INFO = [
+	"트랙 스킵을 사용하지 않습니다.",
 	"Full Vexatonic과 Perfect Paint 중 하나라도 만족하지 못하게 되면 종료합니다.",
 	"Full Vexatonic을 만족하지 못하게 되면 종료합니다.",
 	"Full Combo를 만족하지 못하게 되면 종료합니다.",
@@ -172,7 +173,7 @@ func _build_item_specs():
 			"name": "트랙 스킵",
 			"info": func(): return TRACK_SKIP_INFO[Setting.track_skip],
 			"type": "enum",
-			"values": [Setting.TRACK_SKIP.FVPP, Setting.TRACK_SKIP.FV, Setting.TRACK_SKIP.FC, Setting.TRACK_SKIP.SSS, Setting.TRACK_SKIP.SS, Setting.TRACK_SKIP.S, Setting.TRACK_SKIP.BestScore],
+			"values": [Setting.TRACK_SKIP.Off, Setting.TRACK_SKIP.FVPP, Setting.TRACK_SKIP.FV, Setting.TRACK_SKIP.FC, Setting.TRACK_SKIP.SSS, Setting.TRACK_SKIP.SS, Setting.TRACK_SKIP.S, Setting.TRACK_SKIP.BestScore],
 			"labels": TRACK_SKIP_LABELS,
 			"get": func(): return Setting.track_skip,
 			"set": func(v): Setting.track_skip = v,

@@ -7,6 +7,11 @@ extends Node
 @export var resultPanelHolder: Control
 @export var rightCover: TextureRect
 @export var leftCover: TextureRect
+@export var forcedStopPanel: Control
+@export var forcedStopScorePanel: Control
+
+@onready var forcedStopInfo: Label = forcedStopPanel.get_node("ForcedStopInfo")
+@onready var forcedStopScoreInfo: Label = forcedStopScorePanel.get_node("ForcedStopInfo")
 
 @onready var resultPanel = resultPanelHolder.get_node("ResultPanel")
 @onready var scoreText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/ScoreText")
@@ -33,18 +38,37 @@ func _ready():
 			score_text.text = "SCORE %07d" % 0
 		Setting.SCORE_DISPLAY.Decreasing:
 			score_text.text = "SCORE %07d" % 1000000
+
+	var track_skip_active = Setting.track_skip != Setting.TRACK_SKIP.Off
+	forcedStopPanel.visible = track_skip_active
+	if track_skip_active:
+		forcedStopInfo.text = _forced_stop_text()
+	forcedStopScorePanel.visible = track_skip_active and Setting.track_skip in \
+		[Setting.TRACK_SKIP.SSS, Setting.TRACK_SKIP.SS, Setting.TRACK_SKIP.S, Setting.TRACK_SKIP.BestScore]
+
 	refresh_UI()
+
+func _forced_stop_text() -> String:
+	match Setting.track_skip:
+		Setting.TRACK_SKIP.FVPP: return "FVPP 실패 시 강제종료"
+		Setting.TRACK_SKIP.FV: return "FV 실패 시 강제종료"
+		Setting.TRACK_SKIP.FC: return "FC 실패 시 강제종료"
+		Setting.TRACK_SKIP.SSS: return "SSS 미만 시 강제종료"
+		Setting.TRACK_SKIP.SS: return "SS 미만 시 강제종료"
+		Setting.TRACK_SKIP.S: return "S 미만 시 강제종료"
+		Setting.TRACK_SKIP.BestScore: return "최고기록 미만 시 강제종료"
+	return ""
 
 func refresh_UI():
 	resultPanelHolder.visible = false
 	lampTextHolder.get_node("PerfectPaintText").modulate.a = 0
 	for label in resultPanelHolder.get_node("ResultPanel/VariableLabelHolder").get_children():
 		label.modulate.a = 0.0
-	for i in range(3):
+	for i in range(4):
 		lampTextHolder.get_child(i).modulate.a = 0.0
 		lampTextHolder.get_child(i).visible = true
 	await get_tree().process_frame
-	for i in range(3):
+	for i in range(4):
 		lampTextHolder.get_child(i).visible = false
 		lampTextHolder.get_child(i).modulate.a = 1.0
 
@@ -69,8 +93,10 @@ func _on_status_update(status: GameStatus) -> void:
 	tween.tween_property(judgement_text, "position:y", judgement_text.position.y - 100, 0.6)
 	tween.parallel().tween_property(judgement_text, "modulate:a", 0.0, 0.6)
 	tween.tween_callback(judgement_text.queue_free)
-	
-	#(필요 시) 강제종료 기준 스코어 표시
+
+	# 강제종료 기준 스코어 표시 (랭크/최고기록 기준일 때만)
+	if status.track_skip_margin_applicable:
+		forcedStopScoreInfo.text = "앞으로 %d" % status.track_skip_margin
 
 const RANK_NAMES = ["", "D", "C", "B", "A", "AA", "AAA", "S", "SS", "SSS", "V"]
 
@@ -99,9 +125,9 @@ func show_result_2(data: Dictionary) -> void:
 	sparklicText.text = "%04d" % data["sparklic"]
 	wildText.text = "%04d" % data["wild"]
 	missText.text = "%04d" % data["miss"]
-	if lamp == 2:
+	if lamp == IngameDataManager.ComboLamp.FullVexatonic:
 		comboLampText.text = "FULL VEXATONIC"
-	elif lamp == 1:
+	elif lamp == IngameDataManager.ComboLamp.FullCombo:
 		comboLampText.text = "FULL COMBO"
 
 	  # resultPanel을 화면 오른쪽 밖으로 초기 배치
@@ -145,7 +171,7 @@ func show_result_2(data: Dictionary) -> void:
 		tween.tween_interval(0.25)
 
 	  # 5. comboLampText - 효과B (full combo 또는 full vexatonic일 때만)
-	if lamp >= 1:
+	if lamp >= IngameDataManager.ComboLamp.FullCombo:
 		tween.tween_callback(func(): comboLampText.pivot_offset = comboLampText.size / 2)
 		tween.tween_property(comboLampText, "scale", Vector2.ONE, 1.0).from(Vector2(2.0, 2.0)) \
 		  .set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)

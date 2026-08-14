@@ -4,7 +4,7 @@ class_name SongDataHolder
 const PLAY_DATA_PATH = "user://play_data.cfg"
 
 const RANK_NAMES = ["", "D", "C", "B", "A", "AA", "AAA", "S", "SS", "SSS", "V"]
-const LAMP_NAMES = ["", "Full Combo", "Full Vexatonic"]
+const LAMP_NAMES = ["", "", "Full Combo", "Full Vexatonic"] # index: GameOver, None, FullCombo, FullVexatonic (IngameDataManager.ComboLamp)
 
 @onready var scoreValue: Label = $ScoreValue
 @onready var paintValue: Label = $PaintValue

@@ -52,7 +52,9 @@ func _ready() -> void:
 	
 	levelData = ChartParser.parse(level_path, 0 if Setting.is_tutorial else Setting.selected_difficulty)
 	$IngameDataManager.set_total_notes(levelData.noteDatas)
+	$IngameDataManager.setup_track_skip(level_path)
 	$IngameDataManager.all_notes_cleared.connect(end_game, CONNECT_ONE_SHOT)
+	$IngameDataManager.game_over_triggered.connect(game_over, CONNECT_ONE_SHOT)
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	

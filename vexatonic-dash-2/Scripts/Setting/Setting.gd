@@ -29,7 +29,7 @@ static var speed = 2.0
 
 enum SCORE_DISPLAY {Increasing, Decreasing}
 enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
-enum TRACK_SKIP {FVPP, FV, FC, SSS, SS, S, BestScore}
+enum TRACK_SKIP {Off, FVPP, FV, FC, SSS, SS, S, BestScore}
 enum JUDGEMENT_SFX {SparklicBelow, WildBelow, Miss, Off}
 enum JUDGEMENT_DISPLAY {FastSlowOnly, JudgeOnly, All, Off}
 
@@ -43,7 +43,7 @@ static var tutorial_played = false
 # ==================== 게임플레이 설정 =====================
 
 static var mirror_mode: bool = false
-static var track_skip: TRACK_SKIP = TRACK_SKIP.BestScore
+static var track_skip: TRACK_SKIP = TRACK_SKIP.Off
 
 # ==================== 사운드 설정 =====================
 
