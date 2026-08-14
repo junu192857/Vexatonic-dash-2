@@ -7,6 +7,7 @@ const PLAY_DATA_PATH = "user://play_data.cfg"
 
 enum ComboLamp { GameOver = 0, None = 1, FullCombo = 2, FullVexatonic = 3 }
 enum Rank { None = 0, D = 1, C = 2, B = 3, A = 4, AA = 5, AAA = 6, S = 7, SS = 8, SSS = 9, V = 10 }
+enum RankBorder { D = 0, C = 750000, B = 900000, A = 950000, AA = 970000, AAA = 980000, S = 990000, SS = 995000, SSS = 997500, V = 1000000 }
 
 
 
@@ -32,8 +33,7 @@ signal all_notes_cleared
 signal game_over_triggered
 
 func _ready():
-	track_skip_border = _track_skip_border()
-	margin_applicable = _is_score_based_track_skip()
+	_setup_track_skip()
 
 func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
 	match judgement:
@@ -82,24 +82,26 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 
 		
 
-# 트랙 스킵이 최고기록 기준일 때 비교할 기준 점수를 미리 읽어둠
-func setup_track_skip(chart_path: String) -> void:
-	if Setting.track_skip != Setting.TRACK_SKIP.BestScore:
-		return
-	var cfg = ConfigFile.new()
-	if cfg.load(PLAY_DATA_PATH) != OK:
-		return
-	var s = "%s|%d" % [chart_path, Setting.selected_difficulty]
-	best_score_border = cfg.get_value(s, "best_score", 0)
+# 트랙 스킵 관련 값들을 미리 계산. RhythmManager가 아니라 여기서 자체적으로 chart_path를 구해야
+# _ready() 시점(= IngameUIManager._ready()보다 먼저)에 best_score_border까지 확정할 수 있음
+func _setup_track_skip() -> void:
+	if Setting.track_skip == Setting.TRACK_SKIP.BestScore:
+		var chart_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir
+		var cfg = ConfigFile.new()
+		if cfg.load(PLAY_DATA_PATH) == OK:
+			var s = "%s|%d" % [chart_path, Setting.selected_difficulty]
+			best_score_border = cfg.get_value(s, "best_score", 0)
+	track_skip_border = _track_skip_border()
+	margin_applicable = _is_score_based_track_skip()
 
 func _is_score_based_track_skip() -> bool:
 	return Setting.track_skip in [Setting.TRACK_SKIP.SSS, Setting.TRACK_SKIP.SS, Setting.TRACK_SKIP.S, Setting.TRACK_SKIP.BestScore]
 
 func _track_skip_border() -> int:
 	match Setting.track_skip:
-		Setting.TRACK_SKIP.SSS: return _get_rank_border(Rank.SSS)
-		Setting.TRACK_SKIP.SS: return _get_rank_border(Rank.SS)
-		Setting.TRACK_SKIP.S: return _get_rank_border(Rank.S)
+		Setting.TRACK_SKIP.SSS: return RankBorder.SSS
+		Setting.TRACK_SKIP.SS: return RankBorder.SS
+		Setting.TRACK_SKIP.S: return RankBorder.S
 		Setting.TRACK_SKIP.BestScore: return best_score_border
 	return 0
 
@@ -146,29 +148,16 @@ func calculate_longNote_score(pressed: float):
 		return 0.45 * MAX_LONG_BONUS + (ratio - 0.9) * 5.5 * MAX_LONG_BONUS
 	
 func _get_rank(final_score_int: int) -> Rank:
-	if final_score_int >= _get_rank_border(Rank.V):	return Rank.V
-	if final_score_int >= _get_rank_border(Rank.SSS):	return Rank.SSS
-	if final_score_int >= _get_rank_border(Rank.SS):	return Rank.SS
-	if final_score_int >= _get_rank_border(Rank.S):	return Rank.S
-	if final_score_int >= _get_rank_border(Rank.AAA):	return Rank.AAA
-	if final_score_int >= _get_rank_border(Rank.AA):	return Rank.AA
-	if final_score_int >= _get_rank_border(Rank.A):	return Rank.A
-	if final_score_int >= _get_rank_border(Rank.B):	return Rank.B
-	if final_score_int >= _get_rank_border(Rank.C):	return Rank.C
+	if final_score_int >= RankBorder.V:	return Rank.V
+	if final_score_int >= RankBorder.SSS:	return Rank.SSS
+	if final_score_int >= RankBorder.SS:	return Rank.SS
+	if final_score_int >= RankBorder.S:	return Rank.S
+	if final_score_int >= RankBorder.AAA:	return Rank.AAA
+	if final_score_int >= RankBorder.AA:	return Rank.AA
+	if final_score_int >= RankBorder.A:	return Rank.A
+	if final_score_int >= RankBorder.B:	return Rank.B
+	if final_score_int >= RankBorder.C:	return Rank.C
 	return Rank.D
-
-func _get_rank_border(rank: Rank) -> int:
-	match rank:
-		Rank.V: return 1000000
-		Rank.SSS: return 997500
-		Rank.SS: return 995000
-		Rank.S: return 990000
-		Rank.AAA: return 980000
-		Rank.AA: return 970000
-		Rank.A: return 950000
-		Rank.B: return 900000
-		Rank.C: return 750000
-		_: return 0
 
 func on_song_end(chart_path: String) -> void:
 	var final_score = roundi(score + calculate_longNote_score(pressed_long_length))

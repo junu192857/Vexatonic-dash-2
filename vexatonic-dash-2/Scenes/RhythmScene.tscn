@@ -43,7 +43,7 @@ ignore_rotation = false
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
 
-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover", "forcedStopPanel", "forcedStopScorePanel")]
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover", "forcedStopPanel", "forcedStopScorePanel", "ingameDataManager")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
 score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
@@ -52,6 +52,7 @@ lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
 resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
 rightCover = NodePath("../../CanvasLayer/Control/RightCover")
 leftCover = NodePath("../../CanvasLayer/Control/LeftCover")
+ingameDataManager = NodePath("../IngameDataManager")
 forcedStopPanel = NodePath("../../CanvasLayer/Control/ScorePanel/ForcedStopPanel")
 forcedStopScorePanel = NodePath("../../CanvasLayer/Control/ScorePanel/ForcedStopScorePanel")
 

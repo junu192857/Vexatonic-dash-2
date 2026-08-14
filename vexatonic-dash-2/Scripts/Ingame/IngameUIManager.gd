@@ -9,6 +9,7 @@ extends Node
 @export var leftCover: TextureRect
 @export var forcedStopPanel: Control
 @export var forcedStopScorePanel: Control
+@export var ingameDataManager: IngameDataManager
 
 @onready var forcedStopInfo: Label = forcedStopPanel.get_node("ForcedStopInfo")
 @onready var forcedStopScoreInfo: Label = forcedStopScorePanel.get_node("ForcedStopInfo")
@@ -43,8 +44,11 @@ func _ready():
 	forcedStopPanel.visible = track_skip_active
 	if track_skip_active:
 		forcedStopInfo.text = _forced_stop_text()
-	forcedStopScorePanel.visible = track_skip_active and Setting.track_skip in \
-		[Setting.TRACK_SKIP.SSS, Setting.TRACK_SKIP.SS, Setting.TRACK_SKIP.S, Setting.TRACK_SKIP.BestScore]
+
+	var score_based = track_skip_active and ingameDataManager.margin_applicable
+	forcedStopScorePanel.visible = score_based
+	if score_based:
+		forcedStopScoreInfo.text = "앞으로 %d" % (1000000 - ingameDataManager.track_skip_border)
 
 	refresh_UI()
 
@@ -96,7 +100,7 @@ func _on_status_update(status: GameStatus) -> void:
 
 	# 강제종료 기준 스코어 표시 (랭크/최고기록 기준일 때만)
 	if status.track_skip_margin_applicable:
-		forcedStopScoreInfo.text = "앞으로 %d" % status.track_skip_margin
+		forcedStopScoreInfo.text = "앞으로 %d" % max(0, status.track_skip_margin)
 
 const RANK_NAMES = ["", "D", "C", "B", "A", "AA", "AAA", "S", "SS", "SSS", "V"]
 
