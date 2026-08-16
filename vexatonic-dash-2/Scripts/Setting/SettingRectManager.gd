@@ -38,7 +38,7 @@ const TRACK_SKIP_INFO = [
 	"자신의 최고기록을 달성하지 못하게 되면 종료합니다.",
 ]
 const JUDGEMENT_SFX_LABELS = ["Sparklic 이하", "Wild 이하", "Miss", "Off"]
-const JUDGEMENT_DISPLAY_LABELS = ["Fast/Slow만", "판정만", "전체", "Off"]
+const JUDGEMENT_DISPLAY_LABELS = ["전체", "판정만", "Fast/Slow만", "Off"]
 
 var category_index: int = Category.Gameplay
 var setting_index: int = 0
@@ -230,7 +230,7 @@ func _build_item_specs():
 			"name": "Vexatonic 표시",
 			"info": "Vexatonic 판정 표시 방법을 설정합니다.",
 			"type": "enum",
-			"values": [Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.Off],
+			"values": [Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.Off],
 			"labels": JUDGEMENT_DISPLAY_LABELS,
 			"get": func(): return Setting.vexatonic_display,
 			"set": func(v): Setting.vexatonic_display = v,
@@ -239,7 +239,7 @@ func _build_item_specs():
 			"name": "Sparklic 표시",
 			"info": "Sparklic 판정 표시 방법을 설정합니다.",
 			"type": "enum",
-			"values": [Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.Off],
+			"values": [Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.Off],
 			"labels": JUDGEMENT_DISPLAY_LABELS,
 			"get": func(): return Setting.sparklic_display,
 			"set": func(v): Setting.sparklic_display = v,
@@ -248,7 +248,7 @@ func _build_item_specs():
 			"name": "Wild 표시",
 			"info": "Wild 판정 표시 방법을 설정합니다.",
 			"type": "enum",
-			"values": [Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.Off],
+			"values": [Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.Off],
 			"labels": JUDGEMENT_DISPLAY_LABELS,
 			"get": func(): return Setting.wild_display,
 			"set": func(v): Setting.wild_display = v,
