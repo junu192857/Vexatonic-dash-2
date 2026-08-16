@@ -7,6 +7,7 @@ extends Node
 @export var resultPanelHolder: Control
 @export var rightCover: TextureRect
 @export var leftCover: TextureRect
+@export var centerCover: TextureRect
 @export var forcedStopPanel: Control
 @export var forcedStopScorePanel: Control
 @export var ingameDataManager: IngameDataManager
@@ -27,12 +28,9 @@ extends Node
 
 
 func setup():
-	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-		leftCover.visible = true
-		rightCover.visible = true
-	else:
-		leftCover.visible = false
-		rightCover.visible = false
+	set_cover()
+	
+
 	
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
@@ -200,3 +198,11 @@ func get_note_position(note: Note):
 	else:
 		note_pos.x = get_viewport().get_visible_rect().size.x * 0.2
 	return note_pos  # 마지막 canvas_transform 제거
+
+func set_cover():
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+		leftCover.visible = true
+		rightCover.visible = true
+	else:
+		leftCover.visible = false
+		rightCover.visible = false

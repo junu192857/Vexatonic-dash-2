@@ -43,7 +43,7 @@ ignore_rotation = false
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
 
-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover", "forcedStopPanel", "forcedStopScorePanel", "ingameDataManager")]
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover", "centerCover", "forcedStopPanel", "forcedStopScorePanel", "ingameDataManager")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
 score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
@@ -52,6 +52,7 @@ lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
 resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
 rightCover = NodePath("../../CanvasLayer/Control/RightCover")
 leftCover = NodePath("../../CanvasLayer/Control/LeftCover")
+centerCover = NodePath("../../CanvasLayer/Control/CenterCover")
 forcedStopPanel = NodePath("../../CanvasLayer/Control/ScorePanel/ForcedStopPanel")
 forcedStopScorePanel = NodePath("../../CanvasLayer/Control/ScorePanel/ForcedStopScorePanel")
 ingameDataManager = NodePath("../IngameDataManager")
@@ -124,6 +125,26 @@ expand_mode = 1
 stretch_mode = 1
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/Control/LeftCover" unique_id=493000574]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.83137256)
+
+[node name="CenterCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=156756671]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("13_g5yvx")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/Control/CenterCover" unique_id=496964170]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
