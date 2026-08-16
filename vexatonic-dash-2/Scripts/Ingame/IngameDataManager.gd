@@ -32,9 +32,6 @@ signal status_updated(status: GameStatus)
 signal all_notes_cleared
 signal game_over_triggered
 
-func _ready():
-	_setup_track_skip()
-
 func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Note.Fastslow):
 	match judgement:
 		0: #Vexatonic
@@ -84,12 +81,11 @@ func catch_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: No
 
 # 트랙 스킵 관련 값들을 미리 계산. RhythmManager가 아니라 여기서 자체적으로 chart_path를 구해야
 # _ready() 시점(= IngameUIManager._ready()보다 먼저)에 best_score_border까지 확정할 수 있음
-func _setup_track_skip() -> void:
+func _setup_track_skip(path: String) -> void:
 	if Setting.track_skip == Setting.TRACK_SKIP.BestScore:
-		var chart_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir
 		var cfg = ConfigFile.new()
 		if cfg.load(PLAY_DATA_PATH) == OK:
-			var s = "%s|%d" % [chart_path, Setting.selected_difficulty]
+			var s = "%s|%d" % [path, Setting.selected_difficulty]
 			best_score_border = cfg.get_value(s, "best_score", 0)
 	track_skip_border = _track_skip_border()
 	margin_applicable = _is_score_based_track_skip()

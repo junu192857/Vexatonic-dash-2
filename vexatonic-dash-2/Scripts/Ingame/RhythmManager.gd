@@ -30,7 +30,7 @@ var level_path: String
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# ==== Parsing & Lanes, NoteDatas 정렬
+	#입력 연결
 	InputManager.pressed_a.connect(func(): _on_pressed(0, true))
 	InputManager.released_a.connect(func(): _on_released(0, true))
 	InputManager.pressed_l.connect(func(): _on_pressed(0, false))
@@ -45,15 +45,26 @@ func _ready() -> void:
 	InputManager.released_j.connect(func(): _on_released(2, false))
 	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
 	
+	#채보 경로 설정
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
 	
+	#noteHolder 생성
 	for i in range(4):
 		noteHolders.append(NoteHolder.new(i))
 	
+	#채보 파싱
 	levelData = ChartParser.parse(level_path, 0 if Setting.is_tutorial else Setting.selected_difficulty)
+	
+	#IngameDataManager 설정
 	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	$IngameDataManager.all_notes_cleared.connect(end_game, CONNECT_ONE_SHOT)
 	$IngameDataManager.game_over_triggered.connect(game_over, CONNECT_ONE_SHOT)
+	$IngameDataManager._setup_track_skip(level_path)
+	
+	#IngameUIManager 설정
+	$IngameUIManager.setup()
+	
+	#레인 정렬
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
@@ -308,6 +319,7 @@ func assign_note(note: Note):
 func end_game():
 	game_finished = true
 	PositionCalculator.reset()
+	musicPlayer.stop()
 	$IngameDataManager.on_song_end(level_path)
 	var result = $IngameDataManager.get_result_data()
 	$IngameUIManager.show_result_2(result)

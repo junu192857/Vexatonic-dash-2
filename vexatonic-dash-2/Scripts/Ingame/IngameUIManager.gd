@@ -26,7 +26,7 @@ extends Node
 @onready var paintLampText = resultPanelHolder.get_node("ResultPanel/VariableLabelHolder/PaintLampText")
 
 
-func _ready():
+func setup():
 	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
 		leftCover.visible = true
 		rightCover.visible = true
