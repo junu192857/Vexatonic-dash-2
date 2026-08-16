@@ -53,6 +53,7 @@ func _apply_display_setting(display: Setting.JUDGEMENT_DISPLAY) -> void:
 		Setting.JUDGEMENT_DISPLAY.FastSlowOnly:
 			judgement_text.visible = false
 			fastslow_text.visible = true
+			fastslow_text.position.y = -160.0
 		Setting.JUDGEMENT_DISPLAY.Off:
 			judgement_text.visible = false
 			fastslow_text.visible = false
