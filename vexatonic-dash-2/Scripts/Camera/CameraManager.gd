@@ -92,10 +92,11 @@ func _apply_triggers(time: float) -> void:
 		_trigger_progress[i] = new_progress
 		match tr.type:
 			Trigger.TYPE.Move:
+				var move_c = Setting.mirror_y(tr.c)
 				if (new_progress == 1.0):
-					triggered_delta_position.y += tr.c
+					triggered_delta_position.y += move_c
 				else:
-					temp_delta_position.y += tr.c * new_progress
+					temp_delta_position.y += move_c * new_progress
 
 
 			Trigger.TYPE.Rotate:

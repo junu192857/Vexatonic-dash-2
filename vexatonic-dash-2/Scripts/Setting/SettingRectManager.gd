@@ -26,8 +26,9 @@ const GAMEMODE_INFO = [
 	"TypeB: 판정선이 보입니다.",
 	"TypeC: 노트가 위에서 내려옵니다. 판정선이 보이고 하얀색 플랫폼이 보이지 않습니다."
 ]
-const TRACK_SKIP_LABELS = ["FVPP", "FV", "FC", "SSS", "SS", "S", "최고기록"]
+const TRACK_SKIP_LABELS = ["Off", "FVPP", "FV", "FC", "SSS", "SS", "S", "최고기록"]
 const TRACK_SKIP_INFO = [
+	"트랙 스킵을 사용하지 않습니다.",
 	"Full Vexatonic과 Perfect Paint 중 하나라도 만족하지 못하게 되면 종료합니다.",
 	"Full Vexatonic을 만족하지 못하게 되면 종료합니다.",
 	"Full Combo를 만족하지 못하게 되면 종료합니다.",
@@ -37,7 +38,7 @@ const TRACK_SKIP_INFO = [
 	"자신의 최고기록을 달성하지 못하게 되면 종료합니다.",
 ]
 const JUDGEMENT_SFX_LABELS = ["Sparklic 이하", "Wild 이하", "Miss", "Off"]
-const JUDGEMENT_DISPLAY_LABELS = ["Fast/Slow만", "판정만", "전체", "Off"]
+const JUDGEMENT_DISPLAY_LABELS = ["전체", "판정만", "Fast/Slow만", "Off"]
 
 var category_index: int = Category.Gameplay
 var setting_index: int = 0
@@ -172,7 +173,7 @@ func _build_item_specs():
 			"name": "트랙 스킵",
 			"info": func(): return TRACK_SKIP_INFO[Setting.track_skip],
 			"type": "enum",
-			"values": [Setting.TRACK_SKIP.FVPP, Setting.TRACK_SKIP.FV, Setting.TRACK_SKIP.FC, Setting.TRACK_SKIP.SSS, Setting.TRACK_SKIP.SS, Setting.TRACK_SKIP.S, Setting.TRACK_SKIP.BestScore],
+			"values": [Setting.TRACK_SKIP.Off, Setting.TRACK_SKIP.FVPP, Setting.TRACK_SKIP.FV, Setting.TRACK_SKIP.FC, Setting.TRACK_SKIP.SSS, Setting.TRACK_SKIP.SS, Setting.TRACK_SKIP.S, Setting.TRACK_SKIP.BestScore],
 			"labels": TRACK_SKIP_LABELS,
 			"get": func(): return Setting.track_skip,
 			"set": func(v): Setting.track_skip = v,
@@ -229,7 +230,7 @@ func _build_item_specs():
 			"name": "Vexatonic 표시",
 			"info": "Vexatonic 판정 표시 방법을 설정합니다.",
 			"type": "enum",
-			"values": [Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.Off],
+			"values": [Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.Off],
 			"labels": JUDGEMENT_DISPLAY_LABELS,
 			"get": func(): return Setting.vexatonic_display,
 			"set": func(v): Setting.vexatonic_display = v,
@@ -238,7 +239,7 @@ func _build_item_specs():
 			"name": "Sparklic 표시",
 			"info": "Sparklic 판정 표시 방법을 설정합니다.",
 			"type": "enum",
-			"values": [Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.Off],
+			"values": [Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.Off],
 			"labels": JUDGEMENT_DISPLAY_LABELS,
 			"get": func(): return Setting.sparklic_display,
 			"set": func(v): Setting.sparklic_display = v,
@@ -247,7 +248,7 @@ func _build_item_specs():
 			"name": "Wild 표시",
 			"info": "Wild 판정 표시 방법을 설정합니다.",
 			"type": "enum",
-			"values": [Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.Off],
+			"values": [Setting.JUDGEMENT_DISPLAY.All, Setting.JUDGEMENT_DISPLAY.JudgeOnly, Setting.JUDGEMENT_DISPLAY.FastSlowOnly, Setting.JUDGEMENT_DISPLAY.Off],
 			"labels": JUDGEMENT_DISPLAY_LABELS,
 			"get": func(): return Setting.wild_display,
 			"set": func(v): Setting.wild_display = v,

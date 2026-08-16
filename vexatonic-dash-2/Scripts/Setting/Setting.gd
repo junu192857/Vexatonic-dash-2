@@ -29,7 +29,7 @@ static var speed = 2.0
 
 enum SCORE_DISPLAY {Increasing, Decreasing}
 enum GAMEMODE {Normal_Character, Normal_Line, Suregi}
-enum TRACK_SKIP {FVPP, FV, FC, SSS, SS, S, BestScore}
+enum TRACK_SKIP {Off, FVPP, FV, FC, SSS, SS, S, BestScore}
 enum JUDGEMENT_SFX {SparklicBelow, WildBelow, Miss, Off}
 enum JUDGEMENT_DISPLAY {FastSlowOnly, JudgeOnly, All, Off}
 
@@ -43,7 +43,7 @@ static var tutorial_played = false
 # ==================== 게임플레이 설정 =====================
 
 static var mirror_mode: bool = false
-static var track_skip: TRACK_SKIP = TRACK_SKIP.BestScore
+static var track_skip: TRACK_SKIP = TRACK_SKIP.Off
 
 # ==================== 사운드 설정 =====================
 
@@ -124,3 +124,7 @@ static func load() -> void:
 
 static func change_difficulty():
 	selected_difficulty = (selected_difficulty + 1) % 3
+
+# mirror_mode가 켜져 있으면 y좌표(또는 y 방향 변화량)를 반전. 렌더링 전용 - 채보 데이터 자체는 건드리지 않음
+static func mirror_y(y: float) -> float:
+	return -y if mirror_mode else y

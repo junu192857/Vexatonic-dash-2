@@ -30,7 +30,7 @@ var level_path: String
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# ==== Parsing & Lanes, NoteDatas 정렬
+	#입력 연결
 	InputManager.pressed_a.connect(func(): _on_pressed(0, true))
 	InputManager.released_a.connect(func(): _on_released(0, true))
 	InputManager.pressed_l.connect(func(): _on_pressed(0, false))
@@ -45,14 +45,26 @@ func _ready() -> void:
 	InputManager.released_j.connect(func(): _on_released(2, false))
 	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
 	
+	#채보 경로 설정
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
 	
+	#noteHolder 생성
 	for i in range(4):
 		noteHolders.append(NoteHolder.new(i))
 	
+	#채보 파싱
 	levelData = ChartParser.parse(level_path, 0 if Setting.is_tutorial else Setting.selected_difficulty)
+	
+	#IngameDataManager 설정
 	$IngameDataManager.set_total_notes(levelData.noteDatas)
 	$IngameDataManager.all_notes_cleared.connect(end_game, CONNECT_ONE_SHOT)
+	$IngameDataManager.game_over_triggered.connect(game_over, CONNECT_ONE_SHOT)
+	$IngameDataManager._setup_track_skip(level_path)
+	
+	#IngameUIManager 설정
+	$IngameUIManager.setup()
+	
+	#레인 정렬
 	Lane.sort_lanes(levelData.lanes)
 	lane_index = 0
 	
@@ -222,13 +234,15 @@ func place_note(data:NoteData, pos_x: float, p_is_marker:bool, parent: Node2D) -
 	parent.add_child(note)
 	note.select_color()
 	if !p_is_marker:
-		note.global_position = Vector2(pos_x, lane.get_height(data.time))
+		var height = lane.get_height(data.time)
+		note.global_position = Vector2(pos_x, Setting.mirror_y(height))
 		if data.adjusted == 1:
 			note.set_line()
-		lane.adjust_keyframe(data.time, note.global_position.y)
+		lane.adjust_keyframe(data.time, height)
 	else:
-		note.global_position = Vector2(pos_x, lane.get_height(data.end_time))
-		lane.adjust_keyframe(data.end_time, note.global_position.y)
+		var height = lane.get_height(data.end_time)
+		note.global_position = Vector2(pos_x, Setting.mirror_y(height))
+		lane.adjust_keyframe(data.end_time, height)
 	return note
 
 # 해당 Connector가 단노트 또는 Marker 뒤에 처음 나오는 Connector인 경우 first = true, 그 외의 경우 first = false
@@ -265,9 +279,9 @@ func place_initial_connector(lane: Lane):
 	var start_time = -2 * COUNTDOWN_TIME if lane.is_init else lane.keyframes[0].kf.x
 	var end_time = PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(lane.notes[0].get_data().time) - Setting.NOTE_WIDTH / 2.0) if !lane.notes.is_empty() else lane.keyframes[-1].kf.x
 	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-		place_suregi_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(PositionCalculator.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
+		place_suregi_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(PositionCalculator.get_posx_from_time(start_time),Setting.mirror_y(lane.keyframes[0].kf.y)))
 	else:
-		place_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(PositionCalculator.get_posx_from_time(start_time),lane.keyframes[0].kf.y))
+		place_connector(-1, start_time, end_time, lane.lane_index, false, self, Vector2(PositionCalculator.get_posx_from_time(start_time),Setting.mirror_y(lane.keyframes[0].kf.y)))
 	
 
 # 레인의 마지막 노트 이후의 Connector 생성 또는 노트가 없는 레인의 Connector 생성
@@ -278,17 +292,17 @@ func place_final_connector(lane: Lane):
 		if lane.keyframes[-1].kf.x > connector_time:
 			if (Setting.gamemode == Setting.GAMEMODE.Suregi):
 				var final_connector = place_suregi_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
-								  self,  Vector2(PositionCalculator.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
+								  self,  Vector2(PositionCalculator.get_posx_from_time(connector_time), Setting.mirror_y(lane.get_height(last_note_time))))
 			else:
 				var final_connector = place_connector(-1, connector_time, lane.keyframes[-1].kf.x, lane.lane_index, true,\
-								  self,  Vector2(PositionCalculator.get_posx_from_time(connector_time), lane.get_height(last_note_time)))
+								  self,  Vector2(PositionCalculator.get_posx_from_time(connector_time), Setting.mirror_y(lane.get_height(last_note_time))))
 	else:
 		if (Setting.gamemode == Setting.GAMEMODE.Suregi):
 			var final_connector = place_suregi_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
-							  self, Vector2(PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
+							  self, Vector2(PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x), Setting.mirror_y(lane.keyframes[0].kf.y)))
 		else:
 			var final_connector = place_connector(-1, lane.keyframes[0].kf.x, lane.keyframes[-1].kf.x, lane.lane_index, false,\
-							  self, Vector2(PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x), lane.keyframes[0].kf.y))
+							  self, Vector2(PositionCalculator.get_posx_from_time(lane.keyframes[0].kf.x), Setting.mirror_y(lane.keyframes[0].kf.y)))
 
 # 생성된 노트를 레인의 노트 큐에 할당
 func assign_note(note: Note):
@@ -305,12 +319,13 @@ func assign_note(note: Note):
 func end_game():
 	game_finished = true
 	PositionCalculator.reset()
+	musicPlayer.stop()
 	$IngameDataManager.on_song_end(level_path)
 	var result = $IngameDataManager.get_result_data()
 	$IngameUIManager.show_result_2(result)
 
-
-
+func game_over():
+	end_game()
 
 #================================== Input Reading =================================
 

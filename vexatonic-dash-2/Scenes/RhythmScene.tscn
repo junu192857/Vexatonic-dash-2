@@ -43,7 +43,7 @@ ignore_rotation = false
 [node name="IngameDataManager" type="Node" parent="RhythmManager" unique_id=1191127505]
 script = ExtResource("7_wjq5j")
 
-[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover")]
+[node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover", "forcedStopPanel", "forcedStopScorePanel", "ingameDataManager")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
 score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
@@ -52,6 +52,9 @@ lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
 resultPanelHolder = NodePath("../../CanvasLayer/Control/ResultPanelHolder")
 rightCover = NodePath("../../CanvasLayer/Control/RightCover")
 leftCover = NodePath("../../CanvasLayer/Control/LeftCover")
+forcedStopPanel = NodePath("../../CanvasLayer/Control/ScorePanel/ForcedStopPanel")
+forcedStopScorePanel = NodePath("../../CanvasLayer/Control/ScorePanel/ForcedStopScorePanel")
+ingameDataManager = NodePath("../IngameDataManager")
 
 [node name="CharacterHolder" type="Node2D" parent="RhythmManager" unique_id=1750939579]
 
@@ -66,6 +69,17 @@ storyManager = NodePath("../../CanvasLayer/StoryControl")
 process_mode = 3
 stream = ExtResource("16_rvley")
 parameters/looping = true
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1570471814]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("13_g5yvx")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=84776136]
 
@@ -123,20 +137,70 @@ layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.1
 anchor_right = 0.18
-anchor_bottom = 0.15
+anchor_bottom = 0.194
 offset_right = 0.3199768
+offset_bottom = -54.520004
 
 [node name="ScoreText" type="Label" parent="CanvasLayer/Control/ScorePanel" unique_id=519592229]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.1
-anchor_right = 0.9
+anchor_right = 0.90000004
 anchor_bottom = 1.0
+offset_right = -3.0517578e-05
+offset_bottom = -0.055999756
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("16_r4r31")
 theme_override_font_sizes/font_size = 32
 text = "SCORE 0000000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ForcedStopPanel" type="ColorRect" parent="CanvasLayer/Control/ScorePanel" unique_id=631450857]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 0.99700004
+anchor_bottom = 1.5960001
+offset_right = 0.117767334
+offset_bottom = 12.987999
+color = Color(0.91227055, 4.7168137e-06, 6.738305e-07, 0.6)
+
+[node name="ForcedStopInfo" type="Label" parent="CanvasLayer/Control/ScorePanel/ForcedStopPanel" unique_id=1438789805]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 32
+text = "SSS 미만 시 강제종료:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ForcedStopScorePanel" type="ColorRect" parent="CanvasLayer/Control/ScorePanel" unique_id=717095095]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.8720001
+anchor_right = 0.99700004
+anchor_bottom = 2.723
+offset_top = 0.01599884
+offset_right = 0.117767334
+offset_bottom = 0.018997192
+color = Color(0.91227055, 4.7168137e-06, 6.738305e-07, 0.6)
+
+[node name="ForcedStopInfo" type="Label" parent="CanvasLayer/Control/ScorePanel/ForcedStopScorePanel" unique_id=1138581811]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 32
+text = "앞으로 1000000"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -147,6 +211,28 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="GameOverText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=85679893]
+visible = false
+clip_contents = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.3
+anchor_right = 0.85
+anchor_bottom = 0.5
+focus_mode = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.3137255)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 150
+text = "Game Over..."
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GameFinishedText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=722747667]
 visible = false
@@ -215,6 +301,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PerfectPaintText" type="Label" parent="CanvasLayer/Control/LampTextHolder" unique_id=1974658059]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.3
@@ -231,6 +318,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ResultPanelHolder" type="ColorRect" parent="CanvasLayer/Control" unique_id=2075620177]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -544,17 +632,6 @@ vertical_alignment = 1
 
 [node name="StoryControl" parent="CanvasLayer" unique_id=194327749 instance=ExtResource("17_rvley")]
 visible = false
-
-[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1570471814]
-layer = -1
-
-[node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("13_g5yvx")
 
 [connection signal="status_updated" from="RhythmManager/IngameDataManager" to="RhythmManager/IngameUIManager" method="_on_status_update"]
 [connection signal="pressed" from="CanvasLayer/Control/ResultPanelHolder/ResultPanel/ConstantLabelHolder/Button" to="RhythmManager/IngameUIManager" method="_on_result_confirm"]

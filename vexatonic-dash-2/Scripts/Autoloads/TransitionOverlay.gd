@@ -18,7 +18,9 @@ func _ready() -> void:
 
 	var control = Control.new()
 	control.set_anchors_preset(Control.PRESET_FULL_RECT)
+	control.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(control)
+	
 
 	left_panel = ColorRect.new()
 	left_panel.anchor_bottom = 1.0

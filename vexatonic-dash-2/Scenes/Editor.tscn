@@ -346,6 +346,7 @@ text = "Change
 Speed"
 
 [node name="MoveXTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1348858736]
+visible = false
 layout_mode = 0
 offset_left = 1020.0
 offset_top = 163.0
