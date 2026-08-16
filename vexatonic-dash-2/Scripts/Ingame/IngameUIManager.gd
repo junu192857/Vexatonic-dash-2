@@ -203,6 +203,12 @@ func set_cover():
 	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
 		leftCover.visible = true
 		rightCover.visible = true
+		var ratio2 = Setting.cover2 * 0.05
+		centerCover.visible = ratio2 > 0.0
+		centerCover.anchor_bottom = ratio2
 	else:
 		leftCover.visible = false
-		rightCover.visible = false
+		centerCover.visible = false
+		var ratio1 = Setting.cover1 * 0.06
+		rightCover.visible = ratio1 > 0.0
+		rightCover.anchor_left = 1.0 - ratio1
