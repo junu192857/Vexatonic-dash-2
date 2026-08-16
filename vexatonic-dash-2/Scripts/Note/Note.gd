@@ -2,6 +2,7 @@ extends Node2D
 class_name Note
 
 
+const CRITICAL_MS = 17
 const VEXATONIC_MS = 42
 const SPARKLIC_MS = 84
 const WILD_MS = 126
@@ -45,7 +46,8 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 	)
 	var judgement = Judgement.VEXATONIC if (get_data().adjusted == 1 and raw_judgement != Judgement.VEXATONIC) else raw_judgement
 	var fs = (
-		Fastslow.NOTHING if judgement == Judgement.VEXATONIC or judgement == Judgement.MISS else
+		Fastslow.NOTHING if judgement == Judgement.MISS else
+		Fastslow.NOTHING if judgement == Judgement.VEXATONIC and abs(deltaTime) <= CRITICAL_MS else
 		Fastslow.FAST if deltaTime < 0.0 else
 		Fastslow.SLOW
 	)
