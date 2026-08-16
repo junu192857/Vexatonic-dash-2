@@ -7,7 +7,7 @@ const PLAY_DATA_PATH = "user://play_data.cfg"
 
 enum ComboLamp { GameOver = 0, None = 1, FullCombo = 2, FullVexatonic = 3 }
 enum Rank { None = 0, D = 1, C = 2, B = 3, A = 4, AA = 5, AAA = 6, S = 7, SS = 8, SSS = 9, V = 10 }
-enum RankBorder { D = 0, C = 750000, B = 900000, A = 950000, AA = 970000, AAA = 980000, S = 990000, SS = 995000, SSS = 997500, V = 1000000 }
+enum RankBorder { D = 0, C = 500000, B = 750000, A = 850000, AA = 900000, AAA = 950000, S = 975000, SS = 990000, SSS = 995000, V = 1000000 }
 
 
 
