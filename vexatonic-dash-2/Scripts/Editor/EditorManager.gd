@@ -158,7 +158,7 @@ func _on_zoom_camera(zoom: bool):
 		else:
 			return
 	else:
-		if camera_zoom_level > -5:
+		if camera_zoom_level > -10:
 			camera_zoom_level -= 1
 		else:
 			return
