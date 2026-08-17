@@ -319,13 +319,13 @@ func assign_note(note: Note):
 func end_game():
 	game_finished = true
 	PositionCalculator.reset()
-	musicPlayer.stop()
 	$IngameDataManager.on_song_end(level_path)
 	var result = $IngameDataManager.get_result_data()
 	$IngameUIManager.show_result_2(result)
 
 func game_over():
 	end_game()
+	musicPlayer.stop()
 
 #================================== Input Reading =================================
 
