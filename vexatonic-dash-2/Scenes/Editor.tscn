@@ -741,17 +741,17 @@ offset_bottom = 40.0
 [node name="CameraZoomText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=1395987564]
 layout_mode = 0
 offset_left = 21.0
-offset_top = 64.0
+offset_top = 87.0
 offset_right = 152.0
-offset_bottom = 87.0
+offset_bottom = 110.0
 text = "Camera_Zoom:"
 
 [node name="CameraYText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=1754299761]
 layout_mode = 0
 offset_left = 21.0
-offset_top = 41.0
+offset_top = 62.0
 offset_right = 152.0
-offset_bottom = 64.0
+offset_bottom = 85.0
 text = "Camera_Y:"
 
 [node name="TimeText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=126211545]
@@ -761,6 +761,14 @@ offset_top = 17.0
 offset_right = 150.0
 offset_bottom = 40.0
 text = "Time:"
+
+[node name="CameraXText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=1023911238]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 40.0
+offset_right = 152.0
+offset_bottom = 63.0
+text = "Camera_X:"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=787913441]
 

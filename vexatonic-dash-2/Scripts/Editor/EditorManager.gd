@@ -1621,22 +1621,25 @@ func _process(_delta:float):
 		camera_range.set_bounds(get_camera_bounds_at(current_time, trigger_vector2))
 		set_ingame_status(current_time, trigger_vector2)
 
-func set_ingame_status(time: float, trigger_vector2: Vector2):
-	ingameStatusHolder.get_child(2).text = "Time: %.2f" % time
-	ingameStatusHolder.get_child(1).text = "Camera_Y: %.2f" % trigger_vector2.x
-	ingameStatusHolder.get_child(0).text = "Camera_Zoom: %.2f" % trigger_vector2.y
+func set_ingame_status(time: float, trigger_vector2: Vector3):
+	ingameStatusHolder.get_node("TimeText").text = "Time: %.2f" % time
+	ingameStatusHolder.get_node("CameraYText").text = "Camera_Y(pos_y): %.2f" % trigger_vector2.x
+	ingameStatusHolder.get_node("CameraZoomText").text = "Camera_Zoom: %.2f" % trigger_vector2.y
+	ingameStatusHolder.get_node("CameraXText").text = "Camera_X(ms): %.2f" % trigger_vector2.z
 
-func get_camera_bounds_at(time: float, trigger_vector: Vector2) -> Rect2:
+func get_camera_bounds_at(time: float, trigger_vector: Vector3) -> Rect2:
 	var vp = get_viewport_rect().size
 	var vp_w = vp.x / trigger_vector.y
 	var vp_h = vp.y / trigger_vector.y
-	var center_x = PositionCalculator.get_posx_from_time(time) + vp_w * 0.3
+	var effective_time = time + trigger_vector.z
+	var center_x = PositionCalculator.get_posx_from_time(effective_time) + vp_w * 0.3
 	return Rect2(center_x - vp_w * 0.5, trigger_vector.x - vp_h * 0.5, vp_w, vp_h)
 
-#return: (delta_y, zoom) 형태의 Vector2
-func get_trigger_process_at_time(time: float) -> Vector2:
+#return: (delta_y, zoom, delta_time) 형태의 Vector3
+func get_trigger_process_at_time(time: float) -> Vector3:
 	var delta_y = 0.0
 	var zoom = 1.0
+	var delta_time = 0.0
 	for tr in levelData.triggers:
 		if time < tr.start:
 			continue
@@ -1644,9 +1647,11 @@ func get_trigger_process_at_time(time: float) -> Vector2:
 		match tr.type:
 			Trigger.TYPE.Zoom:
 				zoom += tr.c * progress
+			Trigger.TYPE.MoveX:
+				delta_time += tr.c * progress
 			Trigger.TYPE.Move:
 				delta_y += tr.c * progress
-	return Vector2(delta_y, zoom)
+	return Vector3(delta_y, zoom, delta_time)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
