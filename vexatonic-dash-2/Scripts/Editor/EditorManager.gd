@@ -515,6 +515,8 @@ func generate_preview(selected: int) -> Node2D:
 						my_preview = BPM_TRIGGER_SCENE.instantiate()
 					NoteSelection.SpeedTrigger:
 						my_preview = SPEED_TRIGGER_SCENE.instantiate()
+					NoteSelection.MoveXTrigger:
+						my_preview = MOVEX_TRIGGER_SCENE.instantiate()
 				add_child(my_preview)
 				my_preview.position = Vector2(snapped_x, mouse_pos.y)
 	else: #Note인 경우
