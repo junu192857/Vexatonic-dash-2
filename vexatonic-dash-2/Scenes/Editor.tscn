@@ -169,7 +169,7 @@ offset_bottom = 264.0
 text = "ZoomDown
 "
 
-[node name="Button6" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1549482070]
+[node name="YellowLongButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1549482070]
 layout_mode = 0
 offset_left = 477.0
 offset_top = 160.0
@@ -179,7 +179,7 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "YellowLong"
 
-[node name="Button5" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=562787188]
+[node name="ModifyNoteButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=562787188]
 layout_mode = 0
 offset_left = 1261.0
 offset_top = 31.0
@@ -190,7 +190,7 @@ button_group = SubResource("ButtonGroup_dfuwn")
 text = "Modify
 Note"
 
-[node name="Button4" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=360759748]
+[node name="BlueLongButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=360759748]
 layout_mode = 0
 offset_left = 327.0
 offset_top = 157.0
@@ -200,7 +200,7 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "BlueLong"
 
-[node name="Button3" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1956327696]
+[node name="RedLongButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1956327696]
 layout_mode = 0
 offset_left = 176.0
 offset_top = 157.0
@@ -211,7 +211,7 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "RedLong"
 
-[node name="Button10" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=444161378]
+[node name="BlueNoteButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=444161378]
 layout_mode = 0
 offset_left = 327.0
 offset_top = 31.0
@@ -254,7 +254,7 @@ button_group = SubResource("ButtonGroup_dfuwn")
 text = "Move
 Camera"
 
-[node name="Button9" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1223151017]
+[node name="ModifyLaneButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1223151017]
 layout_mode = 0
 offset_left = 1139.0
 offset_top = 31.0
@@ -265,7 +265,7 @@ button_group = SubResource("ButtonGroup_dfuwn")
 text = "Modify
 Lane"
 
-[node name="Button8" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1578699209]
+[node name="YellowNoteButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1578699209]
 layout_mode = 0
 offset_left = 476.0
 offset_top = 31.0
@@ -275,7 +275,7 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "YellowNote"
 
-[node name="Button7" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=203646748]
+[node name="RedNoteButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=203646748]
 layout_mode = 0
 offset_left = 177.0
 offset_top = 29.0
@@ -285,7 +285,7 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "RedNote"
 
-[node name="Button" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1835172047]
+[node name="LaneButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1835172047]
 layout_mode = 0
 offset_left = 30.0
 offset_top = 28.0
@@ -295,7 +295,7 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Lane"
 
-[node name="Button2" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=228103161]
+[node name="ModifyTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=228103161]
 layout_mode = 0
 offset_left = 1385.0
 offset_top = 31.0
@@ -315,7 +315,7 @@ offset_right = 1708.0
 offset_bottom = 127.0
 text = "Play Music"
 
-[node name="Button11" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=474866379]
+[node name="AdjustedButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=474866379]
 layout_mode = 0
 offset_left = 36.0
 offset_top = 155.0
@@ -324,7 +324,7 @@ offset_bottom = 251.0
 toggle_mode = true
 text = "Adjusted"
 
-[node name="Button12" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=2124973084]
+[node name="JumpButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=2124973084]
 layout_mode = 0
 offset_left = 614.0
 offset_top = 160.0
@@ -346,7 +346,6 @@ text = "Change
 Speed"
 
 [node name="MoveXTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1348858736]
-visible = false
 layout_mode = 0
 offset_left = 1020.0
 offset_top = 163.0
@@ -785,22 +784,22 @@ script = ExtResource("9_847jc")
 [connection signal="pressed" from="CanvasLayer/SavePanel/OnlyForNewSave/Button" to="." method="set_difficulty" binds= [0]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomUpButton" to="." method="_on_zoom_camera" binds= [true]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomDownButton" to="." method="_on_zoom_camera" binds= [false]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button6" to="." method="_on_select_note" binds= [13]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button5" to="." method="_on_select_note" binds= [22]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button4" to="." method="_on_select_note" binds= [12]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button3" to="." method="_on_select_note" binds= [11]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button10" to="." method="_on_select_note" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/YellowLongButton" to="." method="_on_select_note" binds= [13]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ModifyNoteButton" to="." method="_on_select_note" binds= [22]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/BlueLongButton" to="." method="_on_select_note" binds= [12]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/RedLongButton" to="." method="_on_select_note" binds= [11]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/BlueNoteButton" to="." method="_on_select_note" binds= [2]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ChangeBPMButton" to="." method="_on_select_note" binds= [34]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ZoomTriggerButton" to="." method="_on_select_note" binds= [32]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/MoveTriggerButton" to="." method="_on_select_note" binds= [31]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button9" to="." method="_on_select_note" binds= [21]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button8" to="." method="_on_select_note" binds= [3]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button7" to="." method="_on_select_note" binds= [1]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button" to="." method="_on_select_note" binds= [0]]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button2" to="." method="_on_select_note" binds= [23]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ModifyLaneButton" to="." method="_on_select_note" binds= [21]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/YellowNoteButton" to="." method="_on_select_note" binds= [3]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/RedNoteButton" to="." method="_on_select_note" binds= [1]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/LaneButton" to="." method="_on_select_note" binds= [0]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ModifyTriggerButton" to="." method="_on_select_note" binds= [23]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/PlayMusicButton" to="." method="toggle_music"]
-[connection signal="toggled" from="CanvasLayer/NoteSelectorPanel/Button11" to="." method="_on_toggled_adjust"]
-[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/Button12" to="." method="_on_select_note" binds= [14]]
+[connection signal="toggled" from="CanvasLayer/NoteSelectorPanel/AdjustedButton" to="." method="_on_toggled_adjust"]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/JumpButton" to="." method="_on_select_note" binds= [14]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ChangeSpeedButton" to="." method="_on_select_note" binds= [35]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/MoveXTriggerButton" to="." method="_on_select_note" binds= [36]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
