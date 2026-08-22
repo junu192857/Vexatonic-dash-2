@@ -105,11 +105,8 @@ func _apply_triggers(time: float) -> void:
 
 
 			Trigger.TYPE.Rotate:
-				var pivot = _get_rotation_pivot()
 				var delta_rad = deg_to_rad(tr.c * delta_ratio)
 				# 판정선 기준점을 중심으로 Camera2D 회전
-				var offset = camera.position - pivot
-				var rotated_offset = offset.rotated(delta_rad)
 				#camera.position = pivot + rotated_offset
 				#camera.rotation += delta_rad
 				rotation += delta_rad
