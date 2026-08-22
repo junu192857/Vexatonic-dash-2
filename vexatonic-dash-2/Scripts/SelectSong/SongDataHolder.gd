@@ -24,7 +24,7 @@ func load_play_data(chart_dir: String):
 	var rank_val = cfg.get_value(s, "rank", 0)
 
 	scoreValue.text = str(best_score)
-	paintValue.text = "%.1f%%" % (floor(best_paint_ratio * 1000.0) / 10.0)
+	paintValue.text = "100.0%" if paint else "%.1f%%" % (floor(best_paint_ratio * 1000.0) / 10.0)
 	rank.text = RANK_NAMES[rank_val]
 	fcfvLamp.text = LAMP_NAMES[combo_lamp]
 	paintLamp.text = "Perfect Paint" if paint else ""

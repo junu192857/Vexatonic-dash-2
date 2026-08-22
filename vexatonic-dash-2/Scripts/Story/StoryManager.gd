@@ -68,7 +68,7 @@ func _show_line(index: int):
 		else:
 			match(index):
 				4:
-					change_live2D(0 if parts.size() < 3 else int(parts[2]))
+					change_live2D("res://Textures/Sayane_Live2D.png" if parts.size() < 3 else parts[2])
 				5:
 					change_name("버그" if parts.size() < 3 else parts[2])
 				6:
@@ -136,12 +136,8 @@ func show_live2D():
 	storyHolder.get_node("Live2D").visible = true
 	_show_line(current_line)
 
-func change_live2D(index: int):
-	match(index):
-		0:
-			live2d.texture = load("res://Textures/Sayane_Live2D.png")
-		_:
-			pass
+func change_live2D(texture_path: String):
+	live2d.texture = load(texture_path)
 	show_live2D()
 
 func change_name(speaker: String):

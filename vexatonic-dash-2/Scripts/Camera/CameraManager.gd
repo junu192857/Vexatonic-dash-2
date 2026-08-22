@@ -19,6 +19,9 @@ var triggered_delta_zoom: float = 1.0
 var temp_delta_zoom: float = 0.0
 var triggered_zoom: bool = false
 
+var triggered_delta_time: float = 0.0
+var temp_delta_time: float = 0.0
+
 var _initialized: bool = false
 var earliest_remaining_trigger: int = 0
 
@@ -51,7 +54,8 @@ func move(time: float) -> void:
 	if (triggered_zoom):
 		set_camera_zoom()
 		set_camera_position()
-	position = Vector2(PositionCalculator.get_posx_from_time(time), 0.0) + triggered_delta_position + temp_delta_position
+	var effective_time = time + triggered_delta_time + temp_delta_time
+	position = Vector2(PositionCalculator.get_posx_from_time(effective_time), 0.0) + triggered_delta_position + temp_delta_position
 	
 func _apply_triggers(time: float) -> void:
 	if triggers.is_empty():
@@ -66,6 +70,7 @@ func _apply_triggers(time: float) -> void:
 	temp_delta_position = Vector2.ZERO
 	temp_delta_zoom = 0.0
 	triggered_zoom = false
+	temp_delta_time = 0.0
 	
 	for i in range(earliest_remaining_trigger, triggers.size()):
 		var tr: Trigger = triggers[i]
@@ -100,13 +105,11 @@ func _apply_triggers(time: float) -> void:
 
 
 			Trigger.TYPE.Rotate:
-				var pivot = _get_rotation_pivot()
 				var delta_rad = deg_to_rad(tr.c * delta_ratio)
 				# 판정선 기준점을 중심으로 Camera2D 회전
-				var offset = camera.position - pivot
-				var rotated_offset = offset.rotated(delta_rad)
-				camera.position = pivot + rotated_offset
-				camera.rotation += delta_rad
+				#camera.position = pivot + rotated_offset
+				#camera.rotation += delta_rad
+				rotation += delta_rad
 
 			Trigger.TYPE.Zoom:
 				if (new_progress == 1.0):
@@ -114,6 +117,12 @@ func _apply_triggers(time: float) -> void:
 				else:
 					temp_delta_zoom += tr.c * new_progress
 				triggered_zoom = true
+
+			Trigger.TYPE.MoveX:
+				if (new_progress == 1.0):
+					triggered_delta_time += tr.c
+				else:
+					temp_delta_time += tr.c * new_progress
 
 
 func _snapshot_initial(i: int) -> void:
@@ -125,6 +134,8 @@ func _snapshot_initial(i: int) -> void:
 			_trigger_initial[i] = camera.rotation
 		Trigger.TYPE.Zoom:
 			_trigger_initial[i] = camera.zoom.x
+		Trigger.TYPE.MoveX:
+			_trigger_initial[i] = 0.0
 
 
 # 판정선 중앙 위치 반환 (Camera2D 로컬 좌표)

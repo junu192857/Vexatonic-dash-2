@@ -773,7 +773,7 @@ offset_bottom = 0.013092041
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 50
-text = "Paint"
+text = "최고 페인트"
 vertical_alignment = 1
 
 [node name="BestScore" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1883576132]
@@ -790,7 +790,7 @@ offset_bottom = 0.1593628
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("8_puwos")
 theme_override_font_sizes/font_size = 50
-text = "Best Score"
+text = "최고기록"
 vertical_alignment = 1
 
 [node name="PaintValue" type="Label" parent="CanvasLayer/Control/SongDataHolder/Holder" unique_id=1834441864]
@@ -932,7 +932,7 @@ offset_right = -0.104003906
 offset_bottom = -6.1035156e-05
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 52
-text = "Settings"
+text = "설정"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -985,7 +985,7 @@ offset_left = -0.024002075
 offset_right = 0.015991211
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 72
-text = "Start"
+text = "시작!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1015,7 +1015,7 @@ offset_right = -0.1510315
 offset_bottom = 0.13470459
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 40
-text = "Judge_Offset"
+text = "판정 오프셋"
 vertical_alignment = 1
 
 [node name="SoundOffset" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=2025918682]
@@ -1027,11 +1027,11 @@ anchor_right = 0.62200004
 anchor_bottom = 0.62
 offset_left = -0.26202393
 offset_top = 0.0067367554
-offset_right = -103.15103
+offset_right = 1.8489685
 offset_bottom = -0.039352417
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 40
-text = "Sound_Offset"
+text = "소리 오프셋"
 vertical_alignment = 1
 
 [node name="Speed" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1621748373]
@@ -1047,7 +1047,7 @@ offset_right = 0.010269165
 offset_bottom = 8.10466
 theme_override_fonts/font = ExtResource("5_7150g")
 theme_override_font_sizes/font_size = 40
-text = "Speed"
+text = "속도"
 vertical_alignment = 1
 
 [node name="SpeedValue" type="Label" parent="CanvasLayer/Control/SettingHolder" unique_id=1290855835]

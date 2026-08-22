@@ -105,5 +105,5 @@ func close_setting():
 func open_random_conversation():
 	if state != MainMenuState.Main:
 		return
-	var random_int = randi() % 4
+	var random_int = randi() % 6
 	storyManager.start_story("res://Scripts/MainMenu/RandomConversation/%d.txt" % random_int, true)

@@ -7,6 +7,7 @@ extends Node
 @export var resultPanelHolder: Control
 @export var rightCover: TextureRect
 @export var leftCover: TextureRect
+@export var centerCover: TextureRect
 @export var forcedStopPanel: Control
 @export var forcedStopScorePanel: Control
 @export var ingameDataManager: IngameDataManager
@@ -27,12 +28,9 @@ extends Node
 
 
 func setup():
-	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
-		leftCover.visible = true
-		rightCover.visible = true
-	else:
-		leftCover.visible = false
-		rightCover.visible = false
+	set_cover()
+	
+
 	
 	match Setting.score_display:
 		Setting.SCORE_DISPLAY.Increasing:
@@ -112,7 +110,9 @@ func show_result_2(data: Dictionary) -> void:
 	
 	if data["perfect_paint"]:
 		tween.tween_interval(0.7)
+		lampTextHolder.get_node("PerfectPaintText").visible = true
 		tween.tween_property(lampTextHolder.get_node("PerfectPaintText"), "modulate:a", 1.0, 1.0).from(0.0)
+
 	
 	tween.tween_interval(2.0)
 
@@ -200,3 +200,17 @@ func get_note_position(note: Note):
 	else:
 		note_pos.x = get_viewport().get_visible_rect().size.x * 0.2
 	return note_pos  # 마지막 canvas_transform 제거
+
+func set_cover():
+	if (Setting.gamemode == Setting.GAMEMODE.Suregi):
+		leftCover.visible = true
+		rightCover.visible = true
+		var ratio2 = Setting.cover2 * 0.05
+		centerCover.visible = ratio2 > 0.0
+		centerCover.anchor_bottom = ratio2
+	else:
+		leftCover.visible = false
+		centerCover.visible = false
+		var ratio1 = Setting.cover1 * 0.06
+		rightCover.visible = ratio1 > 0.0
+		rightCover.anchor_left = 1.0 - ratio1
