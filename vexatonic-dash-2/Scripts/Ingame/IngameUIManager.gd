@@ -110,7 +110,9 @@ func show_result_2(data: Dictionary) -> void:
 	
 	if data["perfect_paint"]:
 		tween.tween_interval(0.7)
+		lampTextHolder.get_node("PerfectPaintText").visible = true
 		tween.tween_property(lampTextHolder.get_node("PerfectPaintText"), "modulate:a", 1.0, 1.0).from(0.0)
+
 	
 	tween.tween_interval(2.0)
 
