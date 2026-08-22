@@ -1,12 +1,11 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dclpywetp5yw7"]
 
-[ext_resource type="Texture2D" uid="uid://du6cfdt712ycn" path="res://Textures/ZoomTrigger.png" id="1_3ju51"]
+[ext_resource type="Texture2D" uid="uid://cvf5817cgnjnq" path="res://Textures/RotateTrigger.jpg" id="1_enl4h"]
 
 [node name="RotateTrigger" type="Node2D" unique_id=1311778669]
 
 [node name="Line2D" type="Line2D" parent="." unique_id=1123272427]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=299281638]
-position = Vector2(11, 2.0000005)
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("1_3ju51")
+scale = Vector2(0.6470588, 0.6829268)
+texture = ExtResource("1_enl4h")
