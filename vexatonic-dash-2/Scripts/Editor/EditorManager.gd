@@ -11,6 +11,7 @@ var sorted_bpm: Array
 @export var BPM_TRIGGER_SCENE: PackedScene
 @export var SPEED_TRIGGER_SCENE: PackedScene
 @export var MOVEX_TRIGGER_SCENE: PackedScene
+@export var ROTATE_TRIGGER_SCENE: PackedScene
 
 @onready var camera = $Camera2D
 @onready var musicPlayer = $AudioStreamPlayer
@@ -241,7 +242,7 @@ func realign_lines_by_move():
 
 enum NoteSelection {Lane = 0, RedNote = 1, BlueNote = 2, YellowNote = 3, RedLong = 11, BlueLong = 12,
 					YellowLong = 13, Jump = 14, ModifyLane = 21, ModifyNote = 22,
-					ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, BPMTrigger = 34, SpeedTrigger = 35, MoveXTrigger = 36,
+					ModifyTrigger = 23, MoveTrigger = 31, ZoomTrigger = 32, RotateTrigger = 33, BPMTrigger = 34, SpeedTrigger = 35, MoveXTrigger = 36,
 					Nothing = 100}
 
 const colored_notes_list: Array[int] = [0, 1, 2, 3, 11, 12, 13, 14]
@@ -511,6 +512,8 @@ func generate_preview(selected: int) -> Node2D:
 						my_preview = MOVE_TRIGGER_SCENE.instantiate()
 					NoteSelection.ZoomTrigger:
 						my_preview = ZOOM_TRIGGER_SCENE.instantiate()
+					NoteSelection.RotateTrigger:
+						my_preview = ROTATE_TRIGGER_SCENE.instantiate()
 					NoteSelection.BPMTrigger:
 						my_preview = BPM_TRIGGER_SCENE.instantiate()
 					NoteSelection.SpeedTrigger:
@@ -1170,6 +1173,9 @@ func show_modify_panel():
 		Trigger.TYPE.Zoom:
 			value_label.text = "Zoom_value:"
 			length_spinbox.visible = true
+		Trigger.TYPE.Rotate:
+			value_label.text = "Rotate_degree:"
+			length_spinbox.visible = true
 		Trigger.TYPE.BPM:
 			value_label.text = "Set BPM:"
 			length_spinbox.visible = false
@@ -1568,6 +1574,8 @@ func parse(chart_path: String):
 				trigger_node = MOVE_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.Zoom:
 				trigger_node = ZOOM_TRIGGER_SCENE.instantiate()
+			Trigger.TYPE.Rotate:
+				trigger_node = ROTATE_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.BPM:
 				trigger_node = BPM_TRIGGER_SCENE.instantiate()
 			Trigger.TYPE.Speed:

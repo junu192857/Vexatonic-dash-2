@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://dnbcvrxhsooaf" path="res://Prefabs/EditorTriggers/SpeedTrigger.tscn" id="8_ir51w"]
 [ext_resource type="Script" uid="uid://dofrhowavsi7y" path="res://Scripts/Editor/Timer.gd" id="9_847jc"]
 [ext_resource type="PackedScene" uid="uid://bolbw7dhn1fov" path="res://Prefabs/EditorTriggers/MoveXTrigger.tscn" id="9_fx05v"]
+[ext_resource type="PackedScene" path="res://Prefabs/EditorTriggers/RotateTrigger.tscn" id="10_rotat"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_brgpd"]
 
@@ -28,6 +29,7 @@ ZOOM_TRIGGER_SCENE = ExtResource("6_847jc")
 BPM_TRIGGER_SCENE = ExtResource("7_847jc")
 SPEED_TRIGGER_SCENE = ExtResource("8_ir51w")
 MOVEX_TRIGGER_SCENE = ExtResource("9_fx05v")
+ROTATE_TRIGGER_SCENE = ExtResource("10_rotat")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=736166515]
 
@@ -355,6 +357,17 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dfuwn")
 text = "Move
 Camera_X"
+
+[node name="RotateTriggerButton" type="Button" parent="CanvasLayer/NoteSelectorPanel" unique_id=1348858737]
+layout_mode = 0
+offset_left = 1152.0
+offset_top = 163.0
+offset_right = 1252.0
+offset_bottom = 263.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_dfuwn")
+text = "Rotate
+Camera"
 
 [node name="InitialPanel" type="Panel" parent="CanvasLayer" unique_id=281739446]
 anchors_preset = -1
@@ -810,6 +823,7 @@ script = ExtResource("9_847jc")
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/JumpButton" to="." method="_on_select_note" binds= [14]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/ChangeSpeedButton" to="." method="_on_select_note" binds= [35]]
 [connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/MoveXTriggerButton" to="." method="_on_select_note" binds= [36]]
+[connection signal="pressed" from="CanvasLayer/NoteSelectorPanel/RotateTriggerButton" to="." method="_on_select_note" binds= [33]]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/StartButton" to="." method="_on_start_editor"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button2" to="." method="on_push_load_chart_button"]
 [connection signal="pressed" from="CanvasLayer/InitialPanel/Button3" to="." method="start_find_music"]

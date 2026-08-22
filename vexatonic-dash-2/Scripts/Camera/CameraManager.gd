@@ -110,8 +110,9 @@ func _apply_triggers(time: float) -> void:
 				# 판정선 기준점을 중심으로 Camera2D 회전
 				var offset = camera.position - pivot
 				var rotated_offset = offset.rotated(delta_rad)
-				camera.position = pivot + rotated_offset
-				camera.rotation += delta_rad
+				#camera.position = pivot + rotated_offset
+				#camera.rotation += delta_rad
+				rotation += delta_rad
 
 			Trigger.TYPE.Zoom:
 				if (new_progress == 1.0):
