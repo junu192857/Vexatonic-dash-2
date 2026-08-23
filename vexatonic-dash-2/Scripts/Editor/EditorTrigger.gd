@@ -35,7 +35,12 @@ func show_data():
 				Vector2(0, 0),
 				Vector2(PositionCalculator.get_posx_from_time(t), c)
 				])
-			Trigger.TYPE.MoveX, Trigger.TYPE.Zoom, Trigger.TYPE.Rotate:
+			Trigger.TYPE.Rotate:
+				length_line.points = PackedVector2Array([
+				Vector2(0, 0),
+				Vector2(PositionCalculator.get_posx_from_time(t), PositionCalculator.get_posx_from_time(t) * tan(deg_to_rad(c)))
+				])
+			Trigger.TYPE.MoveX, Trigger.TYPE.Zoom:
 				length_line.points = PackedVector2Array([
 				Vector2(0, 0),
 				Vector2(PositionCalculator.get_posx_from_time(t), 0)
@@ -45,12 +50,12 @@ func show_data():
 
 func show_line_preview(end_global_point: Vector2):
 	match(type):
-		Trigger.TYPE.Move:
+		Trigger.TYPE.Move, Trigger.TYPE.Rotate:
 			length_line.points = PackedVector2Array([
 				Vector2(0,0),
 				end_global_point - node.position
 			])
-		Trigger.TYPE.Zoom, Trigger.TYPE.MoveX, Trigger.TYPE.Rotate:
+		Trigger.TYPE.Zoom, Trigger.TYPE.MoveX:
 			length_line.points = PackedVector2Array([
 				Vector2(0,0),
 				Vector2.RIGHT * (end_global_point.x - node.position.x)
@@ -63,6 +68,9 @@ func set_new_data():
 	match(type):
 		Trigger.TYPE.Move:
 			c = length_line.points[1].y
+			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
+		Trigger.TYPE.Rotate:
+			c = rad_to_deg(atan(length_line.points[1].y/length_line.points[1].x if length_line.points[1].x > Setting.EPSILON else 0.0))
 			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)
 		Trigger.TYPE.Zoom, Trigger.TYPE.MoveX, Trigger.TYPE.Rotate:
 			t = PositionCalculator.get_time_from_posx(length_line.points[1].x)

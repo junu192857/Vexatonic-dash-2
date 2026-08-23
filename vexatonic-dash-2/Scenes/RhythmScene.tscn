@@ -75,6 +75,7 @@ parameters/looping = true
 layer = -1
 
 [node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
+modulate = Color(0.4045111, 0.40451115, 0.4045111, 1)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
