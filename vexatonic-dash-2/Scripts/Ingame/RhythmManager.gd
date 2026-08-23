@@ -175,10 +175,23 @@ func render_chart():
 	var previous_time = -1
 	var previous_note
 	var previous_lane = -1
+	var track_same_time_lines = Setting.same_time_note_line
+	# 각 원소: {"time": float, "notes": Array} - time은 그룹의 기준(가장 먼저 들어온 노트) 시각
+	var same_time_notes: Array = []
 	for noteData in levelData.noteDatas:
 		pos_x = PositionCalculator.get_posx_from_time(noteData.time)
 		var cur_note = place_note(noteData, pos_x, false, self)
 		assign_note(cur_note)
+		if track_same_time_lines:
+			var bucket = null
+			for b in same_time_notes:
+				if abs(b["time"] - noteData.time) < Setting.EPSILON:
+					bucket = b
+					break
+			if bucket == null:
+				bucket = {"time": noteData.time, "notes": []}
+				same_time_notes.append(bucket)
+			bucket["notes"].append(cur_note)
 		if (previous_time >= 0 and previous_lane == noteData.lane):
 			var prev_conn_start = PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(previous_time) + Setting.NOTE_WIDTH / 2.0)
 			var prev_conn_end = PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(noteData.time) - Setting.NOTE_WIDTH / 2.0)
@@ -224,6 +237,24 @@ func render_chart():
 		lane.sort_notes()
 		place_initial_connector(lane)
 		place_final_connector(lane)
+
+	if track_same_time_lines:
+		place_same_time_lines(same_time_notes)
+
+# 입력 시간이 같은 노트들을 흰 선으로 연결 (Suregi 모드 전용 설정)
+func place_same_time_lines(same_time_notes: Array) -> void:
+	for bucket in same_time_notes:
+		var notes: Array = bucket["notes"]
+		if notes.size() < 2:
+			continue
+		notes.sort_custom(func(a, b): return a.global_position.y < b.global_position.y)
+		var line := Line2D.new()
+		line.default_color = Color(1, 1, 1, 1)
+		line.width = 4.0
+		line.z_index = -1
+		for note in notes:
+			line.add_point(note.global_position)
+		add_child(line)
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
 func place_note(data:NoteData, pos_x: float, p_is_marker:bool, parent: Node2D) -> Note:

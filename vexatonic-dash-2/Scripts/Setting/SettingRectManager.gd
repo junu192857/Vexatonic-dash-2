@@ -5,14 +5,14 @@ signal close_setting
 enum SettingItem {
 	Speed, SoundOffset, JudgeOffset, Gamemode, MirrorMode, TrackSkip,
 	MasterVolume, TapSound, GuideSound, GuideSoundOffset, JudgementSFX,
-	ScoreDisplay, VexatonicDisplay, SparklicDisplay, WildDisplay, ComboDisplay, Cover1, Cover2,
+	ScoreDisplay, VexatonicDisplay, SparklicDisplay, WildDisplay, ComboDisplay, Cover1, Cover2, SameTimeNoteLine,
 }
 enum Category { Gameplay, Sound, IngameDisplay, Etc }
 
 const CATEGORY_ITEMS = [
 	[SettingItem.Speed, SettingItem.SoundOffset, SettingItem.JudgeOffset, SettingItem.Gamemode, SettingItem.MirrorMode, SettingItem.TrackSkip],
 	[SettingItem.MasterVolume, SettingItem.TapSound, SettingItem.GuideSound, SettingItem.GuideSoundOffset, SettingItem.JudgementSFX],
-	[SettingItem.ScoreDisplay, SettingItem.VexatonicDisplay, SettingItem.SparklicDisplay, SettingItem.WildDisplay, SettingItem.ComboDisplay, SettingItem.Cover1, SettingItem.Cover2],
+	[SettingItem.ScoreDisplay, SettingItem.VexatonicDisplay, SettingItem.SparklicDisplay, SettingItem.WildDisplay, SettingItem.ComboDisplay, SettingItem.Cover1, SettingItem.Cover2, SettingItem.SameTimeNoteLine],
 	[],
 ]
 
@@ -275,6 +275,13 @@ func _build_item_specs():
 			"get": func(): return float(Setting.cover2),
 			"set": func(v): Setting.cover2 = int(v),
 			"format": func(v): return str(int(v)),
+		},
+		SettingItem.SameTimeNoteLine: {
+			"name": "동시 판정선",
+			"info": "입력 시간이 같은 노트들을 하얀 줄로 연결합니다.",
+			"type": "enum", "values": [false, true], "labels": ON_OFF_LABELS,
+			"get": func(): return Setting.same_time_note_line,
+			"set": func(v): Setting.same_time_note_line = v,
 		},
 	}
 

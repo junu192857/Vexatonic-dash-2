@@ -61,6 +61,7 @@ static var wild_display: JUDGEMENT_DISPLAY = JUDGEMENT_DISPLAY.All
 static var combo_display: bool = true
 static var cover1: int = 0
 static var cover2: int = 0
+static var same_time_note_line: bool = false
 
 # ==================== 싱글톤 목적 변수 =====================
 
@@ -95,6 +96,7 @@ static func save() -> void:
 	cfg.set_value(SECTION, "combo_display", combo_display)
 	cfg.set_value(SECTION, "cover1", cover1)
 	cfg.set_value(SECTION, "cover2", cover2)
+	cfg.set_value(SECTION, "same_time_note_line", same_time_note_line)
 	cfg.save(SETTINGS_PATH)
 
 static func load() -> void:
@@ -121,6 +123,7 @@ static func load() -> void:
 	combo_display = cfg.get_value(SECTION, "combo_display", true)
 	cover1 = cfg.get_value(SECTION, "cover1", 0)
 	cover2 = cfg.get_value(SECTION, "cover2", 0)
+	same_time_note_line = cfg.get_value(SECTION, "same_time_note_line", false)
 
 static func change_difficulty():
 	selected_difficulty = (selected_difficulty + 1) % 3
