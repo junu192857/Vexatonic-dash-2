@@ -653,6 +653,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PausedPanelHolder" type="ColorRect" parent="CanvasLayer/Control" unique_id=1124295436]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
