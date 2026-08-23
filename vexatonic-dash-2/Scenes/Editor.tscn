@@ -745,6 +745,7 @@ grow_vertical = 0
 text = "Finish"
 
 [node name="IngameStatusHolder" type="Control" parent="CanvasLayer" unique_id=1014779688]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0

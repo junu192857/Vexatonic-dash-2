@@ -370,7 +370,7 @@ func update_preview(selected: int):
 				if pressing_keys["shift"]:
 					y = lane_start_pos.y
 				elif pressing_keys["c"]:
-					y =  get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
+					y =  get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).camera_y
 				else: 
 					y = mouse_pos.y
 				preview.set_data(lane_start_pos, Vector2(snapped_x, y))
@@ -496,7 +496,7 @@ func generate_preview(selected: int) -> Node2D:
 			if pressing_keys["shift"]:
 				y = lane_start_pos.y
 			elif pressing_keys["c"]:
-				y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
+				y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).camera_y
 			else: 
 				y = mouse_pos.y
 			my_preview.set_data(lane_start_pos, Vector2(snapped_x, y))
@@ -632,7 +632,7 @@ func generate_modify_preview():
 					elif next_connector:
 						adjusted_y = next_connector.end_keyframe.kf.y
 				elif pressing_keys["c"]:
-					adjusted_y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).x
+					adjusted_y = get_trigger_process_at_time(PositionCalculator.get_time_from_posx(snapped_x)).camera_y
 				else:
 					adjusted_y = mouse_pos.y
 				var new_keyframe = Keyframe.new(PositionCalculator.get_time_from_posx(snapped_x), adjusted_y)
@@ -1625,29 +1625,34 @@ func _process(_delta:float):
 	if (music_playing):
 		var current_time = musicPlayer.get_playback_position() * 1000
 		music_bar.global_position.x = PositionCalculator.get_posx_from_time(current_time)
-		var trigger_vector2 = get_trigger_process_at_time(current_time)
-		camera_range.set_bounds(get_camera_bounds_at(current_time, trigger_vector2))
-		set_ingame_status(current_time, trigger_vector2)
+		var trigger_status = get_trigger_process_at_time(current_time)
+		camera_range.set_bounds(get_camera_bounds_at(current_time, trigger_status))
+		set_ingame_status(current_time, trigger_status)
 
-func set_ingame_status(time: float, trigger_vector2: Vector3):
+func set_ingame_status(time: float, status: TriggerStatus):
 	ingameStatusHolder.get_node("TimeText").text = "Time: %.2f" % time
-	ingameStatusHolder.get_node("CameraYText").text = "Camera_Y(pos_y): %.2f" % trigger_vector2.x
-	ingameStatusHolder.get_node("CameraZoomText").text = "Camera_Zoom: %.2f" % trigger_vector2.y
-	ingameStatusHolder.get_node("CameraXText").text = "Camera_X(ms): %.2f" % trigger_vector2.z
+	ingameStatusHolder.get_node("CameraYText").text = "Camera_Y(pos_y): %.2f" % status.camera_y
+	ingameStatusHolder.get_node("CameraZoomText").text = "Camera_Zoom: %.2f" % status.camera_zoom
+	ingameStatusHolder.get_node("CameraXText").text = "Camera_X(ms): %.2f" % status.camera_x
+	ingameStatusHolder.get_node("CameraRotationText").text = "Camera_Rotation: %.2f" % status.camera_rotation
+	ingameStatusHolder.get_node("SpeedText").text = "Speed: %.2f" % status.speed
 
-func get_camera_bounds_at(time: float, trigger_vector: Vector3) -> Rect2:
+func get_camera_bounds_at(time: float, status: TriggerStatus) -> Rect2:
 	var vp = get_viewport_rect().size
-	var vp_w = vp.x / trigger_vector.y
-	var vp_h = vp.y / trigger_vector.y
-	var effective_time = time + trigger_vector.z
+	var vp_w = vp.x / status.camera_zoom
+	var vp_h = vp.y / status.camera_zoom
+	var effective_time = time + status.camera_x
 	var center_x = PositionCalculator.get_posx_from_time(effective_time) + vp_w * 0.3
-	return Rect2(center_x - vp_w * 0.5, trigger_vector.x - vp_h * 0.5, vp_w, vp_h)
+	return Rect2(center_x - vp_w * 0.5, status.camera_y - vp_h * 0.5, vp_w, vp_h)
 
-#return: (delta_y, zoom, delta_time) 형태의 Vector3
-func get_trigger_process_at_time(time: float) -> Vector3:
+# 특정 시점의 카메라/속도 트리거 반영 상태를 TriggerStatus로 반환
+func get_trigger_process_at_time(time: float) -> TriggerStatus:
 	var delta_y = 0.0
 	var zoom = 1.0
 	var delta_time = 0.0
+	var delta_rotation = 0.0
+	var speed = 1.0
+	var speed_start = -1.0
 	for tr in levelData.triggers:
 		if time < tr.start:
 			continue
@@ -1659,7 +1664,14 @@ func get_trigger_process_at_time(time: float) -> Vector3:
 				delta_time += tr.c * progress
 			Trigger.TYPE.Move:
 				delta_y += tr.c * progress
-	return Vector3(delta_y, zoom, delta_time)
+			Trigger.TYPE.Rotate:
+				delta_rotation += tr.c * progress
+			Trigger.TYPE.Speed:
+				# Speed는 변화량이 아니라 절댓값 반영이므로, 가장 최근(시작 시각이 큰) 트리거 값을 그대로 사용
+				if tr.start >= speed_start:
+					speed = tr.c
+					speed_start = tr.start
+	return TriggerStatus.new(delta_y, zoom, delta_time, delta_rotation, speed)
 
 func set_target_lane(p_target_lane: Lane):
 	target_lane = p_target_lane
