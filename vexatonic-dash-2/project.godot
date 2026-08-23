@@ -25,6 +25,7 @@ PausedInputManager="*uid://daelebkyjhm30"
 InputManager="*res://Scripts/Autoloads/InputManager.gd"
 PositionCalculator="*uid://d0oinqdkgv3q8"
 TransitionOverlay="*res://Scripts/Autoloads/TransitionOverlay.gd"
+ServerAPI="*res://Scripts/Autoloads/ServerAPI.gd"
 
 [debug]
 

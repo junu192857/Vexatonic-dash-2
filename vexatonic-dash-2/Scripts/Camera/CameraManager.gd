@@ -22,6 +22,9 @@ var triggered_zoom: bool = false
 var triggered_delta_time: float = 0.0
 var temp_delta_time: float = 0.0
 
+var triggered_delta_rotation: float = 0.0
+var temp_delta_rotation: float = 0.0
+
 var _initialized: bool = false
 var earliest_remaining_trigger: int = 0
 
@@ -56,6 +59,7 @@ func move(time: float) -> void:
 		set_camera_position()
 	var effective_time = time + triggered_delta_time + temp_delta_time
 	position = Vector2(PositionCalculator.get_posx_from_time(effective_time), 0.0) + triggered_delta_position + temp_delta_position
+	rotation = triggered_delta_rotation + temp_delta_rotation
 	
 func _apply_triggers(time: float) -> void:
 	if triggers.is_empty():
@@ -71,6 +75,7 @@ func _apply_triggers(time: float) -> void:
 	temp_delta_zoom = 0.0
 	triggered_zoom = false
 	temp_delta_time = 0.0
+	temp_delta_rotation = 0.0
 	
 	for i in range(earliest_remaining_trigger, triggers.size()):
 		var tr: Trigger = triggers[i]
@@ -93,7 +98,6 @@ func _apply_triggers(time: float) -> void:
 				earliest_remaining_trigger += 1
 			continue
 
-		var delta_ratio = new_progress - prev_progress
 		_trigger_progress[i] = new_progress
 		match tr.type:
 			Trigger.TYPE.Move:
@@ -105,11 +109,11 @@ func _apply_triggers(time: float) -> void:
 
 
 			Trigger.TYPE.Rotate:
-				var delta_rad = deg_to_rad(tr.c * delta_ratio)
-				# 판정선 기준점을 중심으로 Camera2D 회전
-				#camera.position = pivot + rotated_offset
-				#camera.rotation += delta_rad
-				rotation += delta_rad
+				var delta_rad = deg_to_rad(tr.c)
+				if (new_progress == 1.0):
+					triggered_delta_rotation += delta_rad
+				else:
+					temp_delta_rotation += delta_rad * new_progress
 
 			Trigger.TYPE.Zoom:
 				if (new_progress == 1.0):
@@ -131,7 +135,7 @@ func _snapshot_initial(i: int) -> void:
 		Trigger.TYPE.Move:
 			_trigger_initial[i] = position.y
 		Trigger.TYPE.Rotate:
-			_trigger_initial[i] = camera.rotation
+			_trigger_initial[i] = 0.0
 		Trigger.TYPE.Zoom:
 			_trigger_initial[i] = camera.zoom.x
 		Trigger.TYPE.MoveX:
