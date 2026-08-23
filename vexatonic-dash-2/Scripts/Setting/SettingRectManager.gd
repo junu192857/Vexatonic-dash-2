@@ -6,6 +6,7 @@ enum SettingItem {
 	Speed, SoundOffset, JudgeOffset, Gamemode, MirrorMode, TrackSkip,
 	MasterVolume, TapSound, GuideSound, GuideSoundOffset, JudgementSFX,
 	ScoreDisplay, VexatonicDisplay, SparklicDisplay, WildDisplay, ComboDisplay, Cover1, Cover2, SameTimeNoteLine,
+	AlwaysShowTutorialPrompt,
 }
 enum Category { Gameplay, Sound, IngameDisplay, Etc }
 
@@ -13,7 +14,7 @@ const CATEGORY_ITEMS = [
 	[SettingItem.Speed, SettingItem.SoundOffset, SettingItem.JudgeOffset, SettingItem.Gamemode, SettingItem.MirrorMode, SettingItem.TrackSkip],
 	[SettingItem.MasterVolume, SettingItem.TapSound, SettingItem.GuideSound, SettingItem.GuideSoundOffset, SettingItem.JudgementSFX],
 	[SettingItem.ScoreDisplay, SettingItem.VexatonicDisplay, SettingItem.SparklicDisplay, SettingItem.WildDisplay, SettingItem.ComboDisplay, SettingItem.Cover1, SettingItem.Cover2, SettingItem.SameTimeNoteLine],
-	[],
+	[SettingItem.AlwaysShowTutorialPrompt],
 ]
 
 const ROW_HEIGHT = 52.0
@@ -282,6 +283,13 @@ func _build_item_specs():
 			"type": "enum", "values": [false, true], "labels": ON_OFF_LABELS,
 			"get": func(): return Setting.same_time_note_line,
 			"set": func(v): Setting.same_time_note_line = v,
+		},
+		SettingItem.AlwaysShowTutorialPrompt: {
+			"name": "튜토리얼 항상 표시",
+			"info": "이미 튜토리얼을 플레이했더라도, 게임 시작 시 튜토리얼 플레이 여부를 묻는 대화를 항상 표시합니다.",
+			"type": "enum", "values": [false, true], "labels": ON_OFF_LABELS,
+			"get": func(): return Setting.always_show_tutorial_prompt,
+			"set": func(v): Setting.always_show_tutorial_prompt = v,
 		},
 	}
 

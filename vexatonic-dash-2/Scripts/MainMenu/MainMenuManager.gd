@@ -69,11 +69,14 @@ func _on_pressed_esc():
 # =================== 설정 창 ===================
 
 func _on_game_start():
-	if (not Setting.tutorial_played):
+	if (not Setting.tutorial_played or Setting.always_show_tutorial_prompt):
 		open_tutorial_warning()
 	else:
-		Setting.is_tutorial = false
-		get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
+		go_to_select_song()
+
+func go_to_select_song():
+	Setting.is_tutorial = false
+	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 
 func _on_tutorial_start():
 	Setting.is_tutorial = true
@@ -95,6 +98,8 @@ func open_tutorial_warning():
 	Setting.tutorial_played = true
 	if (not storyManager._on_select_left.is_connected(_on_tutorial_start)):
 		storyManager._on_select_left.connect(_on_tutorial_start)
+	if (not storyManager._on_select_right.is_connected(go_to_select_song)):
+		storyManager._on_select_right.connect(go_to_select_song)
 	storyManager.start_story("res://Scripts/MainMenu/GoTutorial.txt", true)
 
 func close_setting():

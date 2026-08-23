@@ -39,6 +39,7 @@ static var sound_offset: float = 0
 static var judge_offset: float = -20
 static var selected_difficulty: int = 1
 static var tutorial_played = false
+static var always_show_tutorial_prompt: bool = false
 
 # ==================== 게임플레이 설정 =====================
 
@@ -97,6 +98,7 @@ static func save() -> void:
 	cfg.set_value(SECTION, "cover1", cover1)
 	cfg.set_value(SECTION, "cover2", cover2)
 	cfg.set_value(SECTION, "same_time_note_line", same_time_note_line)
+	cfg.set_value(SECTION, "always_show_tutorial_prompt", always_show_tutorial_prompt)
 	cfg.save(SETTINGS_PATH)
 
 static func load() -> void:
@@ -124,6 +126,7 @@ static func load() -> void:
 	cover1 = cfg.get_value(SECTION, "cover1", 0)
 	cover2 = cfg.get_value(SECTION, "cover2", 0)
 	same_time_note_line = cfg.get_value(SECTION, "same_time_note_line", false)
+	always_show_tutorial_prompt = cfg.get_value(SECTION, "always_show_tutorial_prompt", false)
 
 static func change_difficulty():
 	selected_difficulty = (selected_difficulty + 1) % 3

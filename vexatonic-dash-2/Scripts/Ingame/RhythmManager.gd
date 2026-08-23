@@ -349,6 +349,8 @@ func assign_note(note: Note):
 
 func end_game():
 	game_finished = true
+	if (Setting.is_tutorial):
+		Setting.is_tutorial = false
 	PositionCalculator.reset()
 	$IngameDataManager.on_song_end(level_path)
 	var result = $IngameDataManager.get_result_data()
