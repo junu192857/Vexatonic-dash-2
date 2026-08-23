@@ -790,7 +790,7 @@ offset_right = 152.0
 offset_bottom = 158.0
 text = "Speed:"
 
-[node name="SpeedText2" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=952012486]
+[node name="CameraRotationText" type="Label" parent="CanvasLayer/IngameStatusHolder" unique_id=952012486]
 layout_mode = 0
 offset_left = 21.0
 offset_top = 111.0
