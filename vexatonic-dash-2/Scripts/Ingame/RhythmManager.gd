@@ -3,7 +3,7 @@ extends Node2D
 var levelData: LevelData
 
 @export var CHARACTER_SCENE: PackedScene
-@onready var musicPlayer = $AudioStreamPlayer
+@onready var musicPlayer: AudioStreamPlayer = $AudioStreamPlayer
 @onready var cameraManager = $CameraManager
 @onready var camera = $CameraManager/Camera2D
 @onready var line = $CharacterHolder/Line
@@ -19,7 +19,6 @@ var started_tutorial: bool = false
 var music_started = false
 var game_finished = false
 var time_start_tick: float
-var music_start_tick: float
 #어느 레인까지 캐릭터가 생성되었는지 체크하는 용도
 var lane_index: int
 
@@ -32,6 +31,9 @@ var level_path: String
 var paused_time: float = 0.0
 var is_resuming_animation: bool = false
 var resuming_from_pause: bool = false
+# 되감기 후 정상 진행 재개(catch-up) 시점의 time 값과, 그 이후 흐른 실제 시간(ms) - delta 누적이라 pause/tween 여부와 무관하게 항상 정확함
+var catchup_start_time: float = 0.0
+var catchup_elapsed_ms: float = 0.0
 
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
@@ -130,8 +132,10 @@ func place_character(lane: Lane):
 func _physics_process(delta: float) -> void:
 	if (not game_finished):
 		if (resuming_from_pause):
-			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
+			catchup_elapsed_ms += delta * 1000.0
+			time = catchup_start_time + catchup_elapsed_ms
 			if time >= paused_time:
+				#time = paused_time
 				musicPlayer.stream_paused = false
 				resuming_from_pause = false
 				is_resuming_animation = false
@@ -142,7 +146,6 @@ func _physics_process(delta: float) -> void:
 			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
 			if time >= Setting.sound_offset:
 				musicPlayer.play()
-				music_start_tick = Time.get_ticks_msec()
 				music_started = true
 		else:
 			time = musicPlayer.get_playback_position() * 1000 + Setting.sound_offset
@@ -391,7 +394,7 @@ func _on_released(p_color:int, is_left: bool):
 func _on_pressed_esc():
 	if game_finished or get_tree().paused:
 		return
-	if time < -COUNTDOWN_TIME * 0.5:
+	if time < 0:
 		return
 	_pause_game()
 
@@ -400,7 +403,6 @@ func _pause_game():
 	$IngameDataManager.record_disabled = true
 	for holder in noteHolders:
 		holder.force_pause(paused_time)
-	musicPlayer.stream_paused = true
 	pausedPanelHolder.visible = true
 	get_tree().paused = true
 
@@ -409,7 +411,7 @@ func _on_pause_resume_pressed():
 		return
 	is_resuming_animation = true
 	pausedPanelHolder.visible = false
-	var rewind_target = max(paused_time - 2000.0, -3000.0)
+	var rewind_target = paused_time - 2000.0
 	var rewind_tween = create_tween()
 	rewind_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	rewind_tween.tween_method(_update_rewind_visual, paused_time, rewind_target, 1.0)
@@ -425,7 +427,8 @@ func _update_rewind_visual(t: float) -> void:
 func _start_resume_catchup(resume_target: float) -> void:
 	PositionCalculator.reset_monotonic_index()
 	cameraManager.reset_trigger_state()
-	time_start_tick = Time.get_ticks_msec() - COUNTDOWN_TIME - resume_target
+	catchup_start_time = resume_target
+	catchup_elapsed_ms = 0.0
 	resuming_from_pause = true
 	get_tree().paused = false
 
