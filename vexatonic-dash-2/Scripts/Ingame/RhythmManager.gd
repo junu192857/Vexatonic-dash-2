@@ -33,6 +33,9 @@ var paused_time: float = 0.0
 # 이 동안엔 음악이 -80db로 음소거된 채로 미리 재생되고 있음 (그대로 musicPlayer 재생 위치가 time 계산에 쓰임)
 var is_resuming_animation: bool = false
 var pre_pause_volume_db: float = 0.0
+# music_started == false일 때 time = Time.get_ticks_msec() - time_start_tick + time_offset 로 계산.
+# 평소엔 -COUNTDOWN_TIME(곡 시작 전 카운트다운), 되감기 목표 시점이 0보다 작으면 (paused_time - 2000)로 바뀜
+var time_offset: float = -COUNTDOWN_TIME
 
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
@@ -134,7 +137,7 @@ func _physics_process(delta: float) -> void:
 			if (Setting.is_tutorial and Time.get_ticks_msec() - time_start_tick > 1000.0 and need_refresh_tutorial):
 				time_start_tick = Time.get_ticks_msec()
 				need_refresh_tutorial = false
-			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
+			time = Time.get_ticks_msec() - time_start_tick + time_offset
 			if time >= Setting.sound_offset:
 				musicPlayer.play()
 				music_started = true
@@ -424,8 +427,15 @@ func _start_resume_catchup(resume_target: float) -> void:
 	PositionCalculator.reset_monotonic_index()
 	cameraManager.reset_trigger_state()
 	musicPlayer.volume_db = -80.0
-	var seek_pos = max(0.0, (resume_target - Setting.sound_offset) / 1000.0)
-	musicPlayer.play(seek_pos)
+	if resume_target < Setting.sound_offset:
+		# 되감기 목표가 곡 시작 전(0 미만)이면 음악을 그 위치로 시크할 수 없으므로,
+		# 곡 시작 전 카운트다운과 동일한 tick 기반 계산으로 되돌아가서 처리
+		music_started = false
+		time_start_tick = Time.get_ticks_msec()
+		time_offset = resume_target
+	else:
+		var seek_pos = (resume_target - Setting.sound_offset) / 1000.0
+		musicPlayer.play(seek_pos)
 	get_tree().paused = false
 
 func _on_pause_restart_pressed():
