@@ -13,6 +13,7 @@ signal pressed_l
 signal pressed_enter
 signal pressed_esc
 signal pressed_a
+signal pressed_s
 signal pressed_d
 
 func _input(event):
@@ -32,6 +33,9 @@ func _input(event):
 			KEY_A:
 				if event.pressed and not event.is_echo():
 					pressed_a.emit()
+			KEY_S:
+				if event.pressed and not event.is_echo():
+					pressed_s.emit()
 			KEY_D:
 				if event.pressed and not event.is_echo():
 					pressed_d.emit()

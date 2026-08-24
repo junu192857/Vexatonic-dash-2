@@ -134,6 +134,21 @@ func process_release(time: float, is_left: bool):
 				note.release_hold(is_left, time)
 	_advance_earliest_unprocessed()
 
+# 일시정지 시 호출: 시점만 처리되고 종점은 미처리인 롱노트를 전부 강제 Miss 처리
+# (홀드 중이었다면 그 시점까지 Paint를 finalize한 뒤 Miss 처리)
+func force_pause(time: float) -> void:
+	for note in notes:
+		if note.get_data().type == 1 and note.is_hit and not note.end_judged:
+			_force_pause_miss(note, time)
+	_advance_earliest_unprocessed(time)
+
+func _force_pause_miss(note: Note, time: float) -> void:
+	note.end_judged = true
+	if note.is_holding_anyway():
+		note.finalize_hold_time(time)
+		note.update_last_hold_visual()
+	note.spread_judgement(Note.Judgement.MISS, note.get_marker(), true)
+
 func move_to_next_note() -> bool:
 	current_index += 1
 	if notes.size() - 1 < current_index:

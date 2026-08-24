@@ -9,6 +9,7 @@ var levelData: LevelData
 @onready var line = $CharacterHolder/Line
 @onready var lineSprite = $CharacterHolder/Line/Sprite2D
 @onready var character_holder:Node2D = $CharacterHolder
+@onready var pausedPanelHolder: Control = $"../CanvasLayer/Control/PausedPanelHolder"
 
 var characters: Array[Character]
 
@@ -27,6 +28,11 @@ var noteHolders: Array[NoteHolder]
 const COUNTDOWN_TIME = 3000
 var level_path: String
 
+# ============================== 일시정지 ==================================
+var paused_time: float = 0.0
+var is_resuming_animation: bool = false
+var resuming_from_pause: bool = false
+
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -44,7 +50,11 @@ func _ready() -> void:
 	InputManager.pressed_j.connect(func(): _on_pressed(2, false))
 	InputManager.released_j.connect(func(): _on_released(2, false))
 	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
-	
+	InputManager.pressed_esc.connect(_on_pressed_esc)
+	PausedInputManager.pressed_a.connect(_on_pause_resume_pressed)
+	PausedInputManager.pressed_s.connect(_on_pause_restart_pressed)
+	PausedInputManager.pressed_d.connect(_on_pause_quit_pressed)
+
 	#채보 경로 설정
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
 	
@@ -119,7 +129,13 @@ func place_character(lane: Lane):
 	
 func _physics_process(delta: float) -> void:
 	if (not game_finished):
-		if (not music_started):
+		if (resuming_from_pause):
+			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
+			if time >= paused_time:
+				musicPlayer.stream_paused = false
+				resuming_from_pause = false
+				is_resuming_animation = false
+		elif (not music_started):
 			if (Setting.is_tutorial and Time.get_ticks_msec() - time_start_tick > 1000.0 and need_refresh_tutorial):
 				time_start_tick = Time.get_ticks_msec()
 				need_refresh_tutorial = false
@@ -369,6 +385,65 @@ func _on_pressed(p_color:int, is_left: bool):
 func _on_released(p_color:int, is_left: bool):
 	if not game_finished:
 		noteHolders[p_color].process_release(time, is_left)
+
+#================================== 일시정지 =================================
+
+func _on_pressed_esc():
+	if game_finished or get_tree().paused:
+		return
+	if time < -COUNTDOWN_TIME * 0.5:
+		return
+	_pause_game()
+
+func _pause_game():
+	paused_time = time
+	$IngameDataManager.record_disabled = true
+	for holder in noteHolders:
+		holder.force_pause(paused_time)
+	musicPlayer.stream_paused = true
+	pausedPanelHolder.visible = true
+	get_tree().paused = true
+
+func _on_pause_resume_pressed():
+	if not get_tree().paused or is_resuming_animation:
+		return
+	is_resuming_animation = true
+	pausedPanelHolder.visible = false
+	var rewind_target = max(paused_time - 2000.0, -3000.0)
+	var rewind_tween = create_tween()
+	rewind_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	rewind_tween.tween_method(_update_rewind_visual, paused_time, rewind_target, 1.0)
+	rewind_tween.tween_callback(_start_resume_catchup.bind(rewind_target))
+
+# 되감기 애니메이션 도중 매 프레임 호출: 카메라와 스크롤 기준점을 되감기 시점에 맞춤
+# (캐릭터 개별 위치는 PositionCalculator의 단조증가 가정 때문에 되감기 중엔 갱신하지 않고
+#  정상 진행이 재개되면 _physics_process가 다시 정확히 따라잡음)
+func _update_rewind_visual(t: float) -> void:
+	cameraManager.scrub_to(t)
+	character_holder.position = Vector2(PositionCalculator.get_posx_from_time(t), cameraManager.position.y)
+
+func _start_resume_catchup(resume_target: float) -> void:
+	PositionCalculator.reset_monotonic_index()
+	cameraManager.reset_trigger_state()
+	time_start_tick = Time.get_ticks_msec() - COUNTDOWN_TIME - resume_target
+	resuming_from_pause = true
+	get_tree().paused = false
+
+func _on_pause_restart_pressed():
+	if not get_tree().paused or is_resuming_animation:
+		return
+	is_resuming_animation = true
+	get_tree().paused = false
+	await TransitionOverlay.close()
+	get_tree().reload_current_scene()
+
+func _on_pause_quit_pressed():
+	if not get_tree().paused or is_resuming_animation:
+		return
+	is_resuming_animation = true
+	get_tree().paused = false
+	await TransitionOverlay.close()
+	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 
 
 #===================================================================================

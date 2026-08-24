@@ -27,6 +27,8 @@ var track_skip_border: int = 0
 var margin_applicable: bool = false
 var _combo_lamp: ComboLamp = ComboLamp.FullVexatonic
 var best_score_border: int = 0
+# 일시정지를 한 번이라도 사용했으면 true - on_song_end()에서 기록 저장을 막는 용도
+var record_disabled: bool = false
 
 signal status_updated(status: GameStatus)
 signal all_notes_cleared
@@ -156,6 +158,8 @@ func _get_rank(final_score_int: int) -> Rank:
 	return Rank.D
 
 func on_song_end(chart_path: String) -> void:
+	if record_disabled:
+		return
 	var final_score = roundi(score + calculate_longNote_score(pressed_long_length))
 	var paint = roundi(calculate_longNote_score(pressed_long_length)) == 10000
 	var paint_ratio = pressed_long_length / total_long_length if total_long_length > 0 else 1.0
