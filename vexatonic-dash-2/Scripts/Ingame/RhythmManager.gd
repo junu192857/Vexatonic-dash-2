@@ -135,8 +135,6 @@ func _physics_process(delta: float) -> void:
 			catchup_elapsed_ms += delta * 1000.0
 			time = catchup_start_time + catchup_elapsed_ms
 			if time >= paused_time:
-				#time = paused_time
-				musicPlayer.stream_paused = false
 				resuming_from_pause = false
 				is_resuming_animation = false
 		elif (not music_started):
