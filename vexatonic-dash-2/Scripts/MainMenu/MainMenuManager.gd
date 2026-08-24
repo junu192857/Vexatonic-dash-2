@@ -27,6 +27,7 @@ func _ready():
 	settingRect.visible = false
 	settingRect.close_setting.connect(close_setting)
 	state = MainMenuState.Main
+	TransitionOverlay.open()
 
 func _refresh_selection():
 	for i in range(button_array.size()):
@@ -76,6 +77,7 @@ func _on_game_start():
 
 func go_to_select_song():
 	Setting.is_tutorial = false
+	await TransitionOverlay.close()
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 
 func _on_tutorial_start():

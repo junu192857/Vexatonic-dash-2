@@ -53,6 +53,7 @@ func _ready() -> void:
 	$CanvasLayer/Control.add_child(settingRect)
 	settingRect.visible = false
 	settingRect.close_setting.connect(close_setting)
+	TransitionOverlay.open()
 
 	_ensure_user_charts()
 	_scan_charts()
@@ -280,4 +281,5 @@ func _on_return_to_main():
 	if setting_open:
 		close_setting()
 	else:
+		await TransitionOverlay.close()
 		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
