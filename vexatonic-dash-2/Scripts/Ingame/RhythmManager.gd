@@ -29,11 +29,10 @@ var level_path: String
 
 # ============================== 일시정지 ==================================
 var paused_time: float = 0.0
+# 재개 버튼을 누른 순간부터 (되감기 + 음악이 일시정지 시점까지 다시 따라잡을 때까지) true.
+# 이 동안엔 음악이 -80db로 음소거된 채로 미리 재생되고 있음 (그대로 musicPlayer 재생 위치가 time 계산에 쓰임)
 var is_resuming_animation: bool = false
-var resuming_from_pause: bool = false
-# 되감기 후 정상 진행 재개(catch-up) 시점의 time 값과, 그 이후 흐른 실제 시간(ms) - delta 누적이라 pause/tween 여부와 무관하게 항상 정확함
-var catchup_start_time: float = 0.0
-var catchup_elapsed_ms: float = 0.0
+var pre_pause_volume_db: float = 0.0
 
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
@@ -131,13 +130,7 @@ func place_character(lane: Lane):
 	
 func _physics_process(delta: float) -> void:
 	if (not game_finished):
-		if (resuming_from_pause):
-			catchup_elapsed_ms += delta * 1000.0
-			time = catchup_start_time + catchup_elapsed_ms
-			if time >= paused_time:
-				resuming_from_pause = false
-				is_resuming_animation = false
-		elif (not music_started):
+		if (not music_started):
 			if (Setting.is_tutorial and Time.get_ticks_msec() - time_start_tick > 1000.0 and need_refresh_tutorial):
 				time_start_tick = Time.get_ticks_msec()
 				need_refresh_tutorial = false
@@ -147,6 +140,9 @@ func _physics_process(delta: float) -> void:
 				music_started = true
 		else:
 			time = musicPlayer.get_playback_position() * 1000 + Setting.sound_offset
+			if is_resuming_animation and time >= paused_time:
+				musicPlayer.volume_db = pre_pause_volume_db
+				is_resuming_animation = false
 		
 		if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 			place_character(levelData.lanes[lane_index])
@@ -401,6 +397,8 @@ func _pause_game():
 	$IngameDataManager.record_disabled = true
 	for holder in noteHolders:
 		holder.force_pause(paused_time)
+	pre_pause_volume_db = musicPlayer.volume_db
+	musicPlayer.stop()
 	pausedPanelHolder.visible = true
 	get_tree().paused = true
 
@@ -425,9 +423,9 @@ func _update_rewind_visual(t: float) -> void:
 func _start_resume_catchup(resume_target: float) -> void:
 	PositionCalculator.reset_monotonic_index()
 	cameraManager.reset_trigger_state()
-	catchup_start_time = resume_target
-	catchup_elapsed_ms = 0.0
-	resuming_from_pause = true
+	musicPlayer.volume_db = -80.0
+	var seek_pos = max(0.0, (resume_target - Setting.sound_offset) / 1000.0)
+	musicPlayer.play(seek_pos)
 	get_tree().paused = false
 
 func _on_pause_restart_pressed():
