@@ -149,3 +149,45 @@ func _get_rotation_pivot() -> Vector2:
 		return Vector2(vp.x * 0.5 / camera.zoom.x, vp.y * 0.7 / camera.zoom.y)
 	else:
 		return Vector2(vp.x * 0.2 / camera.zoom.x, vp.y * 0.5 / camera.zoom.y)
+
+# 일시정지 되감기 전용: move()/_apply_triggers()의 누적 상태(단조증가 가정)를 건드리지 않고
+# 임의 시점(과거로도 이동 가능)의 카메라 상태를 매번 처음부터 다시 계산해서 그대로 적용
+func scrub_to(time: float) -> void:
+	var delta_y = 0.0
+	var zoom = 1.0
+	var delta_time = 0.0
+	var delta_rotation = 0.0
+	for tr in triggers:
+		if time < tr.start:
+			continue
+		var progress = 1.0 if tr.t <= 0.0 else clampf((time - tr.start) / tr.t, 0.0, 1.0)
+		match tr.type:
+			Trigger.TYPE.Move:
+				delta_y += Setting.mirror_y(tr.c) * progress
+			Trigger.TYPE.Rotate:
+				delta_rotation += deg_to_rad(tr.c) * progress
+			Trigger.TYPE.Zoom:
+				zoom += tr.c * progress
+			Trigger.TYPE.MoveX:
+				delta_time += tr.c * progress
+	camera.zoom = Vector2.ONE * zoom
+	set_camera_position()
+	rotation = delta_rotation
+	var effective_time = time + delta_time
+	position = Vector2(PositionCalculator.get_posx_from_time(effective_time), delta_y)
+
+# scrub_to() 사용 후, 정상 진행(move())을 재개하기 전에 호출: 단조증가 누적 상태를 초기화해서
+# 다음 move() 호출부터 현재 트리거 목록을 처음부터 다시 정확히 재계산하도록 함
+func reset_trigger_state() -> void:
+	_trigger_progress.fill(0.0)
+	earliest_remaining_trigger = 0
+	_initialized = false
+	triggered_delta_position = Vector2.ZERO
+	temp_delta_position = Vector2.ZERO
+	triggered_delta_zoom = 1.0
+	temp_delta_zoom = 0.0
+	triggered_zoom = false
+	triggered_delta_time = 0.0
+	temp_delta_time = 0.0
+	triggered_delta_rotation = 0.0
+	temp_delta_rotation = 0.0

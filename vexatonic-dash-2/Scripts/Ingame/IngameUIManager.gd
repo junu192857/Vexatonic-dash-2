@@ -191,6 +191,7 @@ func show_result_2(data: Dictionary) -> void:
 	tween.tween_callback(func(): InputManager.pressed_enter.connect(_on_result_confirm, CONNECT_ONE_SHOT))
 	
 func _on_result_confirm():
+	await TransitionOverlay.close()
 	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 
 func get_note_position(note: Note):

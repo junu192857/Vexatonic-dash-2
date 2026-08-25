@@ -75,6 +75,7 @@ parameters/looping = true
 layer = -1
 
 [node name="TextureRect" type="TextureRect" parent="BackgroundLayer" unique_id=1867714129]
+modulate = Color(0.4045111, 0.40451115, 0.4045111, 1)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -94,6 +95,7 @@ grow_vertical = 2
 
 [node name="RightCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=791685082]
 visible = false
+z_index = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.781
@@ -116,6 +118,7 @@ color = Color(0, 0, 0, 0.83137256)
 
 [node name="LeftCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=276138114]
 visible = false
+z_index = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.21900001
@@ -135,6 +138,7 @@ color = Color(0, 0, 0, 0.83137256)
 
 [node name="CenterCover" type="TextureRect" parent="CanvasLayer/Control" unique_id=156756671]
 visible = false
+z_index = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -154,6 +158,7 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.83137256)
 
 [node name="ScorePanel" type="Panel" parent="CanvasLayer/Control" unique_id=1427313799]
+z_index = 2
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.1
@@ -226,6 +231,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LampTextHolder" type="Control" parent="CanvasLayer/Control" unique_id=442854916]
+z_index = 4
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -340,6 +346,7 @@ vertical_alignment = 1
 
 [node name="ResultPanelHolder" type="ColorRect" parent="CanvasLayer/Control" unique_id=2075620177]
 visible = false
+z_index = 4
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -648,6 +655,112 @@ offset_right = -0.49609375
 offset_bottom = 0.29400635
 theme_override_font_sizes/font_size = 42
 text = "PERFECT PAINT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PausedPanelHolder" type="ColorRect" parent="CanvasLayer/Control" unique_id=1124295436]
+visible = false
+z_index = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.30980393, 0.30980393, 0.30980393, 0.54901963)
+
+[node name="ResultPanel" type="TextureRect" parent="CanvasLayer/Control/PausedPanelHolder" unique_id=1146552497]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.85
+texture = ExtResource("12_ublex")
+
+[node name="PausedLabel" type="Label" parent="CanvasLayer/Control/PausedPanelHolder/ResultPanel" unique_id=204722263]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.067
+anchor_right = 0.8
+anchor_bottom = 0.23900001
+offset_left = 0.20799255
+offset_top = -0.034000397
+offset_right = 6.1035156e-05
+offset_bottom = 0.22200012
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 75
+text = "Paused"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ImportantInformation" type="Label" parent="CanvasLayer/Control/PausedPanelHolder/ResultPanel" unique_id=1763408967]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.11800001
+anchor_top = 0.272
+anchor_right = 0.87900007
+anchor_bottom = 0.379
+offset_left = 0.063964844
+offset_top = 0.055984497
+offset_right = 0.39190674
+offset_bottom = -0.058013916
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 39
+text = "중요: 일시정지를 이용한 기록은 반영되지 않습니다."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResumeLabel" type="Label" parent="CanvasLayer/Control/PausedPanelHolder/ResultPanel" unique_id=1796688954]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.085
+anchor_top = 0.546
+anchor_right = 0.32500002
+anchor_bottom = 0.652
+offset_left = 0.07997131
+offset_top = -0.2919922
+offset_right = -0.4000244
+offset_bottom = 0.29599
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 39
+text = "플레이 재개[A]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestartLabel" type="Label" parent="CanvasLayer/Control/PausedPanelHolder/ResultPanel" unique_id=872752855]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.377
+anchor_top = 0.546
+anchor_right = 0.61600006
+anchor_bottom = 0.652
+offset_left = -0.3040161
+offset_top = -0.2919922
+offset_right = 0.36798096
+offset_bottom = 0.29599
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 39
+text = "다시 시작[S]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestartLabel2" type="Label" parent="CanvasLayer/Control/PausedPanelHolder/ResultPanel" unique_id=1302247568]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.675
+anchor_top = 0.546
+anchor_right = 0.915
+anchor_bottom = 0.652
+offset_left = 0.39996338
+offset_top = -0.2919922
+offset_right = -0.080078125
+offset_bottom = 0.29599
+theme_override_fonts/font = ExtResource("16_r4r31")
+theme_override_font_sizes/font_size = 39
+text = "플레이 종료[D]"
 horizontal_alignment = 1
 vertical_alignment = 1
 

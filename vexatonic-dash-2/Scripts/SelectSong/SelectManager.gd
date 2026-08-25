@@ -15,6 +15,8 @@ extends Node2D
 @export var settingRectScene: PackedScene
 var settingRect
 
+@onready var musicPlayer: AudioStreamPlayer = $MusicPlayer
+
 const DIFFICULTY_COLORS: Array[Color] = [
   Color(0.6, 1.0, 0.4),
   Color(1.0, 0.65, 0.2),
@@ -51,6 +53,7 @@ func _ready() -> void:
 	$CanvasLayer/Control.add_child(settingRect)
 	settingRect.visible = false
 	settingRect.close_setting.connect(close_setting)
+	TransitionOverlay.open()
 
 	_ensure_user_charts()
 	_scan_charts()
@@ -62,6 +65,7 @@ func _ready() -> void:
 				current_index = i
 				break
 	_refresh_all()
+	_play_current_song_music()
 
 func _ensure_user_charts():
 	# user://Charts가 이미 있으면 건너뜀
@@ -203,6 +207,20 @@ func _on_slide_finished():
 	_refresh_can_start()
 	songSelectionHolder.position.x = slide_origin_x
 	is_animating = false
+	_play_current_song_music()
+
+func _play_current_song_music() -> void:
+	var meta = _get_metadata(0)
+	var chart_dir = CHARTS_DIR + "/" + meta.name
+	var music_path = chart_dir + "/" + meta.music_path
+	if not FileAccess.file_exists(music_path):
+		musicPlayer.stop()
+		return
+	var stream := AudioStreamMP3.new()
+	stream.data = FileAccess.get_file_as_bytes(music_path)
+	stream.loop = true
+	musicPlayer.stream = stream
+	musicPlayer.play()
 
 func _refresh_can_start():
 	if (_can_start()):
@@ -263,4 +281,5 @@ func _on_return_to_main():
 	if setting_open:
 		close_setting()
 	else:
+		await TransitionOverlay.close()
 		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")

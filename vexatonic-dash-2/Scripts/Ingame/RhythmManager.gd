@@ -3,12 +3,13 @@ extends Node2D
 var levelData: LevelData
 
 @export var CHARACTER_SCENE: PackedScene
-@onready var musicPlayer = $AudioStreamPlayer
+@onready var musicPlayer: AudioStreamPlayer = $AudioStreamPlayer
 @onready var cameraManager = $CameraManager
 @onready var camera = $CameraManager/Camera2D
 @onready var line = $CharacterHolder/Line
 @onready var lineSprite = $CharacterHolder/Line/Sprite2D
 @onready var character_holder:Node2D = $CharacterHolder
+@onready var pausedPanelHolder: Control = $"../CanvasLayer/Control/PausedPanelHolder"
 
 var characters: Array[Character]
 
@@ -18,7 +19,6 @@ var started_tutorial: bool = false
 var music_started = false
 var game_finished = false
 var time_start_tick: float
-var music_start_tick: float
 #어느 레인까지 캐릭터가 생성되었는지 체크하는 용도
 var lane_index: int
 
@@ -26,6 +26,16 @@ var noteHolders: Array[NoteHolder]
 
 const COUNTDOWN_TIME = 3000
 var level_path: String
+
+# ============================== 일시정지 ==================================
+var paused_time: float = 0.0
+# 재개 버튼을 누른 순간부터 (되감기 + 음악이 일시정지 시점까지 다시 따라잡을 때까지) true.
+# 이 동안엔 음악이 -80db로 음소거된 채로 미리 재생되고 있음 (그대로 musicPlayer 재생 위치가 time 계산에 쓰임)
+var is_resuming_animation: bool = false
+var pre_pause_volume_db: float = 0.0
+# music_started == false일 때 time = Time.get_ticks_msec() - time_start_tick + time_offset 로 계산.
+# 평소엔 -COUNTDOWN_TIME(곡 시작 전 카운트다운), 되감기 목표 시점이 0보다 작으면 (paused_time - 2000)로 바뀜
+var time_offset: float = -COUNTDOWN_TIME
 
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
@@ -44,7 +54,11 @@ func _ready() -> void:
 	InputManager.pressed_j.connect(func(): _on_pressed(2, false))
 	InputManager.released_j.connect(func(): _on_released(2, false))
 	InputManager.pressed_space.connect(func(): _on_pressed(3, true))
-	
+	InputManager.pressed_esc.connect(_on_pressed_esc)
+	PausedInputManager.pressed_a.connect(_on_pause_resume_pressed)
+	PausedInputManager.pressed_s.connect(_on_pause_restart_pressed)
+	PausedInputManager.pressed_d.connect(_on_pause_quit_pressed)
+
 	#채보 경로 설정
 	level_path = "res://Charts/Tutorial" if Setting.is_tutorial else Setting.selected_chart_dir 
 	
@@ -123,13 +137,15 @@ func _physics_process(delta: float) -> void:
 			if (Setting.is_tutorial and Time.get_ticks_msec() - time_start_tick > 1000.0 and need_refresh_tutorial):
 				time_start_tick = Time.get_ticks_msec()
 				need_refresh_tutorial = false
-			time = Time.get_ticks_msec() - time_start_tick - COUNTDOWN_TIME
+			time = Time.get_ticks_msec() - time_start_tick + time_offset
 			if time >= Setting.sound_offset:
 				musicPlayer.play()
-				music_start_tick = Time.get_ticks_msec()
 				music_started = true
 		else:
 			time = musicPlayer.get_playback_position() * 1000 + Setting.sound_offset
+			if is_resuming_animation and time >= paused_time:
+				musicPlayer.volume_db = pre_pause_volume_db
+				is_resuming_animation = false
 		
 		if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 			place_character(levelData.lanes[lane_index])
@@ -175,10 +191,23 @@ func render_chart():
 	var previous_time = -1
 	var previous_note
 	var previous_lane = -1
+	var track_same_time_lines = Setting.same_time_note_line
+	# 각 원소: {"time": float, "notes": Array} - time은 그룹의 기준(가장 먼저 들어온 노트) 시각
+	var same_time_notes: Array = []
 	for noteData in levelData.noteDatas:
 		pos_x = PositionCalculator.get_posx_from_time(noteData.time)
 		var cur_note = place_note(noteData, pos_x, false, self)
 		assign_note(cur_note)
+		if track_same_time_lines:
+			var bucket = null
+			for b in same_time_notes:
+				if abs(b["time"] - noteData.time) < Setting.EPSILON:
+					bucket = b
+					break
+			if bucket == null:
+				bucket = {"time": noteData.time, "notes": []}
+				same_time_notes.append(bucket)
+			bucket["notes"].append(cur_note)
 		if (previous_time >= 0 and previous_lane == noteData.lane):
 			var prev_conn_start = PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(previous_time) + Setting.NOTE_WIDTH / 2.0)
 			var prev_conn_end = PositionCalculator.get_time_from_posx(PositionCalculator.get_posx_from_time(noteData.time) - Setting.NOTE_WIDTH / 2.0)
@@ -224,6 +253,24 @@ func render_chart():
 		lane.sort_notes()
 		place_initial_connector(lane)
 		place_final_connector(lane)
+
+	if track_same_time_lines:
+		place_same_time_lines(same_time_notes)
+
+# 입력 시간이 같은 노트들을 흰 선으로 연결 (Suregi 모드 전용 설정)
+func place_same_time_lines(same_time_notes: Array) -> void:
+	for bucket in same_time_notes:
+		var notes: Array = bucket["notes"]
+		if notes.size() < 2:
+			continue
+		notes.sort_custom(func(a, b): return a.global_position.y < b.global_position.y)
+		var line := Line2D.new()
+		line.default_color = Color(1, 1, 1, 1)
+		line.width = 4.0
+		line.z_index = -1
+		for note in notes:
+			line.add_point(note.global_position)
+		add_child(line)
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
 func place_note(data:NoteData, pos_x: float, p_is_marker:bool, parent: Node2D) -> Note:
@@ -318,6 +365,8 @@ func assign_note(note: Note):
 
 func end_game():
 	game_finished = true
+	if (Setting.is_tutorial):
+		Setting.is_tutorial = false
 	PositionCalculator.reset()
 	$IngameDataManager.on_song_end(level_path)
 	var result = $IngameDataManager.get_result_data()
@@ -336,6 +385,74 @@ func _on_pressed(p_color:int, is_left: bool):
 func _on_released(p_color:int, is_left: bool):
 	if not game_finished:
 		noteHolders[p_color].process_release(time, is_left)
+
+#================================== 일시정지 =================================
+
+func _on_pressed_esc():
+	if game_finished or get_tree().paused:
+		return
+	if time < 0:
+		return
+	_pause_game()
+
+func _pause_game():
+	paused_time = time
+	$IngameDataManager.record_disabled = true
+	for holder in noteHolders:
+		holder.force_pause(paused_time)
+	pre_pause_volume_db = musicPlayer.volume_db
+	musicPlayer.stop()
+	pausedPanelHolder.visible = true
+	get_tree().paused = true
+
+func _on_pause_resume_pressed():
+	if not get_tree().paused or is_resuming_animation:
+		return
+	is_resuming_animation = true
+	pausedPanelHolder.visible = false
+	var rewind_target = paused_time - 2000.0
+	var rewind_tween = create_tween()
+	rewind_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	rewind_tween.tween_method(_update_rewind_visual, paused_time, rewind_target, 1.0)
+	rewind_tween.tween_callback(_start_resume_catchup.bind(rewind_target))
+
+# 되감기 애니메이션 도중 매 프레임 호출: 카메라와 스크롤 기준점을 되감기 시점에 맞춤
+# (캐릭터 개별 위치는 PositionCalculator의 단조증가 가정 때문에 되감기 중엔 갱신하지 않고
+#  정상 진행이 재개되면 _physics_process가 다시 정확히 따라잡음)
+func _update_rewind_visual(t: float) -> void:
+	cameraManager.scrub_to(t)
+	character_holder.position = Vector2(PositionCalculator.get_posx_from_time(t), cameraManager.position.y)
+
+func _start_resume_catchup(resume_target: float) -> void:
+	PositionCalculator.reset_monotonic_index()
+	cameraManager.reset_trigger_state()
+	musicPlayer.volume_db = -80.0
+	if resume_target < Setting.sound_offset:
+		# 되감기 목표가 곡 시작 전(0 미만)이면 음악을 그 위치로 시크할 수 없으므로,
+		# 곡 시작 전 카운트다운과 동일한 tick 기반 계산으로 되돌아가서 처리
+		music_started = false
+		time_start_tick = Time.get_ticks_msec()
+		time_offset = resume_target
+	else:
+		var seek_pos = (resume_target - Setting.sound_offset) / 1000.0
+		musicPlayer.play(seek_pos)
+	get_tree().paused = false
+
+func _on_pause_restart_pressed():
+	if not get_tree().paused or is_resuming_animation:
+		return
+	is_resuming_animation = true
+	get_tree().paused = false
+	await TransitionOverlay.close()
+	get_tree().reload_current_scene()
+
+func _on_pause_quit_pressed():
+	if not get_tree().paused or is_resuming_animation:
+		return
+	is_resuming_animation = true
+	get_tree().paused = false
+	await TransitionOverlay.close()
+	get_tree().change_scene_to_file("res://Scenes/SelectSong.tscn")
 
 
 #===================================================================================

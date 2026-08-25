@@ -125,7 +125,8 @@ func quit_story():
 	storyHolder.visible = false
 	InputManager.blocked = true
 
-	get_tree().paused = false
+	if (get_tree() and get_tree().paused):
+		get_tree().paused = false
 	story_end.emit()
 
 func hide_live2D():
@@ -173,13 +174,13 @@ func _animate_button_in(button: TextureRect):
 
 func _on_press_select_left():
 	_hide_buttons()
-	_on_select_left.emit()
 	_show_line(current_line)
+	_on_select_left.emit()
 
 func _on_press_select_right():
 	_hide_buttons()
-	_on_select_right.emit()
 	_show_line(current_line)
+	_on_select_right.emit()
 
 func _hide_buttons():
 	leftButton.visible = false

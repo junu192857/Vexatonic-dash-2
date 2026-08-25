@@ -10,6 +10,7 @@ outline_size = 4
 outline_color = Color(0, 0, 0, 1)
 
 [node name="JudgementScene" type="Control" unique_id=1702890444]
+z_index = 3
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_06d2l")

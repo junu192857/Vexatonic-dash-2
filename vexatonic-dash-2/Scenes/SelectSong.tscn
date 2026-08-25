@@ -51,6 +51,8 @@ settingHolder = NodePath("CanvasLayer/Control/SettingHolder")
 startButton = NodePath("CanvasLayer/Control/StartButton")
 settingRectScene = ExtResource("2_mdyll")
 
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1950427341]
+
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1950427340]
 
 [node name="Control" type="Control" parent="CanvasLayer" unique_id=399368785]
