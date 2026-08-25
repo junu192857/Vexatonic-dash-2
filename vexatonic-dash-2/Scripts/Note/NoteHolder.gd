@@ -146,7 +146,7 @@ func _force_pause_miss(note: Note, time: float) -> void:
 	note.end_judged = true
 	if note.is_holding_anyway():
 		note.finalize_hold_time(time)
-		note.update_last_hold_visual()
+		#note.update_hold_visual()
 	note.spread_judgement(Note.Judgement.MISS, note.get_marker(), true)
 
 func move_to_next_note() -> bool:
