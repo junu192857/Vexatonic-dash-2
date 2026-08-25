@@ -34,12 +34,12 @@ func set_connector_data(p_color:int, start_time, end_time, p_lane: Lane, first: 
 
 func _ready():
 	polygon = $Polygon2D
-	
+	var half_height = Setting.HALF_CONNECTOR_HEIGHT * Setting.note_width_scale()
 	polygon.polygon = PackedVector2Array([
-		Vector2(0,-Setting.HALF_CONNECTOR_HEIGHT), #좌상
-		Vector2(data.length,-Setting.HALF_CONNECTOR_HEIGHT+data.delta_y), #우상
-		Vector2(data.length,Setting.HALF_CONNECTOR_HEIGHT+data.delta_y), #우하
-		Vector2(0,Setting.HALF_CONNECTOR_HEIGHT) #좌하
+		Vector2(0,-half_height), #좌상
+		Vector2(data.length,-half_height+data.delta_y), #우상
+		Vector2(data.length,half_height+data.delta_y), #우하
+		Vector2(0,half_height) #좌하
 	])
 	polygon.uv = PackedVector2Array([
 		Vector2(0,0),
@@ -75,13 +75,14 @@ func paint_range(from_time: float, to_time: float) -> void:
 	if local_end_x <= local_start_x or data.length <= Setting.EPSILON:
 		processed_polygon.visible = false
 	else:
+		var half_height = Setting.HALF_CONNECTOR_HEIGHT * Setting.note_width_scale()
 		var y_start = (local_start_x / data.length) * data.delta_y
 		var y_end   = (local_end_x   / data.length) * data.delta_y
 		processed_polygon.polygon = PackedVector2Array([
-			Vector2(local_start_x, y_start - Setting.HALF_CONNECTOR_HEIGHT),
-			Vector2(local_end_x,   y_end   - Setting.HALF_CONNECTOR_HEIGHT),
-			Vector2(local_end_x,   y_end   + Setting.HALF_CONNECTOR_HEIGHT),
-			Vector2(local_start_x, y_start + Setting.HALF_CONNECTOR_HEIGHT),
+			Vector2(local_start_x, y_start - half_height),
+			Vector2(local_end_x,   y_end   - half_height),
+			Vector2(local_end_x,   y_end   + half_height),
+			Vector2(local_start_x, y_start + half_height),
 		])
 		processed_polygon.color = Setting.PROCESSED_COLORS[data.color]
 		processed_polygon.visible = true

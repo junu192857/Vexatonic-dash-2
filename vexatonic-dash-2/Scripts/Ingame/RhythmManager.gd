@@ -274,17 +274,23 @@ func place_same_time_lines(same_time_notes: Array) -> void:
 
 # 단노트, 롱노트 시작점 밑 끝점 생성
 func place_note(data:NoteData, pos_x: float, p_is_marker:bool, parent: Node2D) -> Note:
+	
+	#노트 데이터 설정
 	var note = (LONG_NOTE_SCENE if not p_is_marker and data.type == 1 else NOTE_SCENE).instantiate()
 	note.set_data(data)
 	note.is_marker = p_is_marker
 	var lane = Lane.find_lane(levelData.lanes, data.lane)
 	parent.add_child(note)
+	
+	#노트 비주얼 설정(색깔 및 크기)
 	note.select_color()
+	note.sprite.scale.y = Setting.note_width_scale()
 	if !p_is_marker:
 		var height = lane.get_height(data.time)
 		note.global_position = Vector2(pos_x, Setting.mirror_y(height))
 		if data.adjusted == 1:
 			note.set_line()
+			note.set_line_scale()
 		lane.adjust_keyframe(data.time, height)
 	else:
 		var height = lane.get_height(data.end_time)

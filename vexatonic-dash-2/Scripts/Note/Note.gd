@@ -81,6 +81,15 @@ func set_line():
 	line.modulate = Color(0.812, 0.225, 0.0, 1.0)
 	line.width = 6.0
 	line.visible = true
+	
+func set_line_scale():
+	line.points = PackedVector2Array([
+		Vector2(-14.0, 30.0 * Setting.note_width_scale()),
+		Vector2(12.0, 30.0 * Setting.note_width_scale()),
+		Vector2(12.0, -30.0 * Setting.note_width_scale()),
+		Vector2(-12.0, -30.0 * Setting.note_width_scale()),
+		Vector2(-12.0, 30.0 * Setting.note_width_scale())
+	])
 
 func start_hold(_is_left: bool, _time: float, _start_adjust: bool) -> void: pass
 func release_hold(_is_left: bool, _time: float) -> void: pass
