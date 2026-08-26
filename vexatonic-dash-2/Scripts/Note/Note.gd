@@ -65,6 +65,8 @@ func spread_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: F
 	judgement_spread.emit(judgement, note, is_long_end, fastslow)
 	if judgement == Judgement.MISS:
 		note.process_missed_color()
+		if note.is_marker:
+			note.get_parent().process_connector_miss()
 	else:
 		note.process_color()
 

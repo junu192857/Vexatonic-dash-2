@@ -48,8 +48,6 @@ func _ready():
 		Vector2(0,502)
 	])
 	set_color()
-	#if (data.color != -1):
-	#	make_new_polygon()
 	
 func set_color():
 	if (data.color == -1):
@@ -63,7 +61,6 @@ func make_new_polygon():
 	add_child(processed_polygon)
 	processed_polygon.visible = false
 
-# from_time~to_time 구간을 PROCESSED_COLORS로 칠함. 자식 Connector에 재귀 적용.
 func paint_range(from_time: float, to_time: float) -> void:
 	if (data.color == -1):
 		return
@@ -86,7 +83,3 @@ func paint_range(from_time: float, to_time: float) -> void:
 		])
 		processed_polygon.color = Setting.PROCESSED_COLORS[data.color]
 		processed_polygon.visible = true
-
-	#for child in get_children():
-	#	if child is Connector:
-	#		child.paint_range(from_time, to_time)
