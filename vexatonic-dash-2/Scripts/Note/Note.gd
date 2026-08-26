@@ -51,7 +51,6 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 		Fastslow.FAST if deltaTime < 0.0 else
 		Fastslow.SLOW
 	)
-	process_color()
 	is_hit = true
 	spread_judgement(judgement, self, false, fs)
 	return judgement
@@ -59,8 +58,15 @@ func process_input(p_color: int, pressed_ms: float) -> int:
 func process_color(): 
 	sprite.modulate = Setting.PROCESSED_COLORS[get_data().color]
 
+func process_missed_color():
+	sprite.modulate = Setting.MISSED_COLORS[get_data().color]
+
 func spread_judgement(judgement: int, note: Note, is_long_end: bool, fastslow: Fastslow = Fastslow.NOTHING):
 	judgement_spread.emit(judgement, note, is_long_end, fastslow)
+	if judgement == Judgement.MISS:
+		note.process_missed_color()
+	else:
+		note.process_color()
 
 func get_data() -> NoteData:
 	if is_marker:

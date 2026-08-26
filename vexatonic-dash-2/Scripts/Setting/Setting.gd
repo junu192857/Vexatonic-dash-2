@@ -5,6 +5,7 @@ class_name Setting
 const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0), Color(1.0, 1.0, 0.4), Color(0.4, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0), Color(0.0, 0.0, 0.7), Color(0.8, 0.7, 0.0), Color(0.0, 0.6, 0.0)]
 const SELECTED_COLORS = [Color(1,0,1), Color(0,1,1), Color(1,1,0.7), Color(0,1,0.5)]
+const MISSED_COLORS: Array[Color] = [Color(0.431, 0.309, 0.245, 1.0), Color(0.217, 0.216, 0.308, 1.0), Color(0.402, 0.394, 0.258, 1.0), Color(0.376, 0.391, 0.272, 1.0)]
 
 static var PX_PER_MS = 0.5
 #단노트의 좌우 길이
