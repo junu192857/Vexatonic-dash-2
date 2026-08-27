@@ -49,6 +49,8 @@ func _ready() -> void:
 	InputManager.pressed_f10.connect(_on_enter_setting)
 	InputManager.pressed_esc.connect(_on_return_to_main)
 
+	Setting.is_tutorial = false
+
 	settingRect = settingRectScene.instantiate()
 	$CanvasLayer/Control.add_child(settingRect)
 	settingRect.visible = false

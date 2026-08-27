@@ -395,7 +395,7 @@ func _on_released(p_color:int, is_left: bool):
 #================================== 일시정지 =================================
 
 func _on_pressed_esc():
-	if game_finished or get_tree().paused:
+	if game_finished or get_tree().paused or Setting.is_tutorial:
 		return
 	if time < 0:
 		return

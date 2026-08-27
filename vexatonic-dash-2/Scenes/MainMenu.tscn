@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://80v8425q4jhq" path="res://Scripts/MainMenu/MainMenuManager.gd" id="1_8saeu"]
 [ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_ghw46"]
-[ext_resource type="Texture2D" uid="uid://bf77rq4tsbbjb" path="res://Textures/MainBackground.jpg" id="3_8um5k"]
+[ext_resource type="Texture2D" uid="uid://budl6ub3l3w1m" path="res://Textures/MainBackground.jpg" id="3_8um5k"]
 [ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="3_df05h"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="4_ghw46"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_xim88"]
