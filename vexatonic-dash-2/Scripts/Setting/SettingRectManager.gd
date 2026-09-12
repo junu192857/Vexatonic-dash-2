@@ -5,7 +5,7 @@ signal close_setting
 enum SettingItem {
 	Speed, SoundOffset, JudgeOffset, Gamemode, MirrorMode, TrackSkip,
 	MasterVolume, TapSound, GuideSound, GuideSoundOffset, JudgementSFX,
-	ScoreDisplay, VexatonicDisplay, SparklicDisplay, WildDisplay, ComboDisplay, Cover1, Cover2, SameTimeNoteLine,
+	ScoreDisplay, VexatonicDisplay, SparklicDisplay, WildDisplay, ComboDisplay, Cover1, Cover2, SameTimeNoteLine, NoteWidth,
 	AlwaysShowTutorialPrompt,
 }
 enum Category { Gameplay, Sound, IngameDisplay, Etc }
@@ -13,7 +13,7 @@ enum Category { Gameplay, Sound, IngameDisplay, Etc }
 const CATEGORY_ITEMS = [
 	[SettingItem.Speed, SettingItem.SoundOffset, SettingItem.JudgeOffset, SettingItem.Gamemode, SettingItem.MirrorMode, SettingItem.TrackSkip],
 	[SettingItem.MasterVolume, SettingItem.TapSound, SettingItem.GuideSound, SettingItem.GuideSoundOffset, SettingItem.JudgementSFX],
-	[SettingItem.ScoreDisplay, SettingItem.VexatonicDisplay, SettingItem.SparklicDisplay, SettingItem.WildDisplay, SettingItem.ComboDisplay, SettingItem.Cover1, SettingItem.Cover2, SettingItem.SameTimeNoteLine],
+	[SettingItem.ScoreDisplay, SettingItem.VexatonicDisplay, SettingItem.SparklicDisplay, SettingItem.WildDisplay, SettingItem.ComboDisplay, SettingItem.Cover1, SettingItem.Cover2, SettingItem.SameTimeNoteLine, SettingItem.NoteWidth],
 	[SettingItem.AlwaysShowTutorialPrompt],
 ]
 
@@ -283,6 +283,14 @@ func _build_item_specs():
 			"type": "enum", "values": [false, true], "labels": ON_OFF_LABELS,
 			"get": func(): return Setting.same_time_note_line,
 			"set": func(v): Setting.same_time_note_line = v,
+		},
+		SettingItem.NoteWidth: {
+			"name": "노트 폭",
+			"info": "노트의 폭을 설정합니다.\n주의: 너무 큰 값으로 설정할 시 일부 레벨에서 노트가 겹쳐서 보일 수 있습니다.",
+			"type": "range", "min": -5.0, "max": 20.0, "step": 1.0,
+			"get": func(): return float(Setting.note_width),
+			"set": func(v): Setting.note_width = int(v),
+			"format": func(v): return str(int(v)),
 		},
 		SettingItem.AlwaysShowTutorialPrompt: {
 			"name": "튜토리얼 항상 표시",

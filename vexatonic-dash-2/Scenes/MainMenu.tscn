@@ -4,12 +4,12 @@
 [ext_resource type="PackedScene" uid="uid://3wdau5twf7or" path="res://Prefabs/SettingRect.tscn" id="2_ghw46"]
 [ext_resource type="Texture2D" uid="uid://budl6ub3l3w1m" path="res://Textures/MainBackground.jpg" id="3_8um5k"]
 [ext_resource type="Script" uid="uid://bjuvgw7yeol53" path="res://Scripts/MainMenu/MainMenuButton.gd" id="3_df05h"]
-[ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="4_ghw46"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_xim88"]
 [ext_resource type="Texture2D" uid="uid://bmp7buy6slvnu" path="res://Textures/Connector.jpg" id="6_koqhg"]
 [ext_resource type="Texture2D" uid="uid://bwm7x5kcscs40" path="res://Textures/NoteBase.jpg" id="7_koqhg"]
 [ext_resource type="Script" uid="uid://bmavuels06wvq" path="res://Scripts/MainMenu/GameEndButton.gd" id="8_loo7a"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="9_cmrfp"]
+[ext_resource type="Texture2D" uid="uid://bjpp8w58w3pri" path="res://Textures/RandomConversation_image.png" id="9_rrcx7"]
 [ext_resource type="Script" uid="uid://cy352h4c1btsb" path="res://Scripts/MainMenu/ConversationButton.gd" id="10_rrcx7"]
 [ext_resource type="PackedScene" uid="uid://1vo1hag1b3l8" path="res://Scenes/StoryHolder.tscn" id="11_if7li"]
 
@@ -269,27 +269,29 @@ vertical_alignment = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.044000003
-anchor_top = 0.95600003
-anchor_right = 0.16100001
+anchor_top = 0.83100003
+anchor_right = 0.13900001
 anchor_bottom = 1.0020001
 offset_left = 0.51999664
-offset_top = 0.52001953
-offset_right = 0.87997437
+offset_top = 0.5199585
+offset_right = -0.8800354
 offset_bottom = -0.16015625
 pivot_offset_ratio = Vector2(0.5, 1)
-texture = ExtResource("4_ghw46")
+texture = ExtResource("9_rrcx7")
 expand_mode = 1
 script = ExtResource("10_rrcx7")
 
 [node name="Label" type="Label" parent="CanvasLayer/Control/MainMenuButtons/ConversationButton" unique_id=1558157731]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
+anchor_top = 0.80200005
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 0.04598999
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("9_cmrfp")
-theme_override_font_sizes/font_size = 23
+theme_override_font_sizes/font_size = 19
 text = "사야네와 랜덤대화 [A]"
 horizontal_alignment = 1
 vertical_alignment = 1

@@ -77,7 +77,6 @@ func _judge_long_end(note: Note):
 		note.spread_judgement(Note.Judgement.MISS, note, false)
 	if note.is_holding_anyway():
 		note.finalize_hold_time(note.get_data().end_time)
-		note.get_marker().process_color()
 		note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker(), true)
 		note.update_last_hold_visual()
 	else:
@@ -127,7 +126,6 @@ func process_release(time: float, is_left: bool):
 				note.end_judged = true
 				note.release_hold(is_left, time)
 				note.finalize_hold_time(note.get_data().end_time)
-				note.get_marker().process_color()
 				note.spread_judgement(Note.Judgement.VEXATONIC, note.get_marker(), true)
 				note.update_last_hold_visual()
 			else:

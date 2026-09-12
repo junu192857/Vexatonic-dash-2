@@ -5,6 +5,7 @@ class_name Setting
 const UNPROCESSED_COLORS: Array[Color] = [Color(1, 0.4, 0.4), Color(0.4, 0.4, 1.0), Color(1.0, 1.0, 0.4), Color(0.4, 1.0, 0.4)]
 const PROCESSED_COLORS: Array[Color] = [Color(0.8,0,0), Color(0.0, 0.0, 0.7), Color(0.8, 0.7, 0.0), Color(0.0, 0.6, 0.0)]
 const SELECTED_COLORS = [Color(1,0,1), Color(0,1,1), Color(1,1,0.7), Color(0,1,0.5)]
+const MISSED_COLORS: Array[Color] = [Color(0.431, 0.309, 0.245, 1.0), Color(0.217, 0.216, 0.308, 1.0), Color(0.402, 0.394, 0.258, 1.0), Color(0.376, 0.391, 0.272, 1.0)]
 
 static var PX_PER_MS = 0.5
 #단노트의 좌우 길이
@@ -63,6 +64,7 @@ static var combo_display: bool = true
 static var cover1: int = 0
 static var cover2: int = 0
 static var same_time_note_line: bool = false
+static var note_width: int = 1
 
 # ==================== 싱글톤 목적 변수 =====================
 
@@ -99,6 +101,7 @@ static func save() -> void:
 	cfg.set_value(SECTION, "cover2", cover2)
 	cfg.set_value(SECTION, "same_time_note_line", same_time_note_line)
 	cfg.set_value(SECTION, "always_show_tutorial_prompt", always_show_tutorial_prompt)
+	cfg.set_value(SECTION, "note_width", note_width)
 	cfg.save(SETTINGS_PATH)
 
 static func load() -> void:
@@ -127,6 +130,7 @@ static func load() -> void:
 	cover2 = cfg.get_value(SECTION, "cover2", 0)
 	same_time_note_line = cfg.get_value(SECTION, "same_time_note_line", false)
 	always_show_tutorial_prompt = cfg.get_value(SECTION, "always_show_tutorial_prompt", false)
+	note_width = cfg.get_value(SECTION, "note_width", 1)
 
 static func change_difficulty():
 	selected_difficulty = (selected_difficulty + 1) % 3
@@ -134,3 +138,7 @@ static func change_difficulty():
 # mirror_mode가 켜져 있으면 y좌표(또는 y 방향 변화량)를 반전. 렌더링 전용 - 채보 데이터 자체는 건드리지 않음
 static func mirror_y(y: float) -> float:
 	return -y if mirror_mode else y
+
+# note_width 설정값에 따른 Note/Connector의 y scale
+static func note_width_scale() -> float:
+	return 0.9 + note_width * 0.1

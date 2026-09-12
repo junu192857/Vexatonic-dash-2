@@ -97,4 +97,9 @@ func find_child_connector():
 		if child is Connector:
 			child_connector = child
 	return child_connector
-	
+
+func process_connector_miss():
+	var connector = target_visual_connector
+	while (target_visual_connector != null):
+		target_visual_connector.polygon.modulate = Setting.MISSED_COLORS[get_data().color]
+		target_visual_connector = find_child_connector()

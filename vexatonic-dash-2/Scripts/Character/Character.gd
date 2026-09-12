@@ -57,11 +57,11 @@ func set_character_position(time: float) -> bool:
 					pending_jump_notes.pop_front()
 				elif time >= next.get_data().time and not next.is_hit:
 					# note.time 통과, 미처리 → Falling 시작
-					fall_start_y = Setting.mirror_y(lane.get_height(next.get_data().time)) + Setting.CHARACTER_POS_Y
+					fall_start_y = Setting.mirror_y(lane.get_height(next.get_data().time)) + Setting.HALF_CONNECTOR_HEIGHT * Setting.note_width_scale() * -0.75
 					jumping_note = next
 					pending_jump_notes.pop_front()
 					jump_state = JumpState.Falling
-			global_position.y = Setting.mirror_y(lane.get_height(time)) + Setting.CHARACTER_POS_Y
+			global_position.y = Setting.mirror_y(lane.get_height(time)) + Setting.HALF_CONNECTOR_HEIGHT * Setting.note_width_scale() * -0.75
 
 		JumpState.Falling:
 			if time >= jumping_note.get_data().end_time:
@@ -69,7 +69,7 @@ func set_character_position(time: float) -> bool:
 				jump_aborted_note = jumping_note
 				jumping_note = null
 				jump_state = JumpState.None
-				global_position.y = Setting.mirror_y(lane.get_height(time)) + Setting.CHARACTER_POS_Y
+				global_position.y = Setting.mirror_y(lane.get_height(time)) + Setting.HALF_CONNECTOR_HEIGHT * Setting.note_width_scale() * -0.75
 			else:
 				var fall_t = (time - jumping_note.get_data().time) / 1000.0  # ms → s
 				global_position.y = fall_start_y + 0.5 * GRAVITY * fall_t * fall_t
