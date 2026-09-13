@@ -17,8 +17,17 @@ var time: float
 var need_refresh_tutorial: bool = true
 var started_tutorial: bool = false
 var music_started = false
+var music_play_requested = false
 var game_finished = false
-var time_start_tick: float
+var time_start_tick_usec: int
+
+# 오디오 믹스 사이를 보간하고, 실제 출력 지연을 제외한 음악 시각을 계산하기 위한 상태
+var audio_output_latency_sec: float = 0.0
+var music_clock_switch_usec: int = 0
+var last_audio_time_ms: float = -1.0e20
+
+# 인게임에서만 누적 입력을 비활성화하고, 씬을 떠날 때 이전 값을 복원
+var previous_use_accumulated_input: bool
 #어느 레인까지 캐릭터가 생성되었는지 체크하는 용도
 var lane_index: int
 
@@ -33,13 +42,18 @@ var paused_time: float = 0.0
 # 이 동안엔 음악이 -80db로 음소거된 채로 미리 재생되고 있음 (그대로 musicPlayer 재생 위치가 time 계산에 쓰임)
 var is_resuming_animation: bool = false
 var pre_pause_volume_db: float = 0.0
-# music_started == false일 때 time = Time.get_ticks_msec() - time_start_tick + time_offset 로 계산.
+# music_started == false일 때 time은 마이크로초 단위 시스템 시계와 time_offset으로 계산.
 # 평소엔 -COUNTDOWN_TIME(곡 시작 전 카운트다운), 되감기 목표 시점이 0보다 작으면 (paused_time - 2000)로 바뀜
 var time_offset: float = -COUNTDOWN_TIME
 
 var loaded: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	previous_use_accumulated_input = Input.use_accumulated_input
+	Input.use_accumulated_input = false
+	# get_output_latency()는 매 프레임 호출 비용이 있으므로 인게임 시작 시 한 번만 캐시
+	audio_output_latency_sec = AudioServer.get_output_latency()
+
 	#입력 연결
 	InputManager.pressed_a.connect(func(): _on_pressed(0, true))
 	InputManager.released_a.connect(func(): _on_released(0, true))
@@ -115,11 +129,68 @@ func _ready() -> void:
 			lane_index += 1
 	
 	
-	time_start_tick = Time.get_ticks_msec()
+	time_start_tick_usec = Time.get_ticks_usec()
 	
 	await get_tree().create_timer(0.34).timeout
 	
 	TransitionOverlay.open()
+
+
+func _exit_tree() -> void:
+	Input.use_accumulated_input = previous_use_accumulated_input
+
+
+# 음악 시작 전에는 시스템 시계, 시작 후에는 오디오 하드웨어 시계를 사용한다.
+# 입력 콜백에서도 이 함수를 직접 호출해 마지막 physics frame의 캐시된 time을 사용하지 않는다.
+func get_chart_time_ms() -> float:
+	if not music_started:
+		return _get_countdown_time_ms(Time.get_ticks_usec())
+	return _get_audio_time_ms()
+
+
+func _get_countdown_time_ms(now_usec: int) -> float:
+	return (now_usec - time_start_tick_usec) / 1000.0 + time_offset
+
+
+func _get_audio_time_ms() -> float:
+	var audio_time_ms = (
+		musicPlayer.get_playback_position()
+		+ AudioServer.get_time_since_last_mix()
+		- audio_output_latency_sec
+	) * 1000.0 + Setting.sound_offset
+
+	# 오디오 스레드 측정값이 순간적으로 뒤로 움직이는 경우 이전 시각을 유지
+	audio_time_ms = max(audio_time_ms, last_audio_time_ms)
+	last_audio_time_ms = audio_time_ms
+	return audio_time_ms
+
+
+func _update_game_time() -> void:
+	var now_usec = Time.get_ticks_usec()
+
+	if not music_started:
+		if Setting.is_tutorial and (now_usec - time_start_tick_usec) / 1000.0 > 1000.0 and need_refresh_tutorial:
+			time_start_tick_usec = now_usec
+			need_refresh_tutorial = false
+
+		time = _get_countdown_time_ms(now_usec)
+
+		# play() 호출과 실제 출력 사이의 지연만큼 먼저 재생을 요청한다.
+		# music_started 전환 시점까지는 시스템 시계를 유지해 두 시계의 경계를 연속적으로 만든다.
+		if not music_play_requested:
+			var start_delay_sec = AudioServer.get_time_to_next_mix() + audio_output_latency_sec
+			if time >= Setting.sound_offset - start_delay_sec * 1000.0:
+				musicPlayer.play()
+				music_play_requested = true
+				music_clock_switch_usec = now_usec + roundi(start_delay_sec * 1000000.0)
+
+		if music_play_requested and now_usec >= music_clock_switch_usec:
+			music_started = true
+			last_audio_time_ms = time
+			time = _get_audio_time_ms()
+	else:
+		time = _get_audio_time_ms()
+
 
 func place_character(lane: Lane):
 	if (Setting.gamemode != Setting.GAMEMODE.Normal_Character):
@@ -131,21 +202,12 @@ func place_character(lane: Lane):
 	character_holder.add_child(character)
 
 	
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if (not game_finished):
-		if (not music_started):
-			if (Setting.is_tutorial and Time.get_ticks_msec() - time_start_tick > 1000.0 and need_refresh_tutorial):
-				time_start_tick = Time.get_ticks_msec()
-				need_refresh_tutorial = false
-			time = Time.get_ticks_msec() - time_start_tick + time_offset
-			if time >= Setting.sound_offset:
-				musicPlayer.play()
-				music_started = true
-		else:
-			time = musicPlayer.get_playback_position() * 1000 + Setting.sound_offset
-			if is_resuming_animation and time >= paused_time:
-				musicPlayer.volume_db = pre_pause_volume_db
-				is_resuming_animation = false
+		_update_game_time()
+		if is_resuming_animation and time >= paused_time:
+			musicPlayer.volume_db = pre_pause_volume_db
+			is_resuming_animation = false
 		
 		if (lane_index < levelData.lanes.size() and levelData.lanes[lane_index].get_start_time() < time):
 			place_character(levelData.lanes[lane_index])
@@ -386,23 +448,24 @@ func game_over():
 
 func _on_pressed(p_color:int, is_left: bool):
 	if not game_finished:
-		noteHolders[p_color].process_input(time, is_left)
+		noteHolders[p_color].process_input(get_chart_time_ms(), is_left)
 
 func _on_released(p_color:int, is_left: bool):
 	if not game_finished:
-		noteHolders[p_color].process_release(time, is_left)
+		noteHolders[p_color].process_release(get_chart_time_ms(), is_left)
 
 #================================== 일시정지 =================================
 
 func _on_pressed_esc():
 	if game_finished or get_tree().paused or Setting.is_tutorial:
 		return
-	if time < 0:
+	var pause_time = get_chart_time_ms()
+	if pause_time < 0:
 		return
-	_pause_game()
+	_pause_game(pause_time)
 
-func _pause_game():
-	paused_time = time
+func _pause_game(at_time: float):
+	paused_time = at_time
 	$IngameDataManager.record_disabled = true
 	for holder in noteHolders:
 		holder.force_pause(paused_time)
@@ -434,14 +497,20 @@ func _start_resume_catchup(resume_target: float) -> void:
 	cameraManager.reset_trigger_state()
 	musicPlayer.volume_db = -80.0
 	if resume_target < Setting.sound_offset:
-		# 되감기 목표가 곡 시작 전(0 미만)이면 음악을 그 위치로 시크할 수 없으므로,
-		# 곡 시작 전 카운트다운과 동일한 tick 기반 계산으로 되돌아가서 처리
+		# 되감기 목표가 곡 시작 전이면 카운트다운 시계로 돌아간 뒤,
+		# 출력 지연을 고려해 음악 재생을 다시 예약한다.
 		music_started = false
-		time_start_tick = Time.get_ticks_msec()
+		music_play_requested = false
+		time_start_tick_usec = Time.get_ticks_usec()
 		time_offset = resume_target
+		last_audio_time_ms = -1.0e20
 	else:
 		var seek_pos = (resume_target - Setting.sound_offset) / 1000.0
 		musicPlayer.play(seek_pos)
+		music_started = true
+		music_play_requested = false
+		# seek 직후 오디오 시계가 출력 지연만큼 과거를 가리켜도 화면이 뒤로 튀지 않게 고정
+		last_audio_time_ms = resume_target
 	get_tree().paused = false
 
 func _on_pause_restart_pressed():
