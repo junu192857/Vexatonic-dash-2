@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://1vo1hag1b3l8"]
 
 [ext_resource type="Script" uid="uid://dopaax52q8kev" path="res://Scripts/Story/StoryManager.gd" id="1_paxo6"]
-[ext_resource type="Texture2D" uid="uid://b3r6by2y1fado" path="res://Textures/Sayane_Live2D.png" id="1_pcs6n"]
+[ext_resource type="Texture2D" uid="uid://brf8qx7y07kfv" path="res://Textures/Sayane_Live2D.png" id="1_pcs6n"]
 [ext_resource type="Texture2D" uid="uid://vcnx40lramt1" path="res://Textures/ScriptHolder.png" id="3_aew0f"]
 [ext_resource type="FontFile" uid="uid://c7qu5i8snmmjj" path="res://Fonts/Paperlogy-1.001/Paperlogy-5Medium.ttf" id="4_aew0f"]
 [ext_resource type="FontFile" uid="uid://dast1kgc1410a" path="res://Fonts/Paperlogy-1.001/Paperlogy-7Bold.ttf" id="4_ufue0"]
@@ -36,11 +36,12 @@ grow_vertical = 2
 
 [node name="Live2D" type="TextureRect" parent="StoryHolder" unique_id=1668585676]
 layout_mode = 0
-offset_left = 765.0
-offset_top = 162.0
-offset_right = 1152.0
-offset_bottom = 807.0
+offset_left = 664.0
+offset_top = 142.0
+offset_right = 1161.0
+offset_bottom = 735.0
 texture = ExtResource("1_pcs6n")
+expand_mode = 1
 
 [node name="ScriptHolder" type="TextureRect" parent="StoryHolder" unique_id=562684793]
 layout_mode = 1
