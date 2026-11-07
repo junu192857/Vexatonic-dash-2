@@ -1,6 +1,7 @@
 extends Node
 
 @export var JUDGEMENT_TEXT: PackedScene
+@export var HIT_EFFECT: PackedScene
 @export var score_text: Label
 @export var canvasLayer: CanvasLayer
 @export var lampTextHolder: Control
@@ -85,10 +86,20 @@ func _on_status_update(status: GameStatus) -> void:
 			rounded = roundi(status.possible_score)
 	score_text.text = "SCORE %07d" % rounded
 	
+	var note_position := get_note_position(status.note)
+
+	# 성공 판정에만 타격 이펙트를 표시한다. 판정/점수 계산과 분리된 순수한 시각 효과다.
+	if status.judgement != Note.Judgement.MISS and HIT_EFFECT != null:
+		var hit_effect := HIT_EFFECT.instantiate()
+		canvasLayer.add_child(hit_effect)
+		hit_effect.global_position = note_position
+		var note_color: Color = Setting.UNPROCESSED_COLORS[status.note.get_data().color]
+		hit_effect.play(note_color, _get_hit_effect_strength(status.judgement))
+
 	# 판정 텍스트 표시
 	var judgement_text = JUDGEMENT_TEXT.instantiate()
 	canvasLayer.add_child(judgement_text)
-	judgement_text.global_position = get_note_position(status.note)
+	judgement_text.global_position = note_position
 	judgement_text.show_text(status.judgement, status.combo, status.fastslow, status.combo_cut)
 	
 	var tween = judgement_text.create_tween()
@@ -99,6 +110,18 @@ func _on_status_update(status: GameStatus) -> void:
 	# 강제종료 기준 스코어 표시 (랭크/최고기록 기준일 때만)
 	if status.track_skip_margin_applicable:
 		forcedStopScoreInfo.text = "앞으로 %d" % max(0, status.track_skip_margin)
+
+func _get_hit_effect_strength(judgement: int) -> float:
+	match judgement:
+		Note.Judgement.VEXATONIC:
+			return 1.25
+		Note.Judgement.SPARKLIC:
+			return 1.0
+		Note.Judgement.WILD:
+			return 0.75
+		_:
+			return 0.0
+
 
 const RANK_NAMES = ["", "D", "C", "B", "A", "AA", "AAA", "S", "SS", "SSS", "V"]
 

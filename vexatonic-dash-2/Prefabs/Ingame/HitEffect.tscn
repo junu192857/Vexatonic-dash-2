@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Ingame/HitEffect.gd" id="1_hit_effect"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_spark"]
+offsets = PackedFloat32Array(0, 0.42, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.9, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_spark"]
+gradient = SubResource("Gradient_spark")
+width = 16
+height = 16
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_lifetime"]
+offsets = PackedFloat32Array(0, 0.65, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.8, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lifetime"]
+gradient = SubResource("Gradient_lifetime")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sparks"]
+direction = Vector3(1, 0, 0)
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 180.0
+initial_velocity_max = 300.0
+damping_min = 500.0
+damping_max = 700.0
+scale_min = 0.35
+scale_max = 0.75
+color_ramp = SubResource("GradientTexture1D_lifetime")
+
+[node name="HitEffect" type="Node2D"]
+material = SubResource("CanvasItemMaterial_add")
+script = ExtResource("1_hit_effect")
+
+[node name="Sparks" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 14
+lifetime = 0.32
+one_shot = true
+explosiveness = 1.0
+local_coords = false
+visibility_rect = Rect2(-360, -360, 720, 720)
+process_material = SubResource("ParticleProcessMaterial_sparks")
+texture = SubResource("GradientTexture2D_spark")

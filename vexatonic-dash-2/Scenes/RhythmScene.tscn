@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://shwpvgrbox8d" path="res://Scripts/Ingame/IngameDataManager.gd" id="7_wjq5j"]
 [ext_resource type="Script" uid="uid://breghgt5p5ixy" path="res://Scripts/Ingame/IngameUIManager.gd" id="8_pee8w"]
 [ext_resource type="PackedScene" uid="uid://pfmgxw12a4yj" path="res://Prefabs/Ingame/JudgementText.tscn" id="9_qa11p"]
+[ext_resource type="PackedScene" path="res://Prefabs/Ingame/HitEffect.tscn" id="10_hitfx"]
 [ext_resource type="Texture2D" uid="uid://cwewgb07d6uwe" path="res://Textures/IngameBackgroundMirrored.jpg" id="12_63m28"]
 [ext_resource type="Texture2D" uid="uid://bg77qwagtnkvs" path="res://Textures/BlackSquare.jpg" id="12_ublex"]
 [ext_resource type="Texture2D" uid="uid://bs17oeapa4q3o" path="res://Textures/IngameBackground.jpg" id="13_g5yvx"]
@@ -46,6 +47,7 @@ script = ExtResource("7_wjq5j")
 [node name="IngameUIManager" type="Node" parent="RhythmManager" unique_id=971919523 node_paths=PackedStringArray("score_text", "canvasLayer", "lampTextHolder", "resultPanelHolder", "rightCover", "leftCover", "centerCover", "forcedStopPanel", "forcedStopScorePanel", "ingameDataManager")]
 script = ExtResource("8_pee8w")
 JUDGEMENT_TEXT = ExtResource("9_qa11p")
+HIT_EFFECT = ExtResource("10_hitfx")
 score_text = NodePath("../../CanvasLayer/Control/ScorePanel/ScoreText")
 canvasLayer = NodePath("../../CanvasLayer")
 lampTextHolder = NodePath("../../CanvasLayer/Control/LampTextHolder")
